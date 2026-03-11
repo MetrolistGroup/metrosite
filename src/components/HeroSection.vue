@@ -6,12 +6,12 @@ const screenCount = 6
 const isMobile = ref(false)
 
 const screens = [
-  { src: '/1.webp', alt: 'Screenshot 1' },
-  { src: '/2.webp', alt: 'Screenshot 2' },
-  { src: '/3.webp', alt: 'Screenshot 3' },
-  { src: '/4.webp', alt: 'Screenshot 4' },
-  { src: '/5.webp', alt: 'Screenshot 5' },
-  { src: '/6.webp', alt: 'Screenshot 6' },
+  { src: '/1.webp', srcset: '/1-sm.webp 640w, /1-md.webp 1280w, /1.webp 2560w', alt: 'Screenshot 1' },
+  { src: '/2.webp', srcset: '/2-sm.webp 640w, /2-md.webp 1280w, /2.webp 2560w', alt: 'Screenshot 2' },
+  { src: '/3.webp', srcset: '/3-sm.webp 640w, /3-md.webp 1280w, /3.webp 2560w', alt: 'Screenshot 3' },
+  { src: '/4.webp', srcset: '/4-sm.webp 640w, /4-md.webp 1280w, /4.webp 2560w', alt: 'Screenshot 4' },
+  { src: '/5.webp', srcset: '/5-sm.webp 640w, /5-md.webp 1280w, /5.webp 2560w', alt: 'Screenshot 5' },
+  { src: '/6.webp', srcset: '/6-sm.webp 640w, /6-md.webp 1280w, /6.webp 2560w', alt: 'Screenshot 6' },
 ]
 
 // Desktop auto-rotate carousel (lifecycle-safe: no hooks inside functions)
@@ -232,9 +232,9 @@ onBeforeUnmount(() => {
       <div class="hero__visual" aria-hidden="true">
         <div class="hero__mockup-wrap" :class="{ 'hero__mockup-wrap--mobile': isMobile }">
           <div class="hero__phone-carousel" :class="{ 'hero__phone-carousel--mobile': isMobile }">
-            <img v-for="(screen, index) in screens" :key="index" :src="screen.src" :alt="screen.alt"
-              :loading="index === 0 ? 'eager' : 'lazy'" :fetchpriority="index === 0 ? 'high' : 'auto'"
-              decoding="async"
+            <img v-for="(screen, index) in screens" :key="index" :src="screen.src" :srcset="screen.srcset"
+              sizes="(max-width: 640px) 280px, (max-width: 1280px) 280px, 280px" :alt="screen.alt"
+              :loading="index === 0 ? 'eager' : 'lazy'" :fetchpriority="index === 0 ? 'high' : 'auto'" decoding="async"
               class="hero__phone-screen"
               :class="{ 'hero__phone-screen--active': index === currentScreenIndex && !isMobile }" width="280"
               height="560" />
