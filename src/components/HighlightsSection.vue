@@ -10,25 +10,25 @@ const features: Feature[] = [
   {
     icon: 'block',
     title: 'No ads. Ever.',
-    body: 'Stream without interruption — no video ads, no audio ads, no mid-roll breaks. Just the music.',
+    body: 'Stream without interruption. No video ads, no audio ads, no mid-roll breaks. Just the music.',
     variant: 'primary',
   },
   {
     icon: 'headphones',
     title: 'Play it, pocket it.',
-    body: "Keeps playing when you lock your screen or switch apps. Background playback with no paywall.",
+    body: "Keeps playing when you lock your screen or switch apps. Background playback without paywalls.",
     variant: 'secondary',
   },
   {
-    icon: 'palette',
-    title: 'Looks like yours.',
-    body: 'Dynamic colors pulled from your wallpaper via Material You. Feels native on every Android.',
+    icon: 'groups',
+    title: 'Listen together.',
+    body: 'Sync playback with anyone on Metrolist - any network, any country. High performance, minimal latency, open source. Like Spotify Jam, but yours.',
     variant: 'tertiary',
   },
   {
     icon: 'cloud_download',
     title: 'No signal, no problem.',
-    body: 'Cache songs and playlists for offline listening. Your library travels with you.',
+    body: 'Cache songs and playlists for offline listening. Your library travels with you wherever you go.',
     variant: 'primary',
   },
 ]
@@ -40,15 +40,11 @@ const features: Feature[] = [
 
       <header class="highlights__header">
         <h2 class="highlights__title">Built differently.</h2>
-        <p class="highlights__sub">Everything you'd want. Nothing you wouldn't.</p>
+        <p class="highlights__sub">Everything you would want. Nothing you wouldn't.</p>
       </header>
 
       <div class="highlights__grid">
-        <article
-          v-for="f in features"
-          :key="f.title"
-          :class="['feature-card', `feature-card--${f.variant}`]"
-        >
+        <article v-for="f in features" :key="f.title" :class="['feature-card', `feature-card--${f.variant}`]">
           <div class="feature-card__icon-wrap">
             <span class="icon" aria-hidden="true">{{ f.icon }}</span>
           </div>
@@ -79,6 +75,7 @@ const features: Feature[] = [
   letter-spacing: -0.025em;
   color: var(--md-on-background);
   margin-bottom: 10px;
+  min-height: 1.2em;
 }
 
 .highlights__sub {
@@ -86,14 +83,14 @@ const features: Feature[] = [
   color: var(--md-on-surface-variant);
 }
 
-/* 2 × 2 grid — 4 cards */
+/* 2 × 2 grid - 4 cards */
 .highlights__grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
 
-/* ── Card base ── */
+/* -- Card base -- */
 .feature-card {
   border-radius: var(--r-xl);
   padding: 36px 32px;
@@ -107,7 +104,7 @@ const features: Feature[] = [
   box-shadow: var(--el-3);
 }
 
-/* ── Tonal colour variants ── */
+/* -- Tonal colour variants -- */
 .feature-card--primary {
   background: var(--md-primary-container);
   color: var(--md-on-primary-container);
@@ -123,7 +120,7 @@ const features: Feature[] = [
   color: var(--md-on-tertiary-container);
 }
 
-/* ── Icon pill ── */
+/* -- Icon pill -- */
 .feature-card__icon-wrap {
   width: 56px;
   height: 56px;
@@ -140,7 +137,7 @@ const features: Feature[] = [
   font-size: 1.75rem;
 }
 
-/* ── Text ── */
+/* -- Text -- */
 .feature-card__title {
   font-family: 'Nunito', sans-serif;
   font-weight: 900;
@@ -154,7 +151,7 @@ const features: Feature[] = [
   opacity: 0.82;
 }
 
-/* ── Responsive ── */
+/* -- Responsive -- */
 @media (max-width: 640px) {
   .highlights__grid {
     grid-template-columns: 1fr;

@@ -5,7 +5,7 @@
       <!-- Brand blurb -->
       <div class="footer__brand">
         <a href="/" class="footer__logo-link" aria-label="Metrolist home">
-          <img src="/logo.png" alt="" width="28" height="28" loading="lazy" />
+          <img src="/logo.svg" alt="" width="28" height="28" loading="lazy" />
           <span class="footer__wordmark">Metrolist</span>
         </a>
         <p class="footer__tagline">
@@ -15,14 +15,8 @@
 
       <!-- External links -->
       <nav class="footer__links" aria-label="Footer links">
-        <a
-          v-for="link in links"
-          :key="link.label"
-          :href="link.href"
-          class="footer__link"
-          target="_blank"
-          rel="noopener noreferrer"
-        >{{ link.label }}</a>
+        <a v-for="link in links" :key="link.label" :href="link.href" class="footer__link" target="_blank"
+          rel="noopener noreferrer">{{ link.label }}</a>
       </nav>
 
     </div>
@@ -39,7 +33,8 @@
         "YouTube" and "YouTube Music" are registered trademarks of Google LLC.
       </p>
       <p class="footer__credits">
-        Metrolist made by <a href="https://github.com/mostafaalagamy" target="_blank" rel="noopener noreferrer">Mo Agamy</a>, Site made by <a href="https://nyx.meowery.eu" target="_blank" rel="noopener noreferrer">Nyx</a>
+        Metrolist made by <a href="https://github.com/mostafaalagamy" target="_blank" rel="noopener noreferrer">Mo
+          Agamy</a>, Site made by <a href="https://nyx.meowery.eu" target="_blank" rel="noopener noreferrer">Nyx</a>
       </p>
     </div>
   </footer>
@@ -47,10 +42,10 @@
 
 <script setup lang="ts">
 const links = [
-  { label: 'GitHub',   href: 'https://github.com/MetrolistGroup/Metrolist' },
+  { label: 'GitHub', href: 'https://github.com/MetrolistGroup/Metrolist' },
   { label: 'Releases', href: 'https://github.com/MetrolistGroup/Metrolist/releases' },
-  { label: 'Issues',   href: 'https://github.com/MetrolistGroup/Metrolist/issues' },
-  { label: 'Weblate',  href: 'https://hosted.weblate.org/projects/Metrolist/' },
+  { label: 'Issues', href: 'https://github.com/MetrolistGroup/Metrolist/issues' },
+  { label: 'Weblate', href: 'https://hosted.weblate.org/projects/Metrolist/' },
 ]
 </script>
 
@@ -80,6 +75,9 @@ const links = [
 }
 
 .footer__logo-link img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
   border-radius: var(--r-xs);
 }
 

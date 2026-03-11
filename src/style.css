@@ -1,33 +1,31 @@
 /* ======================================================
-   Metrolist — Material 3 Expressive Design System
+   Metrolist - Material 3 Expressive Design System
    Seed colour: #6C4BCC  (Vivid Violet)
    Generated with the M3 Theme Builder tonal palette tool
-   ====================================================== */
-
-@import url('https://fonts.googleapis.com/css2?family=Climate+Crisis&display=swap');
+====================================================== */
 
 :root {
   color-scheme: dark;
-  
-  /* ── Primary ── */
+
+  /* -- Primary -- */
   --md-primary: #D0BCFF;
   --md-on-primary: #371E55;
   --md-primary-container: #4F2C6F;
   --md-on-primary-container: #EEDCFF;
 
-  /* ── Secondary ── */
+  /* -- Secondary -- */
   --md-secondary: #CCC7E0;
   --md-on-secondary: #302E47;
   --md-secondary-container: #49435E;
   --md-on-secondary-container: #E8DEFF;
 
-  /* ── Tertiary (warm rose — music energy) ── */
+  /* -- Tertiary (warm rose - music energy) -- */
   --md-tertiary: #FFB3D9;
   --md-on-tertiary: #5E0A35;
   --md-tertiary-container: #85184E;
   --md-on-tertiary-container: #FFD9E5;
 
-  /* ── Surfaces ── */
+  /* -- Surfaces -- */
   --md-background: #1C1B1F;
   --md-on-background: #E7E0EC;
   --md-surface: #1C1B1F;
@@ -37,35 +35,58 @@
   --md-outline: #938F99;
   --md-outline-variant: #49454F;
 
-  /* ── Surface containers (low → high = brighter → darker) ── */
+  /* -- Surface containers (low → high = brighter → darker) -- */
   --md-sc-lowest: #0F0E12;
   --md-sc-low: #2B2930;
   --md-sc: #362F38;
   --md-sc-high: #413A41;
   --md-sc-highest: #4B464B;
 
-  /* ── Shapes — M3 Expressive favours generous rounding ── */
+  /* -- Shapes - M3 Expressive favours generous rounding -- */
   --r-xs: 4px;
   --r-sm: 8px;
   --r-md: 12px;
   --r-lg: 16px;
-  --r-xl: 28px;   /* "Extra Large" — default card shape in M3 Exp */
+  --r-xl: 28px;
+  /* "Extra Large" - default card shape in M3 Exp */
   --r-2xl: 32px;
   --r-full: 9999px;
 
-  /* ── Elevation shadows (tinted purple for dark mode) ── */
+  /* -- Elevation shadows (tinted purple for dark mode) -- */
   --el-1: 0 1px 2px rgba(0, 0, 0, .3), 0 1px 3px 1px rgba(0, 0, 0, .15);
   --el-2: 0 1px 2px rgba(0, 0, 0, .3), 0 2px 6px 2px rgba(0, 0, 0, .15);
   --el-3: 0 4px 8px 3px rgba(0, 0, 0, .3), 0 1px 3px rgba(0, 0, 0, .15);
 
-  /* ── Motion ── */
+  /* -- Motion -- */
   --t-fast: 150ms cubic-bezier(0.2, 0, 0, 1);
-  --t-std:  250ms cubic-bezier(0.2, 0, 0, 1);
+  --t-std: 250ms cubic-bezier(0.2, 0, 0, 1);
   --t-slow: 400ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-/* ── Reset ─────────────────────────────────────────── */
-*, *::before, *::after {
+/* -- Skip link (a11y) */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 24px;
+  padding: 10px 16px;
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+  font-weight: 600;
+  border-radius: var(--r-sm);
+  z-index: 1000;
+  transition: top var(--t-fast);
+}
+
+.skip-link:focus {
+  top: 24px;
+  outline: 2px solid var(--md-on-primary);
+  outline-offset: 2px;
+}
+
+/* -- Reset */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -86,11 +107,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: 'Nunito', sans-serif;
 }
 
-/* ── Material Symbols helper ────────────────────────── */
+/* -- Material Symbols helper */
 .icon {
   font-family: 'Material Symbols Rounded';
   font-weight: normal;
@@ -104,14 +130,22 @@ h1, h2, h3, h4, h5, h6 {
   font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-/* ── Layout ─────────────────────────────────────────── */
+/* -- Layout */
 .container {
   max-width: 1100px;
   margin: 0 auto;
   padding: 0 24px;
 }
 
-/* ── M3 Buttons ─────────────────────────────────────── */
+/* Below-the-fold sections: skip rendering until near viewport (faster LCP, less CLS) */
+#highlights,
+.download,
+.footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 400px;
+}
+
+/* -- M3 Buttons */
 .btn {
   display: inline-flex;
   align-items: center;

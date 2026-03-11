@@ -12,21 +12,13 @@
         </div>
 
         <div class="download__actions">
-          <a
-            href="https://github.com/MetrolistGroup/Metrolist/releases"
-            class="btn btn-filled btn-lg"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href="https://github.com/MetrolistGroup/Metrolist/releases" class="btn btn-filled btn-lg" target="_blank"
+            rel="noopener noreferrer">
             <span class="icon" aria-hidden="true">download</span>
             Download APK
           </a>
-          <a
-            href="https://github.com/MetrolistGroup/Metrolist/releases"
-            class="download__changelog"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href="https://github.com/MetrolistGroup/Metrolist/releases" class="download__changelog" target="_blank"
+            rel="noopener noreferrer">
             Latest release on GitHub
             <span class="icon" style="font-size: 1rem" aria-hidden="true">arrow_forward</span>
           </a>

@@ -23,37 +23,25 @@ onUnmounted(() => {
 
       <!-- Logo + wordmark -->
       <a href="/" class="navbar__brand">
-        <img src="/logo.png" alt="" width="32" height="32" />
+        <img src="/logo.svg" alt="" width="32" height="32" />
         <span class="navbar__wordmark">Metrolist</span>
       </a>
 
       <!-- Desktop navigation -->
       <nav class="navbar__links" aria-label="Main navigation">
         <a href="#highlights" class="nav-link">Features</a>
-        <a
-          href="https://github.com/MetrolistGroup/Metrolist/releases"
-          class="nav-link"
-          target="_blank"
-          rel="noopener noreferrer"
-        >Download</a>
-        <a
-          href="https://github.com/MetrolistGroup/Metrolist"
-          class="btn btn-tonal btn-sm"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a href="https://github.com/MetrolistGroup/Metrolist/releases" class="nav-link" target="_blank"
+          rel="noopener noreferrer">Download</a>
+        <a href="https://github.com/MetrolistGroup/Metrolist" class="btn btn-tonal btn-sm" target="_blank"
+          rel="noopener noreferrer">
           <span class="icon" aria-hidden="true">code</span>
           GitHub
         </a>
       </nav>
 
       <!-- Mobile hamburger -->
-      <button
-        class="navbar__hamburger"
-        :aria-expanded="isMenuOpen"
-        aria-label="Toggle navigation menu"
-        @click="isMenuOpen = !isMenuOpen"
-      >
+      <button class="navbar__hamburger" :aria-expanded="isMenuOpen" aria-label="Toggle navigation menu"
+        @click="isMenuOpen = !isMenuOpen">
         <span class="icon">{{ isMenuOpen ? 'close' : 'menu' }}</span>
       </button>
     </div>
@@ -62,20 +50,10 @@ onUnmounted(() => {
     <Transition name="drawer">
       <div v-if="isMenuOpen" class="navbar__drawer" role="navigation" aria-label="Mobile navigation">
         <a href="#highlights" class="drawer-link" @click="isMenuOpen = false">Features</a>
-        <a
-          href="https://github.com/MetrolistGroup/Metrolist/releases"
-          class="drawer-link"
-          target="_blank"
-          rel="noopener noreferrer"
-          @click="isMenuOpen = false"
-        >Download</a>
-        <a
-          href="https://github.com/MetrolistGroup/Metrolist"
-          class="drawer-link"
-          target="_blank"
-          rel="noopener noreferrer"
-          @click="isMenuOpen = false"
-        >GitHub</a>
+        <a href="https://github.com/MetrolistGroup/Metrolist/releases" class="drawer-link" target="_blank"
+          rel="noopener noreferrer" @click="isMenuOpen = false">Download</a>
+        <a href="https://github.com/MetrolistGroup/Metrolist" class="drawer-link" target="_blank"
+          rel="noopener noreferrer" @click="isMenuOpen = false">GitHub</a>
       </div>
     </Transition>
   </header>
@@ -100,7 +78,9 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   height: 64px;
+  min-height: 64px;
   gap: 8px;
+  contain: layout style;
 }
 
 /* Brand */
@@ -204,7 +184,12 @@ onUnmounted(() => {
 
 /* Responsive */
 @media (max-width: 640px) {
-  .navbar__links { display: none; }
-  .navbar__hamburger { display: flex; }
+  .navbar__links {
+    display: none;
+  }
+
+  .navbar__hamburger {
+    display: flex;
+  }
 }
 </style>

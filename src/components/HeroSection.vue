@@ -3,21 +3,35 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 const currentScreenIndex = ref(0)
 const screenCount = 6
+const isMobile = ref(false)
 
 const screens = [
-  { src: '/s1.png', alt: 'Screenshot 1' },
-  { src: '/s2.png', alt: 'Screenshot 2' },
-  { src: '/s3.png', alt: 'Screenshot 3' },
-  { src: '/s4.png', alt: 'Screenshot 4' },
-  { src: '/s5.png', alt: 'Screenshot 5' },
-  { src: '/s6.png', alt: 'Screenshot 6' },
+  { src: '/1.webp', alt: 'Screenshot 1' },
+  { src: '/2.webp', alt: 'Screenshot 2' },
+  { src: '/3.webp', alt: 'Screenshot 3' },
+  { src: '/4.webp', alt: 'Screenshot 4' },
+  { src: '/5.webp', alt: 'Screenshot 5' },
+  { src: '/6.webp', alt: 'Screenshot 6' },
 ]
 
-const carouselInterval = setInterval(() => {
-  currentScreenIndex.value = (currentScreenIndex.value + 1) % screenCount
-}, 5000)
+// Desktop auto-rotate carousel (lifecycle-safe: no hooks inside functions)
+let carouselInterval: ReturnType<typeof setInterval> | undefined
 
-// ── Canvas CRT particle system ──────────────────────────────────────────────
+function startAutoCarousel() {
+  if (isMobile.value || carouselInterval) return
+  carouselInterval = window.setInterval(() => {
+    currentScreenIndex.value = (currentScreenIndex.value + 1) % screenCount
+  }, 5000)
+}
+
+function stopAutoCarousel() {
+  if (carouselInterval) {
+    clearInterval(carouselInterval)
+    carouselInterval = undefined
+  }
+}
+
+// -- Canvas CRT particle system
 const noiseTextEl = ref<HTMLElement | null>(null)
 const canvasEl = ref<HTMLCanvasElement | null>(null)
 
@@ -25,7 +39,7 @@ let rafId = 0
 let strength = 0       // 0–1, driven by mouse proximity
 let targetStrength = 0
 
-// Particle pool — reuse objects to avoid GC pressure
+// Particle pool - reuse objects to avoid GC pressure
 interface Particle {
   x: number; y: number
   w: number; h: number
@@ -62,10 +76,15 @@ function spawnParticle(p: Particle, cw: number, ch: number) {
 function tick() {
   const canvas = canvasEl.value
   if (!canvas) return
-
-  const ctx = canvas.getContext('2d')!
-  const cw = canvas.width
-  const ch = canvas.height
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
+  let cw = canvas.width
+  let ch = canvas.height
+  if (cw === 0 || ch === 0) {
+    resizeCanvas()
+    cw = canvas.width
+    ch = canvas.height
+  }
 
   // Smooth approach toward target
   strength += (targetStrength - strength) * 0.12
@@ -82,7 +101,7 @@ function tick() {
     ctx.fillRect(Math.floor(p.x), Math.floor(p.y), p.w, p.h)
   }
 
-  // Occasional bright "radiation spike" — a full-width scanline flash
+  // Occasional bright "radiation spike" - a full-width scanline flash
   if (strength > 0.3 && Math.random() < strength * 0.06) {
     const lineY = Math.floor(Math.random() * ch)
     const grad = ctx.createLinearGradient(0, 0, cw, 0)
@@ -106,11 +125,23 @@ function resizeCanvas() {
   canvas.height = Math.ceil(rect.height)
 }
 
+function detectMobile() {
+  const wasMobile = isMobile.value
+  isMobile.value = window.innerWidth <= 820
+  if (wasMobile !== isMobile.value) {
+    if (isMobile.value) stopAutoCarousel()
+    else startAutoCarousel()
+  }
+}
+
 let mouseMoveHandler: (e: MouseEvent) => void
 let mouseLeaveHandler: () => void
 let resizeObserver: ResizeObserver
 
 onMounted(() => {
+  detectMobile()
+  startAutoCarousel() // starts only when !isMobile
+  window.addEventListener('resize', detectMobile)
   resizeCanvas()
 
   resizeObserver = new ResizeObserver(resizeCanvas)
@@ -141,10 +172,11 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  clearInterval(carouselInterval)
+  stopAutoCarousel()
   cancelAnimationFrame(rafId)
   window.removeEventListener('mousemove', mouseMoveHandler)
   document.removeEventListener('mouseleave', mouseLeaveHandler)
+  window.removeEventListener('resize', detectMobile)
   resizeObserver?.disconnect()
 })
 </script>
@@ -198,11 +230,14 @@ onBeforeUnmount(() => {
 
       <!-- Mockup column -->
       <div class="hero__visual" aria-hidden="true">
-        <div class="hero__mockup-wrap">
-          <div class="hero__phone-carousel">
+        <div class="hero__mockup-wrap" :class="{ 'hero__mockup-wrap--mobile': isMobile }">
+          <div class="hero__phone-carousel" :class="{ 'hero__phone-carousel--mobile': isMobile }">
             <img v-for="(screen, index) in screens" :key="index" :src="screen.src" :alt="screen.alt"
-              class="hero__phone-screen" :class="{ 'hero__phone-screen--active': index === currentScreenIndex }"
-              width="280" height="560" loading="lazy" />
+              :loading="index === 0 ? 'eager' : 'lazy'" :fetchpriority="index === 0 ? 'high' : 'auto'"
+              decoding="async"
+              class="hero__phone-screen"
+              :class="{ 'hero__phone-screen--active': index === currentScreenIndex && !isMobile }" width="280"
+              height="560" />
           </div>
         </div>
       </div>
@@ -267,6 +302,8 @@ onBeforeUnmount(() => {
   letter-spacing: -0.03em;
   color: var(--md-on-background);
   margin-bottom: 20px;
+  /* Reserve space to reduce CLS when web font replaces fallback (2 lines) */
+  min-height: 2.2em;
 }
 
 /* Wrapper so canvas can be positioned over text */
@@ -286,7 +323,7 @@ onBeforeUnmount(() => {
   -webkit-text-fill-color: transparent;
 }
 
-/* Canvas overlay — multiply blends dark particles into the gradient text */
+/* Canvas overlay - multiply blends dark particles into the gradient text */
 .hero__noise-canvas {
   position: absolute;
   inset: 0;
@@ -294,7 +331,7 @@ onBeforeUnmount(() => {
   height: 100%;
   pointer-events: none;
   mix-blend-mode: multiply;
-  /* Crisp pixels — no browser smoothing */
+  /* Crisp pixels - no browser smoothing */
   image-rendering: pixelated;
 }
 
@@ -313,7 +350,7 @@ onBeforeUnmount(() => {
   align-items: center;
 }
 
-/* ── Visual / Mockup ── */
+/* -- Visual / Mockup -- */
 .hero__visual {
   position: relative;
   display: flex;
@@ -326,14 +363,31 @@ onBeforeUnmount(() => {
   position: relative;
   width: 280px;
   height: 560px;
+  aspect-ratio: 1 / 2;
   transform-style: preserve-3d;
+  /* Reserve space before images load to avoid CLS */
+  min-height: 360px;
+}
+
+.hero__mockup-wrap--mobile {
+  width: 100%;
+  overflow: hidden;
 }
 
 .hero__phone-carousel {
   position: relative;
   width: 100%;
   height: 100%;
+  min-height: 0;
   transform-style: preserve-3d;
+  contain: layout;
+}
+
+.hero__phone-carousel--mobile {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+  cursor: grab;
 }
 
 .hero__phone-screen {
@@ -350,6 +404,19 @@ onBeforeUnmount(() => {
 .hero__phone-screen--active {
   opacity: 1;
   transform: rotateX(10deg) rotateZ(5deg);
+}
+
+.hero__phone-carousel--mobile .hero__phone-screen {
+  position: relative;
+  flex-shrink: 0;
+  width: auto;
+  padding-right: 4px;
+  padding-left: 4px;
+  max-width: 100%;
+  opacity: 1;
+  transform: none;
+  border-radius: 26px;
+  box-shadow: 0 20px 70px rgba(108, 75, 204, 0.06), 0 10px 32px rgba(0, 0, 0, 0.10);
 }
 
 .hero__phone-screen:nth-child(1) {
@@ -376,7 +443,7 @@ onBeforeUnmount(() => {
   z-index: 1;
 }
 
-/* ── Responsive ── */
+/* -- Responsive -- */
 @media (max-width: 820px) {
   .hero {
     padding: 60px 0 80px;
@@ -407,9 +474,22 @@ onBeforeUnmount(() => {
     height: 400px;
   }
 
-  .hero__phone-screen {
+  .hero__mockup-wrap--mobile {
     width: 100%;
-    height: 100%;
+    margin-left: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .hero__phone-carousel--mobile {
+    width: 100%;
+  }
+
+  .hero__phone-carousel--mobile .hero__phone-screen {
+    scroll-snap-align: center;
+    margin: 0 auto;
   }
 }
 </style>
