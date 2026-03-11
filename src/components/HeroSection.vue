@@ -361,9 +361,9 @@ onBeforeUnmount(() => {
 
 .hero__mockup-wrap {
   position: relative;
-  width: 280px;
-  height: 560px;
-  aspect-ratio: 1 / 2;
+  width: 270px;
+  aspect-ratio: 9 / 20;
+  height: auto;
   transform-style: preserve-3d;
   /* Reserve space before images load to avoid CLS */
   min-height: 360px;
@@ -398,6 +398,7 @@ onBeforeUnmount(() => {
   box-shadow: 0 20px 70px rgba(108, 75, 204, 0.06), 0 10px 32px rgba(0, 0, 0, 0.10);
   opacity: 0;
   transition: opacity 0.6s ease-in-out;
+  object-fit: contain;
 }
 
 .hero__phone-screen--active {
@@ -468,8 +469,9 @@ onBeforeUnmount(() => {
   }
 
   .hero__mockup-wrap {
-    width: 200px;
-    height: 400px;
+    width: 220px;
+    aspect-ratio: 9 / 20;
+    height: auto;
   }
 
   .hero__mockup-wrap--mobile {
