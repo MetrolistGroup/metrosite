@@ -398,12 +398,10 @@ onBeforeUnmount(() => {
   box-shadow: 0 20px 70px rgba(108, 75, 204, 0.06), 0 10px 32px rgba(0, 0, 0, 0.10);
   opacity: 0;
   transition: opacity 0.6s ease-in-out;
-  transform: rotateX(10deg) rotateZ(5deg);
 }
 
 .hero__phone-screen--active {
   opacity: 1;
-  transform: rotateX(10deg) rotateZ(5deg);
 }
 
 .hero__phone-carousel--mobile .hero__phone-screen {
