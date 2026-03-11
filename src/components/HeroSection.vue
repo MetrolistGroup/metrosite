@@ -361,9 +361,9 @@ onBeforeUnmount(() => {
 
 .hero__mockup-wrap {
   position: relative;
-  width: 270px;
-  aspect-ratio: 9 / 20;
-  height: auto;
+  width: 280px;
+  height: 560px;
+  aspect-ratio: 1 / 2;
   transform-style: preserve-3d;
   /* Reserve space before images load to avoid CLS */
   min-height: 360px;
@@ -371,7 +371,6 @@ onBeforeUnmount(() => {
 
 .hero__mockup-wrap--mobile {
   width: 100%;
-  overflow: hidden;
 }
 
 .hero__phone-carousel {
@@ -388,6 +387,7 @@ onBeforeUnmount(() => {
   flex-wrap: nowrap;
   width: 100%;
   cursor: grab;
+  gap: 6px;
 }
 
 .hero__phone-screen {
@@ -469,27 +469,31 @@ onBeforeUnmount(() => {
   }
 
   .hero__mockup-wrap {
-    width: 220px;
-    aspect-ratio: 9 / 20;
+    width: 200px;
     height: auto;
   }
 
   .hero__mockup-wrap--mobile {
     width: 100%;
     margin-left: 0;
+  }
+
+  .hero__phone-carousel--mobile {
+    width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
   }
 
-  .hero__phone-carousel--mobile {
-    width: 100%;
-  }
-
   .hero__phone-carousel--mobile .hero__phone-screen {
     scroll-snap-align: center;
-    margin: 0 auto;
+    margin: 0;
+    padding-left: 0;
+    padding-right: 0;
+    flex: 0 0 70%;
+    width: auto;
+    height: auto;
   }
 }
 </style>
