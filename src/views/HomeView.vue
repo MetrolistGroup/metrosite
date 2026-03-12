@@ -2,6 +2,7 @@
 import NavBar from '../components/NavBar.vue'
 import HeroSection from '../components/HeroSection.vue'
 import HighlightsSection from '../components/HighlightsSection.vue'
+import FaqSection from '../components/FaqSection.vue'
 import DownloadSection from '../components/DownloadSection.vue'
 import FooterSection from '../components/FooterSection.vue'
 </script>
@@ -11,6 +12,7 @@ import FooterSection from '../components/FooterSection.vue'
   <main id="main">
     <HeroSection />
     <HighlightsSection />
+    <FaqSection />
     <DownloadSection />
   </main>
   <FooterSection />

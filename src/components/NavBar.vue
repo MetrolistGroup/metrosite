@@ -22,14 +22,15 @@ onUnmounted(() => {
     <div class="container navbar__inner">
 
       <!-- Logo + wordmark -->
-      <a href="/" class="navbar__brand">
+      <RouterLink to="/" class="navbar__brand">
         <img src="/logo.svg" alt="" width="32" height="32" />
         <span class="navbar__wordmark">Metrolist</span>
-      </a>
+      </RouterLink>
 
       <!-- Desktop navigation -->
       <nav class="navbar__links" aria-label="Main navigation">
-        <a href="#highlights" class="nav-link">Features</a>
+        <RouterLink :to="{ path: '/', hash: '#highlights' }" class="nav-link">Features</RouterLink>
+        <RouterLink to="/faq" class="nav-link">FAQ</RouterLink>
         <a href="https://github.com/MetrolistGroup/Metrolist/releases" class="nav-link" target="_blank"
           rel="noopener noreferrer">Download</a>
         <a href="https://github.com/MetrolistGroup/Metrolist" class="btn btn-tonal btn-sm" target="_blank"
@@ -49,7 +50,10 @@ onUnmounted(() => {
     <!-- Mobile drawer -->
     <Transition name="drawer">
       <div v-if="isMenuOpen" class="navbar__drawer" role="navigation" aria-label="Mobile navigation">
-        <a href="#highlights" class="drawer-link" @click="isMenuOpen = false">Features</a>
+        <RouterLink :to="{ path: '/', hash: '#highlights' }" class="drawer-link" @click="isMenuOpen = false">
+          Features
+        </RouterLink>
+        <RouterLink to="/faq" class="drawer-link" @click="isMenuOpen = false">FAQ</RouterLink>
         <a href="https://github.com/MetrolistGroup/Metrolist/releases" class="drawer-link" target="_blank"
           rel="noopener noreferrer" @click="isMenuOpen = false">Download</a>
         <a href="https://github.com/MetrolistGroup/Metrolist" class="drawer-link" target="_blank"
