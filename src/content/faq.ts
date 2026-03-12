@@ -5,7 +5,7 @@ export type FaqItem = {
 
 export const FAQ_ITEMS: FaqItem[] = [
   {
-    question: 'Is it safe to use?',
+    question: 'Is the app safe to use?',
     answer: 'Yes. Metrolist is open-source (GPL-3.0), meaning the code is public and auditable.',
   },
   {
@@ -15,7 +15,8 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     question: 'How to update?',
-    answer: 'Download the latest APK from Releases and install it over the old version.',
+    answer:
+      'Use the in-app updater, or download the latest APK from GitHub Releases and install it over the old version.',
   },
   {
     question: 'Can I log in with my Google account?',
@@ -23,6 +24,10 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     question: 'Is there an iOS version?',
-    answer: 'No, Metrolist is currently only available for Android.',
+    answer: 'No, Metrolist is Android-only. iOS users can try YTMusicUltimate.',
+  },
+  {
+    question: 'Is there a desktop version?',
+    answer: 'No. Try YouTube Music in your browser, or Pear-desktop as an alternative.',
   },
 ]

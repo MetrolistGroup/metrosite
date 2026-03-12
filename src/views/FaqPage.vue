@@ -11,10 +11,9 @@ import { FAQ_ITEMS } from '../content/faq'
 
     <div class="container faq-page__inner">
       <header class="faq-page__header">
-        <p class="faq-page__kicker">Support</p>
         <h1 class="faq-page__title">Frequently asked questions</h1>
         <p class="faq-page__sub">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porta sem malesuada magna mollis euismod.
+          Quick answers about Metrolist: safety, updates, account sync, and platform support.
         </p>
       </header>
 
@@ -74,15 +73,6 @@ import { FAQ_ITEMS } from '../content/faq'
 .faq-page__header {
   text-align: center;
   margin: 18px auto 26px;
-}
-
-.faq-page__kicker {
-  font-size: 0.8125rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--md-primary);
-  margin-bottom: 10px;
 }
 
 .faq-page__title {
