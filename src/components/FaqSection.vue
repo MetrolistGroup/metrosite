@@ -8,11 +8,8 @@ const topItems = FAQ_ITEMS.slice(0, 5)
   <section id="faq" class="faq">
     <div class="container">
       <header class="faq__header">
-        <p class="faq__kicker">FAQ</p>
         <h2 class="faq__title">Quick answers.</h2>
-        <p class="faq__sub">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sed odio dui.
-        </p>
+        <p class="faq__sub">Got questions? We've got you covered.</p>
       </header>
 
       <div class="faq__card" role="region" aria-label="Frequently asked questions">
@@ -47,16 +44,6 @@ const topItems = FAQ_ITEMS.slice(0, 5)
   margin-bottom: 28px;
 }
 
-.faq__kicker {
-  display: inline-block;
-  font-size: 0.8125rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--md-primary);
-  margin-bottom: 10px;
-}
-
 .faq__title {
   font-family: 'Nunito', sans-serif;
   font-weight: 900;
@@ -78,7 +65,6 @@ const topItems = FAQ_ITEMS.slice(0, 5)
   margin: 0 auto;
   border-radius: var(--r-2xl);
   background: var(--md-sc);
-  border: 1px solid var(--md-outline-variant);
   overflow: hidden;
 }
 
