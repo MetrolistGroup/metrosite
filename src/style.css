@@ -139,6 +139,7 @@ h6 {
 
 /* Below-the-fold sections: skip rendering until near viewport (faster LCP, less CLS) */
 #highlights,
+.faq,
 .download,
 .footer {
   content-visibility: auto;
