@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 
 const currentScreenIndex = ref(0)
-const screenCount = 6
 const isMobile = ref(false)
+const prefersReducedMotion = ref(false)
 
 const screens = [
   { src: '/1.webp', srcset: '/1-sm.webp 640w, /1-md.webp 1280w, /1.webp 2560w', alt: 'Screenshot 1' },
@@ -14,13 +14,42 @@ const screens = [
   { src: '/6.webp', srcset: '/6-sm.webp 640w, /6-md.webp 1280w, /6.webp 2560w', alt: 'Screenshot 6' },
 ]
 
+const screenCount = screens.length
+
+// Desktop uses a sliding track with cloned ends for seamless wrap-around.
+// Track indices map to: 0 = clone(last), 1..screenCount = real slides, screenCount+1 = clone(first)
+const trackIndex = ref(1)
+const isTrackSnapping = ref(false)
+
+const desktopScreens = computed(() => {
+  const last = screens[screenCount - 1]!
+  const first = screens[0]!
+  return [last, ...screens, first]
+})
+
+const trackStyle = computed(() => {
+  const transition = isTrackSnapping.value ? 'none' : undefined
+  return {
+    transform: `translate3d(-${trackIndex.value * 100}%, 0, 0)`,
+    transition,
+  } as const
+})
+
 // Desktop auto-rotate carousel (lifecycle-safe: no hooks inside functions)
 let carouselInterval: ReturnType<typeof setInterval> | undefined
 
 function startAutoCarousel() {
-  if (isMobile.value || carouselInterval) return
+  if (isMobile.value || prefersReducedMotion.value || carouselInterval) return
   carouselInterval = window.setInterval(() => {
-    currentScreenIndex.value = (currentScreenIndex.value + 1) % screenCount
+    if (currentScreenIndex.value === screenCount - 1) {
+      // Animate onto the trailing clone(first), then snap back to the real first.
+      currentScreenIndex.value = 0
+      trackIndex.value = screenCount + 1
+      return
+    }
+
+    currentScreenIndex.value += 1
+    trackIndex.value = currentScreenIndex.value + 1
   }, 5000)
 }
 
@@ -134,11 +163,34 @@ function detectMobile() {
   }
 }
 
+function onTrackTransitionEnd(e: TransitionEvent) {
+  if (e.propertyName !== 'transform') return
+  if (trackIndex.value !== screenCount + 1) return
+
+  // Snap from clone(first) back to the real first without animating.
+  isTrackSnapping.value = true
+  trackIndex.value = 1
+  requestAnimationFrame(() => {
+    isTrackSnapping.value = false
+  })
+}
+
 let mouseMoveHandler: (e: MouseEvent) => void
 let mouseLeaveHandler: () => void
 let resizeObserver: ResizeObserver
+let motionQuery: MediaQueryList | undefined
+let motionQueryHandler: ((e: MediaQueryListEvent) => void) | undefined
 
 onMounted(() => {
+  motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+  prefersReducedMotion.value = motionQuery.matches
+  motionQueryHandler = (e: MediaQueryListEvent) => {
+    prefersReducedMotion.value = e.matches
+    if (prefersReducedMotion.value) stopAutoCarousel()
+    else startAutoCarousel()
+  }
+  motionQuery.addEventListener('change', motionQueryHandler)
+
   detectMobile()
   startAutoCarousel() // starts only when !isMobile
   window.addEventListener('resize', detectMobile)
@@ -178,6 +230,7 @@ onBeforeUnmount(() => {
   document.removeEventListener('mouseleave', mouseLeaveHandler)
   window.removeEventListener('resize', detectMobile)
   resizeObserver?.disconnect()
+  if (motionQuery && motionQueryHandler) motionQuery.removeEventListener('change', motionQueryHandler)
 })
 </script>
 
@@ -232,12 +285,21 @@ onBeforeUnmount(() => {
       <div class="hero__visual" aria-hidden="true">
         <div class="hero__mockup-wrap" :class="{ 'hero__mockup-wrap--mobile': isMobile }">
           <div class="hero__phone-carousel" :class="{ 'hero__phone-carousel--mobile': isMobile }">
-            <img v-for="(screen, index) in screens" :key="index" :src="screen.src" :srcset="screen.srcset"
-              sizes="(max-width: 640px) 280px, (max-width: 1280px) 280px, 280px" :alt="screen.alt"
-              :loading="index === 0 ? 'eager' : 'lazy'" :fetchpriority="index === 0 ? 'high' : 'auto'" decoding="async"
-              class="hero__phone-screen"
-              :class="{ 'hero__phone-screen--active': index === currentScreenIndex && !isMobile }" width="280"
-              height="560" />
+            <template v-if="isMobile">
+              <img v-for="(screen, index) in screens" :key="index" :src="screen.src" :srcset="screen.srcset"
+                sizes="(max-width: 640px) 280px, (max-width: 1280px) 280px, 280px" :alt="screen.alt"
+                :loading="index === 0 ? 'eager' : 'lazy'" :fetchpriority="index === 0 ? 'high' : 'auto'" decoding="async"
+                class="hero__phone-screen" width="280" height="560" />
+            </template>
+
+            <div v-else class="hero__phone-track" :style="trackStyle" @transitionend="onTrackTransitionEnd">
+              <img v-for="(screen, index) in desktopScreens"
+                :key="index === 0 ? 'clone-last' : index === desktopScreens.length - 1 ? 'clone-first' : `screen-${index - 1}`"
+                :src="screen.src" :srcset="screen.srcset"
+                sizes="(max-width: 640px) 280px, (max-width: 1280px) 280px, 280px" :alt="screen.alt"
+                :loading="index === 1 ? 'eager' : 'lazy'" :fetchpriority="index === 1 ? 'high' : 'auto'" decoding="async"
+                class="hero__phone-screen" width="280" height="560" />
+            </div>
           </div>
         </div>
       </div>
@@ -380,6 +442,16 @@ onBeforeUnmount(() => {
   min-height: 0;
   transform-style: preserve-3d;
   contain: layout;
+  overflow: hidden;
+}
+
+.hero__phone-track {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  transition: transform 0.6s ease-in-out;
+  will-change: transform;
 }
 
 .hero__phone-carousel--mobile {
@@ -391,18 +463,14 @@ onBeforeUnmount(() => {
 }
 
 .hero__phone-screen {
-  position: absolute;
+  position: relative;
   width: 100%;
   height: 100%;
+  flex: 0 0 100%;
+  display: block;
   border-radius: 26px;
   box-shadow: 0 20px 70px rgba(108, 75, 204, 0.06), 0 10px 32px rgba(0, 0, 0, 0.10);
-  opacity: 0;
-  transition: opacity 0.6s ease-in-out;
   object-fit: contain;
-}
-
-.hero__phone-screen--active {
-  opacity: 1;
 }
 
 .hero__phone-carousel--mobile .hero__phone-screen {
@@ -418,28 +486,11 @@ onBeforeUnmount(() => {
   box-shadow: 0 20px 70px rgba(108, 75, 204, 0.06), 0 10px 32px rgba(0, 0, 0, 0.10);
 }
 
-.hero__phone-screen:nth-child(1) {
-  z-index: 6;
-}
 
-.hero__phone-screen:nth-child(2) {
-  z-index: 5;
-}
-
-.hero__phone-screen:nth-child(3) {
-  z-index: 4;
-}
-
-.hero__phone-screen:nth-child(4) {
-  z-index: 3;
-}
-
-.hero__phone-screen:nth-child(5) {
-  z-index: 2;
-}
-
-.hero__phone-screen:nth-child(6) {
-  z-index: 1;
+@media (prefers-reduced-motion: reduce) {
+  .hero__phone-track {
+    transition: none;
+  }
 }
 
 /* -- Responsive -- */
