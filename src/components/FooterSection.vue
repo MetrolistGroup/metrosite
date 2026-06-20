@@ -81,6 +81,10 @@ const links = [
   border-radius: var(--r-xs);
 }
 
+html[data-theme="light"] .footer__logo-link img {
+  filter: brightness(0) saturate(100%);
+}
+
 .footer__wordmark {
   font-family: 'Nunito', sans-serif;
   font-weight: 900;

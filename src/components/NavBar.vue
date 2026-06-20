@@ -3,12 +3,32 @@ import { ref, onMounted, onUnmounted } from 'vue'
 
 const isScrolled = ref(false)
 const isMenuOpen = ref(false)
+const theme = ref<'light' | 'dark'>('dark')
 
 function handleScroll() {
   isScrolled.value = window.scrollY > 16
 }
 
+function applyTheme(next: 'light' | 'dark') {
+  theme.value = next
+  if (next === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light')
+  } else {
+    document.documentElement.removeAttribute('data-theme')
+  }
+  try {
+    localStorage.setItem('theme', next)
+  } catch {
+    /* ignore storage errors */
+  }
+}
+
+function toggleTheme() {
+  applyTheme(theme.value === 'light' ? 'dark' : 'light')
+}
+
 onMounted(() => {
+  theme.value = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark'
   window.addEventListener('scroll', handleScroll, { passive: true })
 })
 
@@ -18,38 +38,44 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <header :class="['navbar', { 'navbar--scrolled': isScrolled }]">
-    <div class="container navbar__inner">
+  <header :class="['top-app-bar', { 'scrolled': isScrolled, 'menu-open': isMenuOpen }]">
+    <div class="bar-content">
 
-      <!-- Logo + wordmark -->
-      <RouterLink to="/" class="navbar__brand">
-        <img src="/logo.svg" alt="" width="32" height="32" />
-        <span class="navbar__wordmark">Metrolist</span>
+      <!-- Brand -->
+      <RouterLink to="/" class="header-brand">
+        <img src="/logo.svg" alt="" width="32" height="32" class="brand-icon-img" />
+        <span class="brand-wordmark">Metrolist</span>
       </RouterLink>
 
-      <!-- Desktop navigation -->
-      <nav class="navbar__links" aria-label="Main navigation">
+      <!-- Centered desktop navigation -->
+      <nav class="nav-desktop" aria-label="Main navigation">
         <RouterLink :to="{ path: '/', hash: '#highlights' }" class="nav-link">Features</RouterLink>
         <RouterLink to="/faq" class="nav-link">FAQ</RouterLink>
         <a href="https://github.com/MetrolistGroup/Metrolist/releases" class="nav-link" target="_blank"
           rel="noopener noreferrer">Download</a>
-        <a href="https://github.com/MetrolistGroup/Metrolist" class="btn btn-tonal btn-sm" target="_blank"
+      </nav>
+
+      <!-- Right actions -->
+      <div class="right-actions">
+        <button class="icon-btn" :aria-label="theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'"
+          @click="toggleTheme">
+          <span class="icon">{{ theme === 'light' ? 'dark_mode' : 'light_mode' }}</span>
+        </button>
+        <a href="https://github.com/MetrolistGroup/Metrolist" class="btn btn-tonal btn-sm nav-github" target="_blank"
           rel="noopener noreferrer">
           <span class="icon" aria-hidden="true">code</span>
           GitHub
         </a>
-      </nav>
-
-      <!-- Mobile hamburger -->
-      <button class="navbar__hamburger" :aria-expanded="isMenuOpen" aria-label="Toggle navigation menu"
-        @click="isMenuOpen = !isMenuOpen">
-        <span class="icon">{{ isMenuOpen ? 'close' : 'menu' }}</span>
-      </button>
+        <button class="icon-btn menu-btn" :aria-expanded="isMenuOpen" aria-label="Toggle navigation menu"
+          @click="isMenuOpen = !isMenuOpen">
+          <span class="icon">{{ isMenuOpen ? 'close' : 'menu' }}</span>
+        </button>
+      </div>
     </div>
 
     <!-- Mobile drawer -->
     <Transition name="drawer">
-      <div v-if="isMenuOpen" class="navbar__drawer" role="navigation" aria-label="Mobile navigation">
+      <div v-if="isMenuOpen" class="drawer-sheet" role="navigation" aria-label="Mobile navigation">
         <RouterLink :to="{ path: '/', hash: '#highlights' }" class="drawer-link" @click="isMenuOpen = false">
           Features
         </RouterLink>
@@ -64,44 +90,66 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.navbar {
+/* Top app bar */
+.top-app-bar {
   position: sticky;
   top: 0;
-  z-index: 100;
-  transition: background var(--t-std), box-shadow var(--t-std);
-}
-
-.navbar--scrolled {
-  background: color-mix(in srgb, var(--md-surface) 88%, transparent);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: var(--el-1);
-}
-
-.navbar__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  z-index: 2000;
+  height: 64px;
   display: flex;
   align-items: center;
-  height: 64px;
-  min-height: 64px;
-  gap: 8px;
-  contain: layout style;
+  background: transparent;
+  box-shadow: none;
+  transition:
+    background var(--t-slow),
+    box-shadow var(--t-slow),
+    border-radius var(--t-slow);
+}
+
+.top-app-bar.scrolled {
+  background: var(--md-sc-high);
+  box-shadow: var(--el-2);
+  border-radius: 0 0 var(--r-xl) var(--r-xl);
+}
+
+.top-app-bar.menu-open {
+  background: var(--md-sc-high);
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.bar-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  gap: 4px;
+  padding: 0 24px;
+  position: relative;
 }
 
 /* Brand */
-.navbar__brand {
+.header-brand {
   display: flex;
   align-items: center;
   gap: 10px;
   text-decoration: none;
-  margin-right: auto;
+  z-index: 10;
 }
 
-.navbar__brand img {
+.brand-icon-img {
   border-radius: var(--r-sm);
   object-fit: contain;
 }
 
-.navbar__wordmark {
+html[data-theme="light"] .brand-icon-img {
+  filter: brightness(0) saturate(100%);
+}
+
+.brand-wordmark {
   font-family: 'Nunito', sans-serif;
   font-weight: 900;
   font-size: 1.25rem;
@@ -109,54 +157,100 @@ onUnmounted(() => {
   letter-spacing: -0.025em;
 }
 
-/* Desktop links */
-.navbar__links {
+/* Desktop nav */
+.nav-desktop {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 24px;
 }
 
 .nav-link {
-  display: inline-flex;
-  align-items: center;
-  padding: 8px 16px;
-  border-radius: var(--r-full);
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 0.9375rem;
+  font-weight: 500;
   color: var(--md-on-surface-variant);
   text-decoration: none;
-  transition: background var(--t-fast), color var(--t-fast);
+  transition: color var(--t-fast);
+  white-space: nowrap;
 }
 
 .nav-link:hover {
-  background: color-mix(in srgb, var(--md-on-surface) 8%, transparent);
-  color: var(--md-on-surface);
+  color: var(--md-primary);
 }
 
-/* Hamburger */
-.navbar__hamburger {
-  display: none;
+.nav-link.router-link-active {
+  color: var(--md-primary);
+  font-weight: 600;
+}
+
+/* Right actions */
+.right-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  z-index: 10;
+}
+
+/* Icon button */
+.icon-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--md-on-surface-variant);
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--md-on-surface);
-  padding: 8px;
-  border-radius: var(--r-full);
-  transition: background var(--t-fast);
+  position: relative;
+  overflow: hidden;
   -webkit-tap-highlight-color: transparent;
 }
 
-.navbar__hamburger:hover {
-  background: color-mix(in srgb, var(--md-on-surface) 8%, transparent);
+.icon-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--md-on-surface-variant);
+  opacity: 0;
+  transition: opacity var(--t-fast);
+  pointer-events: none;
+}
+
+.icon-btn:hover::before {
+  opacity: var(--state-hover);
+}
+
+.icon-btn:active::before {
+  opacity: var(--state-press);
+}
+
+.icon-btn .icon {
+  font-size: 22px;
+}
+
+.menu-btn {
+  display: none;
 }
 
 /* Mobile drawer */
-.navbar__drawer {
+.drawer-sheet {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
   display: flex;
   flex-direction: column;
-  padding: 8px 16px 16px;
-  background: var(--md-sc-low);
-  border-bottom: 1px solid var(--md-outline-variant);
+  padding: 8px 16px 24px;
+  background: var(--md-sc-high);
+  border-radius: 0 0 var(--r-xl) var(--r-xl);
+  box-shadow: none;
+  z-index: 1900;
 }
 
 .drawer-link {
@@ -187,12 +281,13 @@ onUnmounted(() => {
 }
 
 /* Responsive */
-@media (max-width: 640px) {
-  .navbar__links {
+@media (max-width: 720px) {
+  .nav-desktop,
+  .nav-github {
     display: none;
   }
 
-  .navbar__hamburger {
+  .menu-btn {
     display: flex;
   }
 }
