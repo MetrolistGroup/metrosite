@@ -1,302 +1,244 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 
-const currentScreenIndex = ref(0)
-const screenCount = 6
-const isMobile = ref(false)
-const isCarouselGlitching = ref(false)
-
+const b = import.meta.env.BASE_URL
 const screens = [
-  { src: '/1.webp', srcset: '/1-sm.webp 640w, /1-md.webp 1280w, /1.webp 2560w', alt: 'Screenshot 1' },
-  { src: '/2.webp', srcset: '/2-sm.webp 640w, /2-md.webp 1280w, /2.webp 2560w', alt: 'Screenshot 2' },
-  { src: '/3.webp', srcset: '/3-sm.webp 640w, /3-md.webp 1280w, /3.webp 2560w', alt: 'Screenshot 3' },
-  { src: '/4.webp', srcset: '/4-sm.webp 640w, /4-md.webp 1280w, /4.webp 2560w', alt: 'Screenshot 4' },
-  { src: '/5.webp', srcset: '/5-sm.webp 640w, /5-md.webp 1280w, /5.webp 2560w', alt: 'Screenshot 5' },
-  { src: '/6.webp', srcset: '/6-sm.webp 640w, /6-md.webp 1280w, /6.webp 2560w', alt: 'Screenshot 6' },
+  { src: `${b}1.webp`, srcset: `${b}1-sm.webp 640w, ${b}1-md.webp 1280w, ${b}1.webp 2560w`, alt: 'Screenshot 1' },
+  { src: `${b}2.webp`, srcset: `${b}2-sm.webp 640w, ${b}2-md.webp 1280w, ${b}2.webp 2560w`, alt: 'Screenshot 2' },
+  { src: `${b}3.webp`, srcset: `${b}3-sm.webp 640w, ${b}3-md.webp 1280w, ${b}3.webp 2560w`, alt: 'Screenshot 3' },
+  { src: `${b}4.webp`, srcset: `${b}4-sm.webp 640w, ${b}4-md.webp 1280w, ${b}4.webp 2560w`, alt: 'Screenshot 4' },
+  { src: `${b}5.webp`, srcset: `${b}5-sm.webp 640w, ${b}5-md.webp 1280w, ${b}5.webp 2560w`, alt: 'Screenshot 5' },
+  { src: `${b}6.webp`, srcset: `${b}6-sm.webp 640w, ${b}6-md.webp 1280w, ${b}6.webp 2560w`, alt: 'Screenshot 6' },
 ]
 
-// Desktop auto-rotate carousel (lifecycle-safe: no hooks inside functions)
-let carouselInterval: ReturnType<typeof setInterval> | undefined
+const galleryEl = ref<HTMLElement | null>(null)
+const activeIndex = ref(Math.floor(screens.length / 2))
+let scrollTicking = false
 
-function startAutoCarousel() {
-  if (isMobile.value || carouselInterval) return
-  carouselInterval = window.setInterval(() => {
-    advanceCarouselWithNoise()
-  }, 5000)
+function updateGalleryCenter() {
+  const g = galleryEl.value!
+  const shots = Array.from(g.querySelectorAll<HTMLElement>('.hero__shot'))
+  if (!shots.length) return
+  const rect = g.getBoundingClientRect()
+  const center = rect.left + rect.width / 2
+  let best = 0
+  let min = Infinity
+  shots.forEach((s, i) => {
+    const r = s.getBoundingClientRect()
+    const c = r.left + r.width / 2
+    const d = Math.abs(center - c)
+    if (d < min) {
+      min = d
+      best = i
+    }
+  })
+  activeIndex.value = best
 }
 
-function stopAutoCarousel() {
-  if (carouselInterval) {
-    clearInterval(carouselInterval)
-    carouselInterval = undefined
-  }
-  stopCarouselBurst()
+function centerGallery() {
+  const g = galleryEl.value!
+  requestAnimationFrame(() => {
+    g.scrollLeft = Math.max(0, (g.scrollWidth - g.clientWidth) / 2)
+    updateGalleryCenter()
+  })
 }
 
-function stopCarouselBurst() {
-  carouselTargetStrength = 0
-  isCarouselGlitching.value = false
-  if (carouselBurstTimeout) {
-    clearTimeout(carouselBurstTimeout)
-    carouselBurstTimeout = undefined
-  }
-  if (carouselSwitchTimeout) {
-    clearTimeout(carouselSwitchTimeout)
-    carouselSwitchTimeout = undefined
-  }
-  if (carouselGlitchEndTimeout) {
-    clearTimeout(carouselGlitchEndTimeout)
-    carouselGlitchEndTimeout = undefined
+function scrollHandler() {
+  if (scrollTicking) return
+  scrollTicking = true
+  requestAnimationFrame(() => {
+    updateGalleryCenter()
+    scrollTicking = false
+  })
+}
+
+let autoScrollInterval: ReturnType<typeof setInterval> | undefined
+
+function startAutoScroll() {
+  if (autoScrollInterval) return
+  autoScrollInterval = setInterval(() => {
+    if (!galleryEl.value) return
+    const nextIndex = (activeIndex.value + 1) % screens.length
+    const shots = galleryEl.value.querySelectorAll<HTMLElement>('.hero__shot')
+    const g = galleryEl.value
+    const shot = shots[nextIndex]
+    if (shot) {
+      const scrollLeft = shot.offsetLeft - g.clientWidth / 2 + shot.offsetWidth / 2
+      g.scrollTo({ left: scrollLeft, behavior: 'smooth' })
+    }
+  }, 4000)
+}
+
+function stopAutoScroll() {
+  if (autoScrollInterval) {
+    clearInterval(autoScrollInterval)
+    autoScrollInterval = undefined
   }
 }
 
-function advanceCarouselWithNoise() {
-  if (isMobile.value) return
-  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
-    currentScreenIndex.value = (currentScreenIndex.value + 1) % screenCount
-    return
-  }
-
-  stopCarouselBurst()
-  isCarouselGlitching.value = true
-  carouselTargetStrength = 0.92
-
-  // Switch near peak for a glitch-cut feel.
-  carouselSwitchTimeout = window.setTimeout(() => {
-    currentScreenIndex.value = (currentScreenIndex.value + 1) % screenCount
-  }, 170)
-
-  carouselBurstTimeout = window.setTimeout(() => {
-    carouselTargetStrength = 0
-  }, 560)
-
-  carouselGlitchEndTimeout = window.setTimeout(() => {
-    isCarouselGlitching.value = false
-  }, 620)
+function focusShot(e: MouseEvent) {
+  const el = e.currentTarget as HTMLElement
+  const g = galleryEl.value!
+  const scrollLeft = el.offsetLeft - g.clientWidth / 2 + el.offsetWidth / 2
+  g.scrollTo({ left: scrollLeft, behavior: 'smooth' })
+  stopAutoScroll()
+  startAutoScroll()
 }
 
-// -- Canvas CRT particle system
 const noiseTextEl = ref<HTMLElement | null>(null)
 const canvasEl = ref<HTMLCanvasElement | null>(null)
-const phoneCarouselEl = ref<HTMLElement | null>(null)
-const carouselCanvasEl = ref<HTMLCanvasElement | null>(null)
 
 let rafId = 0
-let strength = 0       // 0–1, driven by mouse proximity
+let strength = 0
 let targetStrength = 0
 
-let carouselStrength = 0 // 0–1, short bursts during screen changes
-let carouselTargetStrength = 0
-
-let carouselBurstTimeout: ReturnType<typeof setTimeout> | undefined
-let carouselSwitchTimeout: ReturnType<typeof setTimeout> | undefined
-let carouselGlitchEndTimeout: ReturnType<typeof setTimeout> | undefined
-
-// Particle pool - reuse objects to avoid GC pressure
 interface Particle {
   x: number; y: number
   w: number; h: number
   alpha: number
-  gray: number   // 0–80 (dark end of spectrum)
+  gray: number
 }
 const POOL_SIZE = 280
 const pool: Particle[] = Array.from({ length: POOL_SIZE }, () => ({
   x: 0, y: 0, w: 2, h: 2, alpha: 0, gray: 0,
 }))
 
-const CAROUSEL_POOL_SIZE = 360
-const carouselPool: Particle[] = Array.from({ length: CAROUSEL_POOL_SIZE }, () => ({
-  x: 0, y: 0, w: 2, h: 2, alpha: 0, gray: 0,
-}))
-
 function spawnParticle(p: Particle, cw: number, ch: number) {
   p.x = Math.random() * cw
   p.y = Math.random() * ch
-  // Sharp rectangles: mix of thin scanline-like strips and square dots
   const type = Math.random()
   if (type < 0.35) {
-    // horizontal scanline fragment
     p.w = 4 + Math.random() * 14
     p.h = 1
   } else if (type < 0.55) {
-    // vertical strip
     p.w = 1
     p.h = 3 + Math.random() * 8
   } else {
-    // square pixel dot
     p.w = 1 + Math.floor(Math.random() * 3)
     p.h = p.w
   }
   p.alpha = 0.25 + Math.random() * 0.65
-  p.gray = Math.floor(Math.random() * 85)  // 0 = black, 85 = dark gray
+  p.gray = Math.floor(Math.random() * 85)
 }
 
-function drawNoiseFrame(
-  ctx: CanvasRenderingContext2D,
-  cw: number,
-  ch: number,
-  s: number,
-  particles: Particle[],
-) {
+function drawNoiseFrame(ctx: CanvasRenderingContext2D, cw: number, ch: number, s: number) {
   ctx.clearRect(0, 0, cw, ch)
-
-  const activeCount = Math.floor(s * s * particles.length)
+  const activeCount = Math.floor(s * s * pool.length)
   for (let i = 0; i < activeCount; i++) {
-    const p = particles[i]!
-    spawnParticle(p, cw, ch) // re-randomise every frame → raw static feel
+    const p = pool[i]!
+    spawnParticle(p, cw, ch)
     ctx.fillStyle = `rgba(${p.gray},${p.gray},${p.gray},${p.alpha})`
     ctx.fillRect(Math.floor(p.x), Math.floor(p.y), p.w, p.h)
   }
-
-  // Occasional full-width scanline flash
-  if (s > 0.3 && Math.random() < s * 0.06) {
-    const lineY = Math.floor(Math.random() * ch)
-    const grad = ctx.createLinearGradient(0, 0, cw, 0)
-    grad.addColorStop(0, 'transparent')
-    grad.addColorStop(0.2 + Math.random() * 0.2, `rgba(40,40,40,${s * 0.5})`)
-    grad.addColorStop(0.5 + Math.random() * 0.2, `rgba(10,10,10,${s * 0.7})`)
-    grad.addColorStop(1, 'transparent')
-    ctx.fillStyle = grad
-    ctx.fillRect(0, lineY, cw, 1)
-  }
-}
-
-function tick() {
-  // Smooth approach toward targets
-  strength += (targetStrength - strength) * 0.12
-  carouselStrength += (carouselTargetStrength - carouselStrength) * 0.14
-
-  const textCanvas = canvasEl.value
-  if (textCanvas) {
-    const ctx = textCanvas.getContext('2d')
-    if (ctx) {
-      let cw = textCanvas.width
-      let ch = textCanvas.height
-      if (cw === 0 || ch === 0) {
-        resizeTextCanvas()
-        cw = textCanvas.width
-        ch = textCanvas.height
-      }
-      if (cw > 0 && ch > 0) drawNoiseFrame(ctx, cw, ch, strength, pool)
-    }
-  }
-
-  const carouselCanvas = carouselCanvasEl.value
-  if (carouselCanvas) {
-    const ctx = carouselCanvas.getContext('2d')
-    if (ctx) {
-      let cw = carouselCanvas.width
-      let ch = carouselCanvas.height
-      if (cw === 0 || ch === 0) {
-        resizeCarouselCanvas()
-        cw = carouselCanvas.width
-        ch = carouselCanvas.height
-      }
-
-      if (cw > 0 && ch > 0) {
-        if (carouselStrength < 0.01) ctx.clearRect(0, 0, cw, ch)
-        else drawNoiseFrame(ctx, cw, ch, carouselStrength, carouselPool)
-      }
-    }
-  }
-
-  // Jitter the carousel during glitch bursts (GPU-only transforms).
-  const carouselEl = phoneCarouselEl.value
-  if (carouselEl) {
-    if (isCarouselGlitching.value && carouselStrength > 0.05) {
-      // Keep the shake subtle: the noise canvas sells the glitch.
-      const amp = Math.min(1, carouselStrength) * 2.2
-      const x = (Math.random() * 2 - 1) * amp
-      const y = (Math.random() * 2 - 1) * (amp * 0.35)
-      const skew = (Math.random() * 2 - 1) * (carouselStrength * 0.35)
-      carouselEl.style.setProperty('--glitch-x', `${x.toFixed(2)}px`)
-      carouselEl.style.setProperty('--glitch-y', `${y.toFixed(2)}px`)
-      carouselEl.style.setProperty('--glitch-skew', `${skew.toFixed(2)}deg`)
-    } else {
-      carouselEl.style.setProperty('--glitch-x', '0px')
-      carouselEl.style.setProperty('--glitch-y', '0px')
-      carouselEl.style.setProperty('--glitch-skew', '0deg')
-    }
-  }
-
-  rafId = requestAnimationFrame(tick)
 }
 
 function resizeTextCanvas() {
-  const el = noiseTextEl.value
-  const canvas = canvasEl.value
-  if (!el || !canvas) return
+  const el = noiseTextEl.value!
+  const canvas = canvasEl.value!
   const rect = el.getBoundingClientRect()
   canvas.width = Math.ceil(rect.width)
   canvas.height = Math.ceil(rect.height)
 }
 
-function resizeCarouselCanvas() {
-  const el = phoneCarouselEl.value
-  const canvas = carouselCanvasEl.value
-  if (!el || !canvas) return
-  const rect = el.getBoundingClientRect()
-  canvas.width = Math.ceil(rect.width)
-  canvas.height = Math.ceil(rect.height)
+let running = false
+
+function clearTextCanvas() {
+  const c = canvasEl.value!
+  const ctx = c.getContext('2d')!
+  ctx.clearRect(0, 0, c.width, c.height)
 }
 
-function detectMobile() {
-  const wasMobile = isMobile.value
-  isMobile.value = window.innerWidth <= 820
-  if (wasMobile !== isMobile.value) {
-    if (isMobile.value) stopAutoCarousel()
-    else startAutoCarousel()
+function startLoop() {
+  if (running) return
+  running = true
+  rafId = requestAnimationFrame(tick)
+}
+
+function tick() {
+  strength += (targetStrength - strength) * 0.12
+  targetStrength *= 0.9
+
+  if (strength < 0.005 && targetStrength < 0.005) {
+    strength = 0
+    clearTextCanvas()
+    running = false
+    return
   }
+
+  const textCanvas = canvasEl.value!
+  const ctx = textCanvas.getContext('2d')!
+  let cw = textCanvas.width
+  let ch = textCanvas.height
+  if (cw === 0 || ch === 0) {
+    resizeTextCanvas()
+    cw = textCanvas.width
+    ch = textCanvas.height
+  }
+  if (cw > 0 && ch > 0) drawNoiseFrame(ctx, cw, ch, strength)
+  rafId = requestAnimationFrame(tick)
 }
 
-let mouseMoveHandler: (e: MouseEvent) => void
-let mouseLeaveHandler: () => void
-let resizeObserver: ResizeObserver
+function mouseMoveHandler(e: MouseEvent) {
+  const el = noiseTextEl.value!
+  const rect = el.getBoundingClientRect()
+  const cx = rect.left + rect.width / 2
+  const cy = rect.top + rect.height / 2
+  const dx = e.clientX - cx
+  const dy = e.clientY - cy
+  const dist = Math.sqrt(dx * dx + dy * dy)
+  const radius = Math.max(rect.width, rect.height) * 1.5
+  targetStrength = Math.max(0, 1 - dist / radius)
+  if (targetStrength > 0.005) startLoop()
+}
+
+function mouseLeaveHandler() {
+  targetStrength = 0
+  startLoop()
+}
+
+function onResize() {
+  resizeTextCanvas()
+}
+
+let resizeObserver: ResizeObserver | null = null
 
 onMounted(() => {
-  detectMobile()
-  startAutoCarousel() // starts only when !isMobile
-  window.addEventListener('resize', detectMobile)
+  const reduceMotionMq = window.matchMedia('(prefers-reduced-motion: reduce)')
+
+  centerGallery()
+  galleryEl.value!.addEventListener('scroll', scrollHandler, { passive: true })
+  
+  galleryEl.value!.addEventListener('mouseenter', stopAutoScroll)
+  galleryEl.value!.addEventListener('mouseleave', startAutoScroll)
+  galleryEl.value!.addEventListener('touchstart', stopAutoScroll, { passive: true })
+  galleryEl.value!.addEventListener('touchend', startAutoScroll, { passive: true })
+
   resizeTextCanvas()
-  resizeCarouselCanvas()
+  resizeObserver = new ResizeObserver(() => resizeTextCanvas())
+  resizeObserver.observe(noiseTextEl.value!)
 
-  resizeObserver = new ResizeObserver(() => {
-    resizeTextCanvas()
-    resizeCarouselCanvas()
-  })
-  if (noiseTextEl.value) resizeObserver.observe(noiseTextEl.value)
-  if (phoneCarouselEl.value) resizeObserver.observe(phoneCarouselEl.value)
+  window.addEventListener('resize', onResize)
 
-  mouseMoveHandler = (e: MouseEvent) => {
-    const el = noiseTextEl.value
-    if (!el) return
-    const rect = el.getBoundingClientRect()
-    const cx = rect.left + rect.width / 2
-    const cy = rect.top + rect.height / 2
-    const dx = e.clientX - cx
-    const dy = e.clientY - cy
-    const dist = Math.sqrt(dx * dx + dy * dy)
-    // Activation radius: 1.5× the larger dimension so it starts well outside the text
-    const radius = Math.max(rect.width, rect.height) * 1.5
-    targetStrength = Math.max(0, 1 - dist / radius)
+  if (!reduceMotionMq.matches) {
+    window.addEventListener('mousemove', mouseMoveHandler, { passive: true })
+    document.addEventListener('mouseleave', mouseLeaveHandler)
   }
 
-  mouseLeaveHandler = () => {
-    targetStrength = 0
-  }
-
-  window.addEventListener('mousemove', mouseMoveHandler)
-  document.addEventListener('mouseleave', mouseLeaveHandler)
-
-  rafId = requestAnimationFrame(tick)
+  startAutoScroll()
 })
 
 onBeforeUnmount(() => {
-  stopAutoCarousel()
   cancelAnimationFrame(rafId)
+  running = false
+  stopAutoScroll()
+  galleryEl.value?.removeEventListener('scroll', scrollHandler)
+  galleryEl.value?.removeEventListener('mouseenter', stopAutoScroll)
+  galleryEl.value?.removeEventListener('mouseleave', startAutoScroll)
+  galleryEl.value?.removeEventListener('touchstart', stopAutoScroll)
+  galleryEl.value?.removeEventListener('touchend', startAutoScroll)
   window.removeEventListener('mousemove', mouseMoveHandler)
   document.removeEventListener('mouseleave', mouseLeaveHandler)
-  window.removeEventListener('resize', detectMobile)
+  window.removeEventListener('resize', onResize)
   resizeObserver?.disconnect()
 })
 </script>
@@ -324,7 +266,6 @@ onBeforeUnmount(() => {
           Music without<br />
           <span class="hero__noise-wrap">
             <span ref="noiseTextEl" class="hero__noise">the noise.</span>
-            <!-- Canvas sits over the text, blends multiplicatively so particles darken the gradient -->
             <canvas ref="canvasEl" class="hero__noise-canvas" aria-hidden="true" />
           </span>
         </h1>
@@ -350,22 +291,12 @@ onBeforeUnmount(() => {
 
       <!-- Mockup column -->
       <div class="hero__visual" aria-hidden="true">
-        <div class="hero__mockup-wrap" :class="{ 'hero__mockup-wrap--mobile': isMobile }">
-          <div
-            ref="phoneCarouselEl"
-            class="hero__phone-carousel"
-            :class="{
-              'hero__phone-carousel--mobile': isMobile,
-              'hero__phone-carousel--glitching': isCarouselGlitching && !isMobile,
-            }"
-          >
-            <img v-for="(screen, index) in screens" :key="index" :src="screen.src" :srcset="screen.srcset"
-              sizes="(max-width: 640px) 280px, (max-width: 1280px) 280px, 280px" :alt="screen.alt"
+        <div ref="galleryEl" class="hero__gallery">
+          <div v-for="(screen, index) in screens" :key="index" class="hero__shot"
+            :class="{ 'is-active': index === activeIndex }" @click="focusShot">
+            <img :src="screen.src" :srcset="screen.srcset" sizes="(max-width: 640px) 260px, 300px" :alt="screen.alt"
               :loading="index === 0 ? 'eager' : 'lazy'" :fetchpriority="index === 0 ? 'high' : 'auto'" decoding="async"
-              class="hero__phone-screen"
-              :class="{ 'hero__phone-screen--active': index === currentScreenIndex && !isMobile }" width="280"
-              height="560" />
-            <canvas ref="carouselCanvasEl" class="hero__phone-carousel-noise-canvas" aria-hidden="true" />
+              class="hero__shot-img" width="280" height="560" />
           </div>
         </div>
       </div>
@@ -377,10 +308,11 @@ onBeforeUnmount(() => {
 <style scoped>
 .hero {
   position: relative;
-  min-height: 88vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
-  padding: 80px 0 100px;
+  margin-top: -64px;
+  padding: 120px 0 80px;
   overflow: hidden;
 }
 
@@ -389,9 +321,18 @@ onBeforeUnmount(() => {
   inset: 0;
   background:
     radial-gradient(ellipse 65% 65% at 85% 45%, var(--md-primary-container) 0%, transparent 65%),
-    radial-gradient(ellipse 55% 65% at 5% 95%, var(--md-secondary-container) 0%, transparent 55%),
-    radial-gradient(ellipse 35% 45% at 55% 5%, var(--md-tertiary-container) 0%, transparent 50%);
+    radial-gradient(ellipse 64% 72% at 2% 80%, var(--md-secondary-container) 0%, transparent 62%),
+    radial-gradient(ellipse 58% 45% at 26% 5%, var(--md-tertiary-container) 0%, transparent 55%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 62%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0, #000 62%, transparent 100%);
   z-index: 0;
+}
+
+html[data-theme="light"] .hero__bg {
+  background:
+    radial-gradient(ellipse 65% 65% at 85% 45%, color-mix(in srgb, var(--md-primary) 32%, transparent) 0%, transparent 65%),
+    radial-gradient(ellipse 64% 72% at 2% 80%, color-mix(in srgb, var(--md-tertiary) 30%, transparent) 0%, transparent 62%),
+    radial-gradient(ellipse 58% 45% at 26% 5%, color-mix(in srgb, var(--md-tertiary) 36%, transparent) 0%, transparent 55%);
 }
 
 .hero__inner {
@@ -399,8 +340,18 @@ onBeforeUnmount(() => {
   z-index: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 64px;
+  gap: 56px;
   align-items: center;
+}
+
+.hero__visual {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.hero__copy {
+  max-width: 680px;
 }
 
 .hero__badges {
@@ -430,11 +381,9 @@ onBeforeUnmount(() => {
   letter-spacing: -0.03em;
   color: var(--md-on-background);
   margin-bottom: 20px;
-  /* Reserve space to reduce CLS when web font replaces fallback (2 lines) */
   min-height: 2.2em;
 }
 
-/* Wrapper so canvas can be positioned over text */
 .hero__noise-wrap {
   position: relative;
   display: inline-block;
@@ -451,7 +400,6 @@ onBeforeUnmount(() => {
   -webkit-text-fill-color: transparent;
 }
 
-/* Canvas overlay - multiply blends dark particles into the gradient text */
 .hero__noise-canvas {
   position: absolute;
   inset: 0;
@@ -459,7 +407,6 @@ onBeforeUnmount(() => {
   height: 100%;
   pointer-events: none;
   mix-blend-mode: multiply;
-  /* Crisp pixels - no browser smoothing */
   image-rendering: pixelated;
 }
 
@@ -478,201 +425,132 @@ onBeforeUnmount(() => {
   align-items: center;
 }
 
-/* -- Visual / Mockup -- */
-.hero__visual {
+
+
+.hero__gallery {
   position: relative;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  perspective: 1200px;
+  align-items: center;
+  gap: 22px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 64px 30%;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 18%, #000 82%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 18%, #000 82%, transparent 100%);
 }
 
-.hero__mockup-wrap {
-  position: relative;
-  width: 280px;
-  height: 560px;
-  aspect-ratio: 1 / 2;
-  transform-style: preserve-3d;
-  /* Reserve space before images load to avoid CLS */
-  min-height: 360px;
-}
-
-.hero__mockup-wrap--mobile {
-  width: 100%;
-}
-
-.hero__phone-carousel {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  transform-style: preserve-3d;
-  contain: layout;
-  --glitch-x: 0px;
-  --glitch-y: 0px;
-  --glitch-skew: 0deg;
-}
-
-.hero__phone-carousel--mobile {
-  display: flex;
-  flex-wrap: nowrap;
-  width: 100%;
-  cursor: grab;
-  gap: 6px;
-}
-
-.hero__phone-screen {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 26px;
-  box-shadow: 0 20px 70px rgba(108, 75, 204, 0.06), 0 10px 32px rgba(0, 0, 0, 0.10);
-  opacity: 0;
-  transition: none;
-  object-fit: contain;
-  will-change: transform, filter;
-}
-
-.hero__phone-screen--active {
-  opacity: 1;
-}
-
-.hero__phone-carousel--glitching .hero__phone-screen--active {
-  transform: translate3d(var(--glitch-x), var(--glitch-y), 0) skewX(var(--glitch-skew));
-  animation: heroPhoneGlitchFlicker 620ms steps(1, end) both;
-}
-
-.hero__phone-carousel--glitching .hero__phone-carousel-noise-canvas {
-  animation: heroPhoneGlitchCanvas 620ms steps(1, end) both;
-}
-
-@keyframes heroPhoneGlitchFlicker {
-  0% { filter: none; }
-  8% { filter: contrast(1.18) saturate(0.85) brightness(1.04); }
-  12% { filter: none; }
-  20% { filter: contrast(1.22) saturate(0.8) brightness(1.06); }
-  24% { filter: none; }
-  40% { filter: contrast(1.14) saturate(0.9) brightness(1.03); }
-  56% { filter: contrast(1.1) saturate(0.95); }
-  100% { filter: none; }
-}
-
-@keyframes heroPhoneGlitchCanvas {
-  0% { opacity: 0; }
-  8% { opacity: 0.8; }
-  12% { opacity: 0.25; }
-  20% { opacity: 1; }
-  28% { opacity: 0.55; }
-  46% { opacity: 0.9; }
-  70% { opacity: 0.35; }
-  100% { opacity: 0; }
-}
-
-.hero__phone-carousel-noise-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  mix-blend-mode: multiply;
-  image-rendering: pixelated;
-  border-radius: 26px;
-  z-index: 20;
-}
-
-.hero__phone-carousel--mobile .hero__phone-screen {
-  position: relative;
-  flex-shrink: 0;
-  width: auto;
-  padding-right: 4px;
-  padding-left: 4px;
-  max-width: 100%;
-  opacity: 1;
-  transform: none;
-  border-radius: 26px;
-  box-shadow: 0 20px 70px rgba(108, 75, 204, 0.06), 0 10px 32px rgba(0, 0, 0, 0.10);
-}
-
-.hero__phone-carousel--mobile .hero__phone-carousel-noise-canvas {
+.hero__gallery::-webkit-scrollbar {
   display: none;
 }
 
-.hero__phone-screen:nth-child(1) {
-  z-index: 6;
+.hero__shot {
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  flex-shrink: 0;
+  height: 430px;
+  border-radius: 24px;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+  transform: scale(0.86);
+  transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.4s ease;
 }
 
-.hero__phone-screen:nth-child(2) {
-  z-index: 5;
+.hero__shot-img {
+  display: block;
+  height: 100%;
+  width: auto;
+  border-radius: inherit;
 }
 
-.hero__phone-screen:nth-child(3) {
-  z-index: 4;
-}
-
-.hero__phone-screen:nth-child(4) {
-  z-index: 3;
-}
-
-.hero__phone-screen:nth-child(5) {
-  z-index: 2;
-}
-
-.hero__phone-screen:nth-child(6) {
-  z-index: 1;
+.hero__shot.is-active {
+  transform: scale(1.05);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.55);
 }
 
 /* -- Responsive -- */
 @media (max-width: 820px) {
   .hero {
-    padding: 60px 0 80px;
+    padding: 104px 0 56px;
     min-height: auto;
   }
 
   .hero__inner {
-    grid-template-columns: 1fr;
-    gap: 52px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 36px;
     text-align: center;
+    min-width: 0;
   }
 
-  .hero__sub {
-    max-width: 100%;
-  }
-
-  .hero__badges,
-  .hero__actions {
-    justify-content: center;
+  .hero__copy {
+    width: 100%;
+    min-width: 0;
   }
 
   .hero__visual {
-    order: -1;
+    min-width: 0;
   }
 
-  .hero__mockup-wrap {
-    width: 200px;
-    height: auto;
+  .hero__headline {
+    font-size: clamp(2.9rem, 12.5vw, 3.6rem);
+    white-space: nowrap;
   }
 
-  .hero__mockup-wrap--mobile {
-    width: 100%;
-    margin-left: 0;
+  .hero__sub {
+    max-width: 38ch;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 28px;
   }
 
-  .hero__phone-carousel--mobile {
-    width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
+  .hero__badges {
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 6px;
   }
 
-  .hero__phone-carousel--mobile .hero__phone-screen {
-    scroll-snap-align: center;
-    margin: 0;
-    padding-left: 0;
-    padding-right: 0;
-    flex: 0 0 70%;
+  .badge {
+    padding: 5px 11px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .hero__actions {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero__actions .btn {
+    flex: 0 0 auto;
+    max-width: 100%;
+  }
+
+  .hero__actions .btn-filled {
+    width: 240px;
+  }
+
+  .hero__actions .btn-outlined {
     width: auto;
-    height: auto;
+  }
+
+  .hero__visual {
+    width: 100vw;
+    max-width: 100vw;
+  }
+
+  .hero__gallery {
+    padding: 62px 24%;
+    gap: 16px;
+  }
+
+  .hero__shot {
+    height: 56vh;
   }
 }
 </style>

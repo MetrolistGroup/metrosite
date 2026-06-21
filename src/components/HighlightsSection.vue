@@ -90,51 +90,50 @@ const features: Feature[] = [
   gap: 16px;
 }
 
-/* -- Card base -- */
+/* -- Card -- */
 .feature-card {
+  background: var(--md-sc-low);
+  color: var(--md-on-surface);
   border-radius: var(--r-xl);
-  padding: 36px 32px;
+  padding: 28px 28px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  transition: box-shadow var(--t-std), transform var(--t-std);
+  gap: 14px;
+  position: relative;
+  overflow: hidden;
+  transition: background var(--t-std), box-shadow var(--t-std);
 }
 
 .feature-card:hover {
-  box-shadow: var(--el-3);
+  background: var(--md-sc);
 }
 
-/* -- Tonal colour variants -- */
-.feature-card--primary {
-  background: var(--md-primary-container);
-  color: var(--md-on-primary-container);
-}
-
-.feature-card--secondary {
-  background: var(--md-secondary-container);
-  color: var(--md-on-secondary-container);
-}
-
-.feature-card--tertiary {
-  background: var(--md-tertiary-container);
-  color: var(--md-on-tertiary-container);
-}
-
-/* -- Icon pill -- */
+/* -- Icon chip -- */
 .feature-card__icon-wrap {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--r-md);
+  width: 52px;
+  height: 52px;
+  border-radius: var(--r-lg);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.42);
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
   margin-bottom: 4px;
   flex-shrink: 0;
 }
 
+.feature-card--secondary .feature-card__icon-wrap {
+  background: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+}
+
+.feature-card--tertiary .feature-card__icon-wrap {
+  background: var(--md-tertiary-container);
+  color: var(--md-on-tertiary-container);
+}
+
 .feature-card__icon-wrap .icon {
-  font-size: 1.75rem;
+  font-size: 1.625rem;
 }
 
 /* -- Text -- */
@@ -143,12 +142,13 @@ const features: Feature[] = [
   font-weight: 900;
   font-size: 1.25rem;
   line-height: 1.2;
+  color: var(--md-on-surface);
 }
 
 .feature-card__body {
   font-size: 0.9375rem;
   line-height: 1.65;
-  opacity: 0.82;
+  color: var(--md-on-surface-variant);
 }
 
 /* -- Responsive -- */
