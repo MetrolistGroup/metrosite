@@ -75,15 +75,10 @@ function advanceCarouselWithNoise() {
   }, 620)
 }
 
-// -- Canvas CRT particle system
-const noiseTextEl = ref<HTMLElement | null>(null)
-const canvasEl = ref<HTMLCanvasElement | null>(null)
 const phoneCarouselEl = ref<HTMLElement | null>(null)
 const carouselCanvasEl = ref<HTMLCanvasElement | null>(null)
 
 let rafId = 0
-let strength = 0       // 0–1, driven by mouse proximity
-let targetStrength = 0
 
 let carouselStrength = 0 // 0–1, short bursts during screen changes
 let carouselTargetStrength = 0
@@ -92,17 +87,12 @@ let carouselBurstTimeout: ReturnType<typeof setTimeout> | undefined
 let carouselSwitchTimeout: ReturnType<typeof setTimeout> | undefined
 let carouselGlitchEndTimeout: ReturnType<typeof setTimeout> | undefined
 
-// Particle pool - reuse objects to avoid GC pressure
 interface Particle {
   x: number; y: number
   w: number; h: number
   alpha: number
-  gray: number   // 0–80 (dark end of spectrum)
+  gray: number
 }
-const POOL_SIZE = 280
-const pool: Particle[] = Array.from({ length: POOL_SIZE }, () => ({
-  x: 0, y: 0, w: 2, h: 2, alpha: 0, gray: 0,
-}))
 
 const CAROUSEL_POOL_SIZE = 360
 const carouselPool: Particle[] = Array.from({ length: CAROUSEL_POOL_SIZE }, () => ({
@@ -162,24 +152,7 @@ function drawNoiseFrame(
 }
 
 function tick() {
-  // Smooth approach toward targets
-  strength += (targetStrength - strength) * 0.12
   carouselStrength += (carouselTargetStrength - carouselStrength) * 0.14
-
-  const textCanvas = canvasEl.value
-  if (textCanvas) {
-    const ctx = textCanvas.getContext('2d')
-    if (ctx) {
-      let cw = textCanvas.width
-      let ch = textCanvas.height
-      if (cw === 0 || ch === 0) {
-        resizeTextCanvas()
-        cw = textCanvas.width
-        ch = textCanvas.height
-      }
-      if (cw > 0 && ch > 0) drawNoiseFrame(ctx, cw, ch, strength, pool)
-    }
-  }
 
   const carouselCanvas = carouselCanvasEl.value
   if (carouselCanvas) {
@@ -222,15 +195,6 @@ function tick() {
   rafId = requestAnimationFrame(tick)
 }
 
-function resizeTextCanvas() {
-  const el = noiseTextEl.value
-  const canvas = canvasEl.value
-  if (!el || !canvas) return
-  const rect = el.getBoundingClientRect()
-  canvas.width = Math.ceil(rect.width)
-  canvas.height = Math.ceil(rect.height)
-}
-
 function resizeCarouselCanvas() {
   const el = phoneCarouselEl.value
   const canvas = carouselCanvasEl.value
@@ -249,44 +213,18 @@ function detectMobile() {
   }
 }
 
-let mouseMoveHandler: (e: MouseEvent) => void
-let mouseLeaveHandler: () => void
 let resizeObserver: ResizeObserver
 
 onMounted(() => {
   detectMobile()
   startAutoCarousel() // starts only when !isMobile
   window.addEventListener('resize', detectMobile)
-  resizeTextCanvas()
   resizeCarouselCanvas()
 
   resizeObserver = new ResizeObserver(() => {
-    resizeTextCanvas()
     resizeCarouselCanvas()
   })
-  if (noiseTextEl.value) resizeObserver.observe(noiseTextEl.value)
   if (phoneCarouselEl.value) resizeObserver.observe(phoneCarouselEl.value)
-
-  mouseMoveHandler = (e: MouseEvent) => {
-    const el = noiseTextEl.value
-    if (!el) return
-    const rect = el.getBoundingClientRect()
-    const cx = rect.left + rect.width / 2
-    const cy = rect.top + rect.height / 2
-    const dx = e.clientX - cx
-    const dy = e.clientY - cy
-    const dist = Math.sqrt(dx * dx + dy * dy)
-    // Activation radius: 1.5× the larger dimension so it starts well outside the text
-    const radius = Math.max(rect.width, rect.height) * 1.5
-    targetStrength = Math.max(0, 1 - dist / radius)
-  }
-
-  mouseLeaveHandler = () => {
-    targetStrength = 0
-  }
-
-  window.addEventListener('mousemove', mouseMoveHandler)
-  document.addEventListener('mouseleave', mouseLeaveHandler)
 
   rafId = requestAnimationFrame(tick)
 })
@@ -294,8 +232,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
   stopAutoCarousel()
   cancelAnimationFrame(rafId)
-  window.removeEventListener('mousemove', mouseMoveHandler)
-  document.removeEventListener('mouseleave', mouseLeaveHandler)
   window.removeEventListener('resize', detectMobile)
   resizeObserver?.disconnect()
 })
@@ -322,11 +258,7 @@ onBeforeUnmount(() => {
 
         <h1 class="hero__headline">
           Music without<br />
-          <span class="hero__noise-wrap">
-            <span ref="noiseTextEl" class="hero__noise">the noise.</span>
-            <!-- Canvas sits over the text, blends multiplicatively so particles darken the gradient -->
-            <canvas ref="canvasEl" class="hero__noise-canvas" aria-hidden="true" />
-          </span>
+          <span class="hero__noise">the noise.</span>
         </h1>
 
         <p class="hero__sub">
@@ -350,6 +282,9 @@ onBeforeUnmount(() => {
 
       <!-- Mockup column -->
       <div class="hero__visual" aria-hidden="true">
+        <div class="hero__annotation hero__annotation--left">
+          ADS? NEVER HEARD OF THEM! 🙅‍♀️
+        </div>
         <div class="hero__mockup-wrap" :class="{ 'hero__mockup-wrap--mobile': isMobile }">
           <div
             ref="phoneCarouselEl"
@@ -363,10 +298,17 @@ onBeforeUnmount(() => {
               sizes="(max-width: 640px) 280px, (max-width: 1280px) 280px, 280px" :alt="screen.alt"
               :loading="index === 0 ? 'eager' : 'lazy'" :fetchpriority="index === 0 ? 'high' : 'auto'" decoding="async"
               class="hero__phone-screen"
-              :class="{ 'hero__phone-screen--active': index === currentScreenIndex && !isMobile }" width="280"
+              :class="{
+                'hero__phone-screen--center': index === currentScreenIndex && !isMobile,
+                'hero__phone-screen--left': index === (currentScreenIndex - 1 + screenCount) % screenCount && !isMobile,
+                'hero__phone-screen--right': index === (currentScreenIndex + 1) % screenCount && !isMobile
+              }" width="280"
               height="560" />
             <canvas ref="carouselCanvasEl" class="hero__phone-carousel-noise-canvas" aria-hidden="true" />
           </div>
+        </div>
+        <div class="hero__annotation hero__annotation--right">
+          CACHED SONGS GO BRRRR! 🧊
         </div>
       </div>
 
@@ -377,135 +319,142 @@ onBeforeUnmount(() => {
 <style scoped>
 .hero {
   position: relative;
-  min-height: 88vh;
+  min-height: 90vh;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  padding: 80px 0 100px;
+  padding: 100px 0 120px;
   overflow: hidden;
-}
-
-.hero__bg {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 65% 65% at 85% 45%, var(--md-primary-container) 0%, transparent 65%),
-    radial-gradient(ellipse 55% 65% at 5% 95%, var(--md-secondary-container) 0%, transparent 55%),
-    radial-gradient(ellipse 35% 45% at 55% 5%, var(--md-tertiary-container) 0%, transparent 50%);
-  z-index: 0;
 }
 
 .hero__inner {
   position: relative;
   z-index: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 64px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  text-align: center;
+  gap: 56px;
+  width: 100%;
+}
+
+.hero__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 860px;
 }
 
 .hero__badges {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 8px;
-  margin-bottom: 28px;
+  margin-bottom: 32px;
 }
 
 .badge {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 5px 14px;
+  padding: 6px 16px;
   border-radius: var(--r-full);
   background: var(--md-secondary-container);
   color: var(--md-on-secondary-container);
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .hero__headline {
   font-family: 'Nunito', sans-serif;
   font-weight: 900;
-  font-size: clamp(2.75rem, 5.5vw, 4.5rem);
+  font-size: clamp(3.2rem, 7vw, 5.2rem);
   line-height: 1.05;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
   color: var(--md-on-background);
-  margin-bottom: 20px;
-  /* Reserve space to reduce CLS when web font replaces fallback (2 lines) */
-  min-height: 2.2em;
-}
-
-/* Wrapper so canvas can be positioned over text */
-.hero__noise-wrap {
-  position: relative;
-  display: inline-block;
+  margin-bottom: 24px;
 }
 
 .hero__noise {
   font-family: 'Climate Crisis', cursive;
   display: inline-block;
-  background: linear-gradient(90deg,
-      var(--md-primary) 0%,
-      var(--md-tertiary) 100%);
+  background: linear-gradient(
+    120deg,
+    #a582ff 0%,
+    #d0bcff 30%,
+    #80e2ff 55%,
+    #ff94cc 80%,
+    #a582ff 100%
+  );
+  background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  animation: noiseAnim 8s linear infinite;
+  filter: drop-shadow(0 0 6px rgba(208, 188, 255, 0.35));
+  transition: filter 0.3s ease;
 }
 
-/* Canvas overlay - multiply blends dark particles into the gradient text */
-.hero__noise-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  mix-blend-mode: multiply;
-  /* Crisp pixels - no browser smoothing */
-  image-rendering: pixelated;
+.hero__noise:hover {
+  filter: drop-shadow(0 0 12px rgba(208, 188, 255, 0.6));
+}
+
+@keyframes noiseAnim {
+  0% {
+    background-position: 200% 0;
+    filter: hue-rotate(0deg) drop-shadow(0 0 6px rgba(208, 188, 255, 0.35));
+  }
+  50% {
+    filter: hue-rotate(180deg) drop-shadow(0 0 12px rgba(242, 184, 181, 0.5));
+  }
+  100% {
+    background-position: -200% 0;
+    filter: hue-rotate(360deg) drop-shadow(0 0 6px rgba(208, 188, 255, 0.35));
+  }
 }
 
 .hero__sub {
-  font-size: clamp(1rem, 1.4vw, 1.125rem);
+  font-size: clamp(1.0625rem, 1.8vw, 1.25rem);
   color: var(--md-on-surface-variant);
-  max-width: 44ch;
-  margin-bottom: 36px;
-  line-height: 1.7;
+  max-width: 52ch;
+  margin-bottom: 40px;
+  line-height: 1.75;
 }
 
 .hero__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  justify-content: center;
+  gap: 16px;
   align-items: center;
 }
 
-/* -- Visual / Mockup -- */
 .hero__visual {
   position: relative;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   perspective: 1200px;
+  width: 100%;
+  height: 580px;
+  margin-top: 100px;
 }
 
 .hero__mockup-wrap {
   position: relative;
   width: 280px;
-  height: 560px;
-  aspect-ratio: 1 / 2;
+  height: 520px;
   transform-style: preserve-3d;
-  /* Reserve space before images load to avoid CLS */
-  min-height: 360px;
-}
-
-.hero__mockup-wrap--mobile {
-  width: 100%;
 }
 
 .hero__phone-carousel {
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 0;
   transform-style: preserve-3d;
   contain: layout;
   --glitch-x: 0px;
@@ -513,32 +462,48 @@ onBeforeUnmount(() => {
   --glitch-skew: 0deg;
 }
 
-.hero__phone-carousel--mobile {
-  display: flex;
-  flex-wrap: nowrap;
-  width: 100%;
-  cursor: grab;
-  gap: 6px;
-}
-
 .hero__phone-screen {
   position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  border-radius: 26px;
-  box-shadow: 0 20px 70px rgba(108, 75, 204, 0.06), 0 10px 32px rgba(0, 0, 0, 0.10);
-  opacity: 0;
-  transition: none;
+  border-radius: 28px;
   object-fit: contain;
-  will-change: transform, filter;
+  transition: transform var(--t-std), opacity var(--t-std), filter var(--t-std), box-shadow var(--t-std);
+  will-change: transform, opacity, filter;
+  opacity: 0;
+  pointer-events: none;
+  border: 4px solid #000;
+  background-color: var(--md-primary-container);
 }
 
-.hero__phone-screen--active {
+.hero__phone-screen--center {
   opacity: 1;
+  z-index: 10;
+  transform: translate3d(0, 0, 80px) scale(1.05);
+  box-shadow: 10px 10px 0px var(--md-primary);
+  pointer-events: auto;
 }
 
-.hero__phone-carousel--glitching .hero__phone-screen--active {
-  transform: translate3d(var(--glitch-x), var(--glitch-y), 0) skewX(var(--glitch-skew));
+.hero__phone-screen--left {
+  opacity: 0.65;
+  z-index: 5;
+  transform: translate3d(-200px, 0, 0) rotateY(32deg) scale(0.85);
+  filter: blur(1.5px) brightness(0.7);
+  box-shadow: 8px 8px 0px rgba(108, 75, 204, 0.5);
+}
+
+.hero__phone-screen--right {
+  opacity: 0.65;
+  z-index: 5;
+  transform: translate3d(200px, 0, 0) rotateY(-32deg) scale(0.85);
+  filter: blur(1.5px) brightness(0.7);
+  box-shadow: -8px 8px 0px rgba(108, 75, 204, 0.5);
+}
+
+.hero__phone-carousel--glitching .hero__phone-screen--center {
+  transform: translate3d(var(--glitch-x), var(--glitch-y), 80px) skewX(var(--glitch-skew)) scale(1.05);
   animation: heroPhoneGlitchFlicker 620ms steps(1, end) both;
 }
 
@@ -576,103 +541,128 @@ onBeforeUnmount(() => {
   pointer-events: none;
   mix-blend-mode: multiply;
   image-rendering: pixelated;
-  border-radius: 26px;
+  border-radius: 28px;
   z-index: 20;
 }
 
-.hero__phone-carousel--mobile .hero__phone-screen {
-  position: relative;
-  flex-shrink: 0;
-  width: auto;
-  padding-right: 4px;
-  padding-left: 4px;
-  max-width: 100%;
-  opacity: 1;
-  transform: none;
-  border-radius: 26px;
-  box-shadow: 0 20px 70px rgba(108, 75, 204, 0.06), 0 10px 32px rgba(0, 0, 0, 0.10);
+.hero__annotation {
+  position: absolute;
+  background: var(--md-tertiary-container);
+  color: var(--md-on-tertiary-container);
+  border: 3px solid #000;
+  padding: 10px 16px;
+  border-radius: var(--r-md);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 4px 4px 0px #000;
+  z-index: 15;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: transform var(--t-std), opacity var(--t-std);
 }
 
-.hero__phone-carousel--mobile .hero__phone-carousel-noise-canvas {
-  display: none;
+.hero__annotation--left {
+  left: 10%;
+  top: 30%;
+  transform: rotate(-8deg);
+  animation: floatLeft 4s ease-in-out infinite alternate;
 }
 
-.hero__phone-screen:nth-child(1) {
-  z-index: 6;
+.hero__annotation--right {
+  right: 10%;
+  top: 50%;
+  transform: rotate(8deg);
+  animation: floatRight 4.5s ease-in-out infinite alternate;
 }
 
-.hero__phone-screen:nth-child(2) {
-  z-index: 5;
+@keyframes floatLeft {
+  0% {
+    transform: translateY(0) rotate(-8deg);
+  }
+  100% {
+    transform: translateY(-10px) rotate(-6deg);
+  }
 }
 
-.hero__phone-screen:nth-child(3) {
-  z-index: 4;
+@keyframes floatRight {
+  0% {
+    transform: translateY(0) rotate(8deg);
+  }
+  100% {
+    transform: translateY(-10px) rotate(10deg);
+  }
 }
 
-.hero__phone-screen:nth-child(4) {
-  z-index: 3;
+@media (max-width: 1000px) {
+  .hero__annotation {
+    display: none;
+  }
 }
 
-.hero__phone-screen:nth-child(5) {
-  z-index: 2;
-}
-
-.hero__phone-screen:nth-child(6) {
-  z-index: 1;
-}
-
-/* -- Responsive -- */
 @media (max-width: 820px) {
   .hero {
-    padding: 60px 0 80px;
+    padding: 40px 0 60px;
     min-height: auto;
   }
 
   .hero__inner {
-    grid-template-columns: 1fr;
-    gap: 52px;
-    text-align: center;
+    gap: 32px;
+    width: 100%;
+  }
+
+  .hero__headline {
+    font-size: clamp(2.4rem, 6vw, 3.4rem);
   }
 
   .hero__sub {
     max-width: 100%;
-  }
-
-  .hero__badges,
-  .hero__actions {
-    justify-content: center;
+    margin-bottom: 24px;
   }
 
   .hero__visual {
-    order: -1;
+    height: 480px;
+    margin-top: 32px;
   }
 
   .hero__mockup-wrap {
-    width: 200px;
-    height: auto;
-  }
-
-  .hero__mockup-wrap--mobile {
     width: 100%;
-    margin-left: 0;
+    height: 460px;
   }
 
   .hero__phone-carousel--mobile {
+    display: flex;
+    flex-wrap: nowrap;
     width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
+    gap: 16px;
+    padding: 10px 16px;
+    justify-content: flex-start;
   }
 
   .hero__phone-carousel--mobile .hero__phone-screen {
+    position: relative;
     scroll-snap-align: center;
     margin: 0;
-    padding-left: 0;
-    padding-right: 0;
-    flex: 0 0 70%;
-    width: auto;
-    height: auto;
+    flex: 0 0 220px;
+    width: 220px;
+    height: 440px;
+    opacity: 1;
+    transform: none;
+    filter: none;
+    border-radius: 20px;
+    border: 3px solid #000;
+    box-shadow: 6px 6px 0px var(--md-primary);
+    pointer-events: auto;
+  }
+
+  .hero__phone-carousel--mobile .hero__phone-carousel-noise-canvas {
+    display: none;
   }
 }
 </style>

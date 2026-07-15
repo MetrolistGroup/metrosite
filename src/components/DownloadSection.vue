@@ -37,6 +37,8 @@
 .download__card {
   background: var(--md-primary-container);
   border-radius: var(--r-2xl);
+  border: 3px solid #000;
+  box-shadow: 6px 6px 0px #000;
   padding: 60px 52px;
   display: flex;
   align-items: center;

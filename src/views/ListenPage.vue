@@ -139,14 +139,7 @@ async function copyCode() {
 }
 
 .listen__bg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background:
-    radial-gradient(ellipse 70% 60% at 90% 20%, var(--md-primary-container) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 70% at 10% 80%, var(--md-tertiary-container) 0%, transparent 50%),
-    radial-gradient(ellipse 50% 50% at 50% 50%, var(--md-secondary-container) 0%, transparent 60%);
-  pointer-events: none;
+  display: none;
 }
 
 .listen__inner {
@@ -239,6 +232,8 @@ async function copyCode() {
   border-radius: var(--r-2xl);
   padding: 24px 20px;
   margin-bottom: 24px;
+  border: 3px solid #000;
+  box-shadow: 6px 6px 0px #000;
   animation: listen-enter 0.5s cubic-bezier(0.2, 0, 0, 1) backwards;
 }
 
@@ -272,10 +267,11 @@ async function copyCode() {
 
 .listen__code-value {
   font-family: ui-monospace, 'SF Mono', monospace;
-  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-size: clamp(1.5rem, 5vw, 2.25rem);
   font-weight: 800;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.15em;
   line-height: 1;
+  word-break: break-all;
 }
 
 .listen__copy-btn {
@@ -283,7 +279,7 @@ async function copyCode() {
   align-items: center;
   gap: 8px;
   padding: 12px 22px;
-  border: none;
+  border: 2px solid #000;
   border-radius: var(--r-full);
   background: rgba(255, 255, 255, 0.22);
   color: inherit;
@@ -291,12 +287,15 @@ async function copyCode() {
   font-size: 0.9375rem;
   font-weight: 700;
   cursor: pointer;
-  transition: background var(--t-fast), transform var(--t-fast);
+  box-shadow: 3px 3px 0px #000;
+  transition: background var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
   -webkit-tap-highlight-color: transparent;
 }
 
 .listen__copy-btn:hover {
   background: rgba(255, 255, 255, 0.32);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px #000;
 }
 
 .listen__copy-btn:active {
@@ -317,6 +316,8 @@ async function copyCode() {
   border-radius: var(--r-xl);
   background: var(--md-sc-low);
   color: var(--md-on-surface-variant);
+  border: 3px solid #000;
+  box-shadow: 6px 6px 0px #000;
   animation: listen-enter 0.5s cubic-bezier(0.2, 0, 0, 1) 0.05s backwards;
 }
 
@@ -339,27 +340,27 @@ async function copyCode() {
   line-height: 1.5;
 }
 
-/* Cards — two-column on larger screens, staggered motion */
+/* Cards — auto-fit columns on all screens, staggered motion */
 .listen__cards {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
   margin-bottom: 28px;
-}
-
-@media (min-width: 620px) {
-  .listen__cards {
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 36px;
-  }
 }
 
 .listen__card {
   border-radius: var(--r-2xl);
   padding: 24px 20px;
   background: var(--md-sc);
+  border: 3px solid #000;
+  box-shadow: 6px 6px 0px #000;
   animation: listen-enter 0.5s cubic-bezier(0.2, 0, 0, 1) backwards;
+  transition: transform var(--t-std), box-shadow var(--t-std);
+}
+
+.listen__card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0px #000;
 }
 
 @media (min-width: 480px) {
@@ -383,6 +384,7 @@ async function copyCode() {
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 2px solid #000;
   margin-bottom: 18px;
 }
 
@@ -456,6 +458,8 @@ async function copyCode() {
   color: var(--md-on-secondary-container);
   font-size: 0.875rem;
   font-weight: 700;
+  border: 2px solid #000;
+  box-shadow: 3px 3px 0px #000;
   animation: listen-enter 0.5s cubic-bezier(0.2, 0, 0, 1) 0.2s backwards;
 }
 

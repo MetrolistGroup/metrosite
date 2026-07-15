@@ -94,17 +94,71 @@
 
 html {
   scroll-behavior: smooth;
+  background: radial-gradient(circle at 50% 40%, #1c1b22 0%, #121116 70%, #0d0c0f 100%);
+  background-attachment: fixed;
 }
 
 body {
   font-family: 'Nunito Sans', sans-serif;
   font-size: 1rem;
   line-height: 1.6;
-  background: var(--md-background);
+  background: transparent;
   color: var(--md-on-background);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  position: relative;
+  min-height: 100vh;
+}
+
+#app::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: linear-gradient(90deg, rgba(108, 75, 204, 0.08) 1px, transparent 1px),
+                    linear-gradient(0deg, rgba(108, 75, 204, 0.08) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  mask-image: radial-gradient(circle at 50% 40%, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 75%);
+  -webkit-mask-image: radial-gradient(circle at 50% 40%, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 75%);
+  z-index: -1;
+  animation: gridMove 24s linear infinite;
+}
+
+#app::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: linear-gradient(90deg, rgba(108, 75, 204, 0.25) 1px, transparent 1px),
+                    linear-gradient(0deg, rgba(108, 75, 204, 0.25) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  mask-image: radial-gradient(circle at 50% 40%, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 75%);
+  -webkit-mask-image: radial-gradient(circle at 50% 40%, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 75%);
+  z-index: -1;
+  filter: blur(4px);
+  animation: gridMove 24s linear infinite, gridPulse 8s ease-in-out infinite alternate;
+}
+
+@keyframes gridMove {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 50px;
+  }
+}
+
+@keyframes gridPulse {
+  0% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0.8;
+  }
 }
 
 h1,

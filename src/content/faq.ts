@@ -28,6 +28,6 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     question: 'Is there a desktop version?',
-    answer: 'No. Try YouTube Music in your browser, or Pear-desktop as an alternative.',
+    answer: 'No, but Metrolist Desktop is currently in development! You can also try YouTube Music in your browser, or Pear-desktop as an alternative.',
   },
 ]

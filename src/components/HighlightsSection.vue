@@ -83,11 +83,11 @@ const features: Feature[] = [
   color: var(--md-on-surface-variant);
 }
 
-/* 2 × 2 grid - 4 cards */
+/* Auto-fit grid - no media queries needed, works on all screens */
 .highlights__grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
 }
 
 /* -- Card base -- */
@@ -97,11 +97,14 @@ const features: Feature[] = [
   display: flex;
   flex-direction: column;
   gap: 12px;
+  border: 3px solid #000;
+  box-shadow: 6px 6px 0px #000;
   transition: box-shadow var(--t-std), transform var(--t-std);
 }
 
 .feature-card:hover {
-  box-shadow: var(--el-3);
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0px #000;
 }
 
 /* -- Tonal colour variants -- */
@@ -128,7 +131,8 @@ const features: Feature[] = [
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid #000;
   margin-bottom: 4px;
   flex-shrink: 0;
 }

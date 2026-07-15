@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { FAQ_ITEMS } from '../content/faq'
-
-const topItems = FAQ_ITEMS.slice(0, 5)
 </script>
 
 <template>
@@ -13,22 +11,17 @@ const topItems = FAQ_ITEMS.slice(0, 5)
       </header>
 
       <div class="faq__card" role="region" aria-label="Frequently asked questions">
-        <details v-for="item in topItems" :key="item.question" class="faq__item">
+        <details v-for="item in FAQ_ITEMS" :key="item.question" class="faq__item">
           <summary class="faq__q">
             <span class="faq__q-text">{{ item.question }}</span>
             <span class="faq__chev icon" aria-hidden="true">arrow_forward</span>
           </summary>
           <div class="faq__a">
-            <p>{{ item.answer }}</p>
+            <div class="faq__a-content">
+              <p>{{ item.answer }}</p>
+            </div>
           </div>
         </details>
-
-        <div class="faq__cta">
-          <RouterLink to="/faq" class="btn btn-tonal btn-lg">
-            Got more questions? View full FAQ
-            <span class="icon" aria-hidden="true" style="font-size: 1.125rem">arrow_forward</span>
-          </RouterLink>
-        </div>
       </div>
     </div>
   </section>
@@ -70,10 +63,15 @@ const topItems = FAQ_ITEMS.slice(0, 5)
 
 .faq__item {
   border-bottom: 1px solid var(--md-outline-variant);
+  transition: background-color var(--t-std);
 }
 
 .faq__item:last-of-type {
   border-bottom: none;
+}
+
+.faq__item[open] {
+  background-color: rgba(255, 255, 255, 0.015);
 }
 
 .faq__q {
@@ -86,6 +84,11 @@ const topItems = FAQ_ITEMS.slice(0, 5)
   padding: 18px 20px;
   color: var(--md-on-surface);
   user-select: none;
+  transition: color var(--t-std);
+}
+
+.faq__q:hover {
+  color: var(--md-primary);
 }
 
 .faq__q::-webkit-details-marker {
@@ -102,18 +105,40 @@ const topItems = FAQ_ITEMS.slice(0, 5)
 .faq__chev {
   pointer-events: none;
   transform: rotate(0deg);
-  transition: transform var(--t-std), opacity var(--t-fast);
+  transition: transform var(--t-std), opacity var(--t-fast), color var(--t-std);
   opacity: 0.7;
 }
 
 .faq__item[open] .faq__chev {
   transform: rotate(90deg);
   opacity: 1;
+  color: var(--md-primary);
 }
 
 .faq__a {
-  padding: 0 20px 18px;
+  padding: 0 20px;
   color: var(--md-on-surface-variant);
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--t-std), padding var(--t-std);
+}
+
+.faq__item[open] .faq__a {
+  grid-template-rows: 1fr;
+  padding: 0 20px 18px;
+}
+
+.faq__a-content {
+  min-height: 0;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity var(--t-std), transform var(--t-std);
+}
+
+.faq__item[open] .faq__a-content {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .faq__a p {
@@ -123,24 +148,17 @@ const topItems = FAQ_ITEMS.slice(0, 5)
   max-width: 76ch;
 }
 
-.faq__cta {
-  display: flex;
-  justify-content: center;
-  padding: 20px;
-  background: color-mix(in srgb, var(--md-sc) 75%, var(--md-secondary-container));
-}
-
 @media (min-width: 640px) {
   .faq__q {
     padding: 20px 28px;
   }
 
   .faq__a {
-    padding: 0 28px 22px;
+    padding: 0 28px;
   }
 
-  .faq__cta {
-    padding: 26px;
+  .faq__item[open] .faq__a {
+    padding: 0 28px 22px;
   }
 }
 </style>
