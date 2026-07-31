@@ -1,0 +1,14 @@
+{
+  "name": "Adriel",
+  "role": "Core Developer",
+  "github": "adrielGGmotion",
+  "avatar": "https://github.com/adrielGGmotion.png",
+  "bio": "Contributes to the app's maintenance, including performance, UI components, and integrations, keeping Metrolist fast and reliable.",
+  "isHead": false,
+  "order": 4,
+  "socials": [
+    { "platform": "website", "url": "https://adriel-motionpage.pages.dev/" },
+    { "platform": "instagram", "url": "https://www.instagram.com/adrielggmotion" },
+    { "platform": "telegram", "url": "https://t.me/adrielggmotion" }
+  ]
+}

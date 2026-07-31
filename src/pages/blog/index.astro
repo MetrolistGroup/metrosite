@@ -1,0 +1,134 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { t, defaultLocale } from '../../i18n';
+const locale = Astro.locals.locale ?? defaultLocale;
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<BaseLayout title={t(locale, 'blog.pageTitle')} description={t(locale, 'blog.description')}>
+	<main class="container page-content">
+		<header class="page-header" transition:name="page-header">
+			<h1 class="display-l">{t(locale, 'blog.heading')}</h1>
+			<p class="headline-l">{t(locale, 'blog.description')}</p>
+		</header>
+		<section class="post-list">
+			{posts.length > 0 ? (
+				posts.map((post) => (
+					<a href={`/blog/${post.slug}/`} class="post-card">
+						{post.data.heroImage && (
+							<img 
+								src={post.data.heroImage} 
+								alt={post.data.title} 
+								class="post-hero" 
+								transition:name={`hero-${post.slug}`}
+							/>
+						)}
+						<div class="post-content">
+							<p class="label-l date">
+								<time datetime={post.data.pubDate.toISOString()}>
+									{post.data.pubDate.toLocaleDateString(locale, {
+										year: 'numeric',
+										month: 'short',
+										day: 'numeric',
+									})}
+								</time>
+							</p>
+							<h2 class="title-l title" transition:name={`title-${post.slug}`}>{post.data.title}</h2>
+							<p class="body-l description">{post.data.description}</p>
+						</div>
+					</a>
+				))
+			) : (
+				<div class="empty-state">
+					<span class="material-symbols-rounded">article</span>
+					<p class="headline-s">{t(locale, 'blog.empty')}</p>
+					<p class="body-l secondary">{t(locale, 'blog.emptyHint')}</p>
+				</div>
+			)}
+		</section>
+	</main>
+</BaseLayout>
+
+<style>
+	.page-content {
+		padding: var(--space-section-y) calc(var(--unit) * 4);
+		max-width: 1200px;
+	}
+
+	.page-header {
+		text-align: start;
+		margin-bottom: var(--space-grid-gap);
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--unit) * 2);
+	}
+
+	.post-list {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		gap: var(--space-card-gap);
+	}
+
+	.post-card {
+		background-color: var(--md-sys-color-surface-container-low);
+		border-radius: var(--radius-l);
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+		transition: background-color 0.4s cubic-bezier(0.2, 0, 0, 1);
+	}
+
+	.post-card:hover {
+		background-color: var(--md-sys-color-surface-container-high);
+	}
+
+	.post-hero {
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		object-fit: cover;
+	}
+
+	.post-content {
+		padding: var(--space-card-padding);
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--unit) * 2);
+	}
+
+	.date {
+		color: var(--md-sys-color-on-surface-variant);
+	}
+
+	.title {
+		color: var(--md-sys-color-on-surface);
+	}
+
+	.description {
+		color: var(--md-sys-color-on-surface-variant);
+	}
+
+	.empty-state {
+		grid-column: 1 / -1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: calc(var(--unit) * 20) 0;
+		text-align: center;
+		gap: calc(var(--unit) * 4);
+		color: var(--md-sys-color-on-surface-variant);
+	}
+
+	.empty-state .material-symbols-rounded {
+		font-size: 64px;
+		opacity: 0.5;
+	}
+
+	.empty-state .secondary {
+		max-width: 400px;
+	}
+</style>

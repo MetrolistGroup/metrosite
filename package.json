@@ -1,0 +1,29 @@
+{
+  "name": "metrosite",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "node node_modules/astro/astro.js check && astro build",
+    "check": "node node_modules/astro/astro.js check",
+    "preview": "astro preview",
+    "generate:tokens": "bun scripts/generate-tokens.mjs",
+    "screenshot": "bun scripts/screenshot.mjs",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^9.1.0",
+    "@astrojs/mdx": "^2.0.0",
+    "@fontsource-variable/jetbrains-mono": "^5.2.8",
+    "@material/material-color-utilities": "^0.2.7",
+    "astro": "^4.16.19"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.8",
+    "@playwright/test": "^1.59.1",
+    "playwright": "^1.59.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.1.1"
+  }
+}

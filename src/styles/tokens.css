@@ -1,0 +1,38 @@
+:root {
+  --md-sys-color-background: #131313;
+  --md-sys-color-on-background: #e2e2e2;
+  --md-sys-color-surface: #131313;
+  --md-sys-color-surface-dim: #131313;
+  --md-sys-color-surface-bright: #393939;
+  --md-sys-color-surface-container-lowest: #0e0e0e;
+  --md-sys-color-surface-container-low: #1b1b1b;
+  --md-sys-color-surface-container: #1f1f1f;
+  --md-sys-color-surface-container-high: #2a2a2a;
+  --md-sys-color-surface-container-highest: #353535;
+  --md-sys-color-surface-variant: #303030;
+  --md-sys-color-on-surface: #e2e2e2;
+  --md-sys-color-on-surface-variant: #c6c6c6;
+  --md-sys-color-outline: #919191;
+  --md-sys-color-outline-variant: #474747;
+  --md-sys-color-primary: #c6c6c6;
+  --md-sys-color-on-primary: #303030;
+  --md-sys-color-primary-container: #474747;
+  --md-sys-color-on-primary-container: #e2e2e2;
+
+  /* Base Units */
+  --unit: 4px;
+  
+  /* M3 Radii */
+  --radius-s: 9999px;
+  --radius-m: 16px;
+  --radius-l: 28px;
+
+  /* Semantic Spacing */
+  --space-section-y: calc(var(--unit) * 20);
+  --space-section-y-mobile: calc(var(--unit) * 12);
+  --space-grid-gap: calc(var(--unit) * 12);
+  --space-grid-gap-small: calc(var(--unit) * 8);
+  --space-card-gap: calc(var(--unit) * 6);
+  --space-card-padding: calc(var(--unit) * 8);
+  --space-card-padding-mobile: calc(var(--unit) * 6);
+}

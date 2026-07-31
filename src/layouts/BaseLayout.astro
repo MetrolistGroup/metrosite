@@ -1,0 +1,365 @@
+---
+import '../styles/tokens.css';
+import '../styles/global.css';
+import '../styles/markdown.css';
+import '@fontsource-variable/jetbrains-mono';
+import SEO from '../components/common/SEO.astro';
+import Header from '../components/common/Header.astro';
+import Footer from '../components/common/Footer.astro';
+import NavigationDrawer from '../components/common/NavigationDrawer.astro';
+import { ViewTransitions } from 'astro:transitions';
+import { t, defaultLocale, localeDir } from '../i18n';
+import { getSearchIndex } from '../utils/search';
+
+interface Props {
+	title?: string;
+	description?: string;
+	image?: string;
+	locale?: string;
+}
+
+const defaultTitle = 'Metrosite · Official Website for Metrolist';
+const defaultDescription = 'Metrolist is an open-source YouTube Music client for Android built with Material You.';
+
+const { 
+  title = defaultTitle,
+  description = defaultDescription,
+  image,
+  locale: propsLocale
+} = Astro.props;
+
+const locale = propsLocale ?? Astro.locals.locale ?? defaultLocale;
+const searchIndex = await getSearchIndex();
+---
+
+<!doctype html>
+<html lang={locale} dir={localeDir[locale as keyof typeof localeDir] ?? 'ltr'}>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="preload" href="/fonts/GoogleSansFlex.woff2" as="font" type="font/woff2" crossorigin />
+		<SEO {title} {description} {image} />
+		<ViewTransitions />
+
+		<script type="speculationrules">
+		{
+			"prerender": [
+				{
+					"where": { "href_matches": "/download" },
+					"eagerness": "moderate"
+				},
+				{
+					"where": { "href_matches": "/blog" },
+					"eagerness": "moderate"
+				},
+				{
+					"where": { "href_matches": "/docs" },
+					"eagerness": "moderate"
+				},
+				{
+					"where": { "href_matches": "/info" },
+					"eagerness": "moderate"
+				}
+			]
+		}
+		</script>
+	</head>
+	<body>
+		<progress id="nav-progress" class="nav-progress wavy" aria-hidden="true"></progress>
+		<a href="#main-content" class="skip-link">{t(locale, 'skipToContent')}</a>
+		<div class="drawer-overlay" id="drawer-overlay"></div>
+		<NavigationDrawer />
+
+		<Header />
+
+		<main id="main-content" tabindex="-1">
+			<slot />
+		</main>
+
+		<Footer />
+
+		<script id="search-index-data" type="application/json" set:html={JSON.stringify(searchIndex).replace(/<\//g, '<\\/')}></script>
+
+		<script>
+			import { setupNavigation } from '../utils/navigation';
+
+			const setupReveal = () => {
+				const observer = new IntersectionObserver((entries) => {
+					entries.forEach(entry => {
+						if (entry.isIntersecting) {
+							entry.target.classList.add('visible');
+						}
+					});
+				}, { threshold: 0.1 });
+
+				document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+			};
+
+			const init = () => {
+				const dataElement = document.getElementById('search-index-data');
+				const index = dataElement ? JSON.parse(dataElement.textContent || '[]') : [];
+				setupNavigation(index);
+				setupReveal();
+			};
+
+			document.addEventListener('astro:page-load', init);
+
+			// Global cleanup and state sync before navigation
+			document.addEventListener('astro:before-preparation', () => {
+				document.body.classList.remove('drawer-open', 'search-active');
+				const searchContainer = document.getElementById('search-container');
+				if (searchContainer) searchContainer.classList.remove('active');
+
+				// Kill video lag during transitions
+				document.querySelectorAll('video').forEach(video => {
+					video.pause();
+				});
+			});
+
+			// Prevent "Recomposing" by making reveal elements instant on transition
+			document.addEventListener('astro:after-swap', () => {
+				document.querySelectorAll('.reveal').forEach(el => {
+					el.classList.add('visible');
+				});
+			});
+
+			// Wavy navigation progress bar
+			let navProgressTimer: ReturnType<typeof setTimeout>;
+			const getNavProgress = () => document.getElementById('nav-progress');
+
+			document.addEventListener('astro:before-preparation', () => {
+				clearTimeout(navProgressTimer);
+				// Only show if the navigation takes longer than a prefetch hit (~150ms)
+				navProgressTimer = setTimeout(() => {
+					getNavProgress()?.classList.add('active');
+				}, 150);
+			});
+
+			const hideNavProgress = () => {
+				clearTimeout(navProgressTimer);
+				getNavProgress()?.classList.remove('active');
+			};
+
+			document.addEventListener('astro:after-swap', hideNavProgress);
+			document.addEventListener('astro:page-load', hideNavProgress);
+		</script>
+	</body>
+</html>
+
+<style is:global>
+	/* Global Body Layout */
+	body {
+		background-color: var(--md-sys-color-background);
+		color: var(--md-sys-color-on-background);
+		margin: 0;
+		font-family: 'Google Sans Flex', 'Roboto', sans-serif;
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+	}
+
+	main {
+		flex: 1;
+	}
+
+	/* Language/content switch: depth transition
+	   - Old content shrinks back and rises (scale 1→0.96, lift 8px)
+	   - New content expands forward and rises from beneath (scale 0.96→1, climb 16px) */
+	::view-transition-old(root) {
+		animation: none;
+	}
+
+	::view-transition-new(root) {
+		animation: 350ms cubic-bezier(0.2, 0, 0, 1) both depth-in;
+	}
+
+	@keyframes depth-out {
+		from { opacity: 1; transform: scale(1) translateY(0); }
+		to { opacity: 0; transform: scale(0.96) translateY(-8px); }
+	}
+
+	@keyframes depth-in {
+		from { opacity: 0; transform: scale(0.96) translateY(16px); }
+		to { opacity: 1; transform: scale(1) translateY(0); }
+	}
+
+	/* Docs header: cross-fade instead of geometric morph.
+	   Named elements are pulled out of the root snapshot. Old exits, then
+	   new enters — staggered so they never sit at mid-opacity together
+	   (which caused the overlap). No position/size tween, so no fling. */
+	::view-transition-old(doc-title),
+	::view-transition-old(doc-desc) {
+		animation: 150ms cubic-bezier(0.2, 0, 0, 1) both doc-out;
+	}
+
+	::view-transition-new(doc-title),
+	::view-transition-new(doc-desc) {
+		animation: 200ms cubic-bezier(0.2, 0, 0, 1) 100ms both doc-in;
+	}
+
+	@keyframes doc-out {
+		from { opacity: 1; }
+		to { opacity: 0; }
+	}
+
+	@keyframes doc-in {
+		from { opacity: 0; }
+		to { opacity: 1; }
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		::view-transition-old(root),
+		::view-transition-new(root),
+		::view-transition-old(doc-title),
+		::view-transition-old(doc-desc),
+		::view-transition-new(doc-title),
+		::view-transition-new(doc-desc) {
+			animation: none;
+		}
+	}
+
+	/* Wavy navigation progress bar (beercss pattern) */
+	#nav-progress {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		z-index: 9999;
+		inline-size: 100%;
+		block-size: var(--_size);
+		--_size: 0.25rem;
+		border: none;
+		background: none;
+		color: var(--md-sys-color-primary);
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.3s ease;
+		-webkit-appearance: none;
+		appearance: none;
+		overflow: hidden;
+		writing-mode: horizontal-tb;
+		direction: ltr;
+		border-radius: 1rem;
+		flex: none;
+	}
+
+	#nav-progress.active {
+		opacity: 1;
+	}
+
+	#nav-progress.active::after {
+		animation-play-state: running;
+	}
+
+	/* Kill any default progress backgrounds (beercss pattern) */
+	#nav-progress::-webkit-progress-bar {
+		background: none;
+	}
+
+	/* Indeterminate: render bar via ::after with sweep animation */
+	#nav-progress:not([value])::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		inline-size: 100%;
+		block-size: 100%;
+		background: currentcolor;
+		animation: to-linear-progress 3.2s ease infinite;
+		animation-play-state: paused;
+	}
+
+	/* Wavy: double height + wave mask on the bar */
+	#nav-progress.wavy {
+		block-size: calc(var(--_size) * 2);
+	}
+
+	#nav-progress.wavy:not([value])::after {
+		-webkit-mask-image: url(/wavy.svg);
+		mask-image: url(/wavy.svg);
+		-webkit-mask-position: 0 50%;
+		mask-position: 0 50%;
+		-webkit-mask-repeat: repeat-x;
+		mask-repeat: repeat-x;
+		-webkit-mask-size: auto 100%;
+		mask-size: auto 100%;
+	}
+
+	#nav-progress.wavy::-webkit-progress-value,
+	#nav-progress.wavy::-moz-progress-bar {
+		-webkit-mask-image: url(/wavy.svg);
+		mask-image: url(/wavy.svg);
+		-webkit-mask-position: 0 50%;
+		mask-position: 0 50%;
+		-webkit-mask-repeat: repeat-x;
+		mask-repeat: repeat-x;
+		-webkit-mask-size: auto 100%;
+		mask-size: auto 100%;
+		background: currentcolor;
+	}
+
+	@keyframes to-linear-progress {
+		0% { margin: 0 0 0 -100%; }
+		50% { margin: 0; }
+		to { margin: 0 0 0 100%; }
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		#nav-progress {
+			display: none;
+		}
+	}
+
+	@keyframes img-fade-in {
+		from { opacity: 0; }
+		to { opacity: 1; }
+	}
+
+	main img:not(.hero-icon):not(.app-icon) {
+		animation: img-fade-in 0.4s ease both;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		main img:not(.hero-icon):not(.app-icon) {
+			animation: none;
+		}
+	}
+
+	.skip-link {
+		position: fixed;
+		top: calc(var(--unit) * 2);
+		left: calc(var(--unit) * 2);
+		z-index: 10000;
+		padding: calc(var(--unit) * 3) calc(var(--unit) * 6);
+		background-color: var(--md-sys-color-primary);
+		color: var(--md-sys-color-on-primary);
+		border-radius: 28px;
+		font-weight: 500;
+		text-decoration: none;
+		transform: translateY(-120%);
+		transition: transform 0.2s ease;
+	}
+
+	.skip-link:focus {
+		transform: translateY(0);
+	}
+
+	.drawer-overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 1900;
+		background-color: rgba(0, 0, 0, 0.4);
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.3s ease;
+	}
+
+	body.drawer-open {
+		overflow: hidden;
+	}
+
+	body.drawer-open .drawer-overlay {
+		opacity: 1;
+		pointer-events: auto;
+	}
+</style>

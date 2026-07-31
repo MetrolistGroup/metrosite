@@ -1,0 +1,8 @@
+{ 
+  "name": "Telegram", 
+  "url": "https://t.me/metrolistapp", 
+  "type": "brand",
+  "icon": "telegram", 
+  "description": "Join our main community chat for updates and discussion.",
+  "order": 1
+}

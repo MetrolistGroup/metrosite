@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install --frozen-lockfile
+      - run: bun run check
+      - run: bun run build
+
+  # End-to-end checks (Playwright) against a running dev server.
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install --frozen-lockfile
+
+      # Playwright browsers + OS deps (no browser download on every run)
+      - run: bunx playwright install --with-deps chromium
+
+      # GITHUB_TOKEN lets the dev server render the download/stats pages.
+      - run: bunx playwright test
+        env:
+          GITHUB_TOKEN: ${{ secrets.METROLIST_GITHUB_TOKEN }}

@@ -1,0 +1,588 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getRepoStats, getLatestRelease, getContributors } from '../utils/github';
+import { getCollection } from 'astro:content';
+import { t, defaultLocale } from '../i18n';
+const locale = Astro.locals.locale ?? defaultLocale;
+
+const [stats, latestRelease, contributors] = await Promise.all([
+  getRepoStats(),
+  getLatestRelease(),
+  getContributors()
+]);
+
+const teamEntries = await getCollection('team');
+const sortedTeam = teamEntries
+  .sort((a, b) => {
+    if (a.data.isHead) return -1;
+    if (b.data.isHead) return 1;
+    return (a.data.order || 0) - (b.data.order || 0);
+  })
+  .map(entry => entry.data);
+const headDev = sortedTeam.find(m => m.isHead);
+const coreDevs = sortedTeam.filter(m => !m.isHead);
+
+const communityLinks = (await getCollection('community'))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map(entry => entry.data);
+
+const organization = {
+  name: 'MetrolistGroup',
+  github: 'MetrolistGroup',
+  avatar: 'https://github.com/MetrolistGroup.png',
+  description: t(locale, 'info.orgDesc'),
+};
+---
+
+<BaseLayout title={`${t(locale, 'info.title')} · Metrosite`} description={t(locale, 'info.subtitle')}>
+  <main class="info-page">
+    <div class="container">
+      
+      <!-- M3 Hero Section -->
+      <header class="m3-hero reveal" transition:name="page-header">
+        <h1 class="display-l">{t(locale, 'info.title')}</h1>
+        <p class="body-l secondary">{t(locale, 'info.subtitle')}</p>
+        
+        <!-- Metadata Pills (Centralized Stats) -->
+          <div class="m3-chip-set">
+            <a href="https://github.com/MetrolistGroup/Metrolist" target="_blank" class="m3-pill tonal">
+              <svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+              <span class="label-l">GitHub</span>
+            </a>
+            {stats && (
+              <>
+                <a href="https://github.com/MetrolistGroup/Metrolist/stargazers" target="_blank" class="m3-pill tonal">
+                  <span class="material-symbols-rounded">star</span>
+                  <span class="label-l">{stats.stargazers_count} {t(locale, 'info.stars')}</span>
+                </a>
+                <a href="https://github.com/MetrolistGroup/Metrolist/network/members" target="_blank" class="m3-pill tonal">
+                  <span class="material-symbols-rounded">call_split</span>
+                  <span class="label-l">{stats.forks_count} {t(locale, 'info.forks')}</span>
+                </a>
+              </>
+            )}
+            {contributors.length > 0 && (
+              <a href="https://github.com/MetrolistGroup/Metrolist/graphs/contributors" target="_blank" class="m3-pill tonal">
+                <span class="material-symbols-rounded">groups</span>
+                <span class="label-l">{contributors.length}+ {t(locale, 'info.contributors')}</span>
+              </a>
+            )}
+            {stats && (
+              <a href="https://github.com/MetrolistGroup/Metrolist/issues" target="_blank" class="m3-pill tonal">
+                <span class="material-symbols-rounded">bug_report</span>
+                <span class="label-l">{stats.open_issues_count} {t(locale, 'info.issues')}</span>
+              </a>
+            )}
+            {latestRelease && (
+              <div class="m3-pill primary">
+                <span class="material-symbols-rounded">auto_awesome</span>
+                <span class="label-l">{latestRelease.tag_name}</span>
+              </div>
+            )}
+          </div>
+      </header>
+
+      <!-- Section: The Builders -->
+      <section class="m3-section reveal">
+        <h2 class="title-l section-label">{t(locale, 'info.builders')}</h2>
+
+        {headDev && (
+          <div class="builder-featured">
+            <div class="builder-featured__avatar-wrap">
+              <a href={`https://github.com/${headDev.github}`} target="_blank">
+                <img src={headDev.avatar} alt="" class="builder-featured__avatar" width="120" height="120" />
+              </a>
+              <span class="m3-badge">{t(locale, 'info.headDev')}</span>
+            </div>
+            <div class="builder-featured__text">
+              <a href={`https://github.com/${headDev.github}`} target="_blank" class="card-title-link">
+                <h3 class="display-s">{headDev.name}</h3>
+              </a>
+              <p class="label-m secondary handle">@{headDev.github}</p>
+              <p class="body-l bio">{headDev.bio || t(locale, 'info.defaultBio')}</p>
+              {headDev.socials && headDev.socials.length > 0 && (
+                <div class="social-links">
+                  {headDev.socials.map((s) => (
+                    <a href={s.url} target="_blank" class="social-link" title={s.platform}>
+                      {s.platform === 'website' ? (
+                        <span class="material-symbols-rounded">language</span>
+                      ) : s.platform === 'twitter' ? (
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                      ) : s.platform === 'instagram' ? (
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                      ) : s.platform === 'telegram' ? (
+                        <svg viewBox="0 0 240 240" width="18" height="18" fill="currentColor"><path d="M81.229,128.772l14.237,39.406s1.78,3.687,3.686,3.687,30.255-29.492,30.255-29.492l31.525-60.89L81.737,118.6Z"/><path d="M100.106,138.878l-2.733,29.046s-1.144,8.9,7.754,0,17.415-15.763,17.415-15.763"/><path d="M81.486,130.178,52.2,120.636s-3.5-1.42-2.373-4.64c.232-.664.7-1.229,2.1-2.2,6.489-4.523,120.106-45.36,120.106-45.36s3.208-1.081,5.1-.362a2.766,2.766,0,0,1,1.885,2.055,9.357,9.357,0,0,1,.254,2.585c-.009.752-.1,1.449-.169,2.542-.692,11.165-21.4,94.493-21.4,94.493s-1.239,4.876-5.678,5.043A8.13,8.13,0,0,1,146.1,172.5c-8.711-7.493-38.819-27.727-45.472-32.177a1.27,1.27,0,0,1-.546-.9c-.093-.469.417-1.05.417-1.05s52.426-46.6,53.821-51.492c.108-.379-.3-.566-.848-.4-3.482,1.281-63.844,39.4-70.506,43.607A3.21,3.21,0,0,1,81.486,130.178Z"/></svg>
+                      ) : (
+                        <span class="material-symbols-rounded">link</span>
+                      )}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+              <a href={`https://github.com/${headDev.github}`} target="_blank" class="builder-featured__icon">
+              <span class="material-symbols-rounded">{locale === 'ar' ? 'north_west' : 'north_east'}</span>
+            </a>
+          </div>
+        )}
+
+        <div class="builders-row">
+          {coreDevs.map((member) => (
+            <div class="builder-card">
+              <div class="card-header">
+                <a href={`https://github.com/${member.github}`} target="_blank">
+                  <img src={member.avatar} alt="" class="profile-avatar" width="80" height="80" />
+                </a>
+              </div>
+              <div class="card-content">
+                <a href={`https://github.com/${member.github}`} target="_blank" class="card-title-link">
+                  <h3 class="title-l">{member.name}</h3>
+                </a>
+                <p class="label-m secondary handle">@{member.github}</p>
+                <p class="body-m bio">{member.bio || t(locale, 'info.defaultBio')}</p>
+                {member.socials && member.socials.length > 0 && (
+                  <div class="social-links">
+                    {member.socials.map((s) => (
+                      <a href={s.url} target="_blank" class="social-link" title={s.platform}>
+                        {s.platform === 'website' ? (
+                          <span class="material-symbols-rounded">language</span>
+                        ) : s.platform === 'twitter' ? (
+                          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        ) : s.platform === 'instagram' ? (
+                          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                        ) : s.platform === 'telegram' ? (
+                          <svg viewBox="0 0 496 512" width="18" height="18" fill="currentColor"><path d="M248,8C111.033,8,0,119.033,0,256S111.033,504,248,504,496,392.967,496,256,384.967,8,248,8ZM362.952,176.66c-3.732,39.215-19.881,134.378-28.1,178.3-3.476,18.584-10.322,24.816-16.948,25.425-14.4,1.326-25.338-9.517-39.287-18.661-21.827-14.308-34.158-23.215-55.346-37.177-24.485-16.135-8.612-25,5.342-39.5,3.652-3.793,67.107-61.51,68.335-66.746.153-.655.3-3.1-1.154-4.384s-3.59-.849-5.135-.5q-3.283.746-104.608,69.142-14.845,10.194-26.894,9.934c-8.855-.191-25.888-5.006-38.551-9.123-15.531-5.048-27.875-7.717-26.8-16.291q.84-6.7,18.45-13.7,108.446-47.248,144.628-62.3c68.872-28.647,83.183-33.623,92.511-33.789,2.052-.034,6.639.474,9.61,2.885a10.452,10.452,0,0,1,3.53,6.716A43.765,43.765,0,0,1,362.952,176.66Z"/></svg>
+                        ) : (
+                          <span class="material-symbols-rounded">link</span>
+                        )}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div class="card-actions">
+                <a href={`https://github.com/${member.github}`} target="_blank">
+                  <span class="material-symbols-rounded">{locale === 'ar' ? 'north_west' : 'north_east'}</span>
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- Section: The Organization -->
+      <section class="m3-section reveal">
+        <h2 class="title-l section-label">{t(locale, 'info.organization')}</h2>
+        <div class="org-card-group">
+          <a href={`https://github.com/${organization.github}`} target="_blank" class="org-card">
+            <img src={organization.avatar} alt="" class="org-card-avatar" width="56" height="56" />
+            <div class="org-card-content">
+              <h3 class="title-m">{organization.name}</h3>
+              <p class="body-s secondary">{organization.description}</p>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Section: Support & Community -->
+      <section class="m3-section reveal">
+        <h2 class="title-l section-label">{t(locale, 'info.support')}</h2>
+        <div class="links-grid">
+          {communityLinks.map((link) => (
+            <a href={link.url} target="_blank" class="link-card">
+              <div class="link-icon">
+                {link.type === 'brand' ? (
+                  link.icon === 'telegram' ? (
+                    <svg viewBox="0 0 192 192" fill="none" width="24" height="24"><path stroke="currentColor" stroke-linejoin="round" stroke-width="12" d="M31.072 87.11s65.458-26.771 88.16-36.197c8.702-3.77 38.215-15.837 38.215-15.837s13.621-5.277 12.486 7.541c-.379 5.279-3.406 23.754-6.433 43.738-4.54 28.279-9.459 59.196-9.459 59.196s-.756 8.672-7.188 10.18c-6.433 1.509-15.354-3.781-17.919-4.788-2.565-1.006-28.377-18.098-38.214-26.392-2.65-2.263-5.676-6.788.378-12.066 13.621-12.442 43.526-45.5 43.526-45.5l-66.985 41.352c-4.64 2.13-9.64 2.698-17.404.377-11.351-3.393-25.594-9.917-25.594-9.917s-9.08-5.656 6.433-11.688h-.002Z"/></svg>
+                  ) : (
+                    <svg viewBox="0 0 192 192" fill="none" width="24" height="24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="12" d="m68.138 137-7.96 16c-10.14-4.246-20.64-8.492-31.803-15.8-3.892-2.549-6.253-6.88-6.346-11.548-.486-23.964 5.109-48.056 19.273-73.528 1.854-3.334 4.943-5.778 8.525-7.056C58.372 42.02 64.174 39.664 74.108 38l5.97 11S86.05 47 96 47s15.92 2 15.92 2l5.971-11c9.934 1.664 15.736 4.02 24.281 7.068 3.582 1.278 6.671 3.722 8.525 7.056 14.165 25.472 19.759 49.564 19.274 73.528-.094 4.668-2.455 8.999-6.347 11.548-11.163 7.308-21.662 11.554-31.802 15.8l-7.961-16m-67.664-8S76.098 139 96 139s39.802-10 39.802-10"/><path stroke="currentColor" stroke-width="12" d="M70.63 108c3.297 0 5.969-3.582 5.969-8s-2.672-8-5.969-8c-3.296 0-5.968 3.582-5.968 8s2.672 8 5.968 8Zm49.74 0c3.296 0 5.969-3.582 5.969-8s-2.673-8-5.969-8-5.969 3.582-5.969 8 2.672 8 5.969 8Z"/></svg>
+                  )
+                ) : (
+                  <span class="material-symbols-rounded">{link.icon}</span>
+                )}
+              </div>
+              <div class="link-info">
+                <h3 class="title-m">{link.name}</h3>
+                <p class="body-s secondary">{link.description}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    import { setupPaletteSwap } from '../utils/palette-swap';
+
+    document.addEventListener('astro:page-load', () => {
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        setupPaletteSwap();
+      }
+    });
+  </script>
+</BaseLayout>
+
+<style>
+  .info-page {
+    padding: var(--space-section-y) 0;
+    background-color: var(--md-sys-color-background);
+  }
+
+  .secondary {
+    color: var(--md-sys-color-on-surface-variant);
+  }
+
+  /* Palette swap transitions */
+  .info-page,
+  .info-page .section-label,
+  .info-page .m3-badge,
+  .info-page .link-icon {
+    transition: background-color 0.4s cubic-bezier(0.2, 0, 0, 1),
+                color 0.4s cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  /* M3 Hero */
+  .m3-hero {
+    text-align: center;
+    margin-bottom: var(--space-grid-gap);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .m3-chip-set {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: calc(var(--unit) * 3);
+    margin-top: calc(var(--unit) * 8);
+  }
+
+  .m3-pill {
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+
+  .m3-pill.tonal {
+    background-color: var(--md-sys-color-surface-container-high);
+    color: var(--md-sys-color-on-surface);
+  }
+
+  .m3-pill.primary {
+    background-color: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+  }
+
+  /* Sections */
+  .m3-section {
+    margin-bottom: var(--space-section-y);
+  }
+
+  .section-label {
+    margin-bottom: var(--space-card-gap);
+    color: var(--md-sys-color-primary);
+    font-weight: 500;
+  }
+
+  /* Builders Layout */
+  .builder-featured {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--unit) * 8);
+    background-color: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+    border-radius: 32px;
+    padding: calc(var(--unit) * 10);
+    text-decoration: none;
+    margin-bottom: calc(var(--unit) * 4);
+    transition: background-color 0.3s cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .builder-featured:hover {
+    background-color: color-mix(in srgb, var(--md-sys-color-primary-container) 85%, var(--md-sys-color-primary));
+  }
+
+  .builder-featured__avatar-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(var(--unit) * 3);
+    flex-shrink: 0;
+  }
+
+  .builder-featured__avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: var(--md-sys-color-surface-container-high);
+  }
+
+  .builder-featured__text {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--unit) * 1);
+    flex: 1;
+  }
+
+  .builder-featured__icon {
+    font-size: 32px;
+    opacity: 0.3;
+    flex-shrink: 0;
+    color: inherit;
+    text-decoration: none;
+    display: inline-flex;
+  }
+
+  .builder-featured__icon:hover {
+    opacity: 0.6;
+  }
+
+  .builders-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: calc(var(--unit) * 4);
+  }
+
+  .builder-card {
+    background-color: var(--md-sys-color-surface-container-low);
+    border-radius: var(--radius-l);
+    padding: calc(var(--unit) * 6);
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--unit) * 4);
+    transition: background-color 0.3s cubic-bezier(0.2, 0, 0, 1), transform 0.2s ease;
+  }
+
+  .builder-card:hover {
+    background-color: var(--md-sys-color-surface-container);
+    transform: translateY(-4px);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+  }
+
+  .profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: var(--md-sys-color-surface-container-high);
+  }
+
+  .m3-badge {
+    padding: 4px 12px;
+    border-radius: 9999px;
+    background-color: var(--md-sys-color-on-primary-container);
+    color: var(--md-sys-color-primary-container);
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .handle {
+    font-family: ui-monospace, 'SFMono-Regular', 'Roboto Mono', monospace;
+    opacity: 0.7;
+    margin-top: 2px;
+  }
+
+  .bio {
+    margin-top: calc(var(--unit) * 2);
+    line-height: 1.6;
+  }
+
+  .card-actions {
+    margin-top: auto;
+    display: flex;
+    justify-content: end;
+    opacity: 0.3;
+  }
+
+  .card-actions a {
+    color: inherit;
+    text-decoration: none;
+    display: inline-flex;
+  }
+
+  .card-title-link {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .card-title-link:hover {
+    text-decoration: underline;
+  }
+
+  .card-header a {
+    display: inline-flex;
+    line-height: 0;
+  }
+
+  .social-links {
+    display: flex;
+    gap: calc(var(--unit) * 2);
+    margin-top: calc(var(--unit) * 2);
+  }
+
+  .social-link {
+    width: 32px;
+    height: 32px;
+    border-radius: 9999px;
+    background-color: var(--md-sys-color-surface-container-high);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--md-sys-color-on-surface-variant);
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .social-link:hover {
+    background-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+  }
+
+  /* Organization Card Group */
+  .org-card-group {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--unit) * 1);
+  }
+
+  .org-card {
+    background-color: var(--md-sys-color-surface-container-low);
+    padding: calc(var(--unit) * 6);
+    display: flex;
+    align-items: center;
+    gap: calc(var(--unit) * 6);
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.2s ease;
+    border-radius: 8px;
+  }
+
+  .org-card:hover {
+    background-color: var(--md-sys-color-surface-container);
+  }
+
+  .org-card:first-child {
+    border-radius: 28px 28px 8px 8px;
+  }
+
+  .org-card:last-child {
+    border-radius: 8px 8px 28px 28px;
+  }
+
+  .org-card:only-child {
+    border-radius: 28px;
+  }
+
+  .org-card-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    flex-shrink: 0;
+    object-fit: cover;
+    background-color: var(--md-sys-color-surface-container-high);
+  }
+
+  .org-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--unit) * 1);
+  }
+
+  /* Support Card Group */
+  .links-grid {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--unit) * 1);
+  }
+
+  .link-card {
+    background-color: var(--md-sys-color-surface-container-low);
+    padding: calc(var(--unit) * 6);
+    display: flex;
+    align-items: center;
+    gap: calc(var(--unit) * 4);
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.2s ease;
+    border-radius: 8px;
+  }
+
+  .link-card:hover {
+    background-color: var(--md-sys-color-surface-container);
+  }
+
+  .link-card:first-child {
+    border-radius: 28px 28px 8px 8px;
+  }
+
+  .link-card:last-child {
+    border-radius: 8px 8px 28px 28px;
+  }
+
+  .link-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background-color: var(--md-sys-color-surface-container-high);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--md-sys-color-primary);
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: all 0.6s cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 800px) {
+    .builder-featured {
+      flex-direction: column;
+      text-align: center;
+      align-items: center;
+      padding: calc(var(--unit) * 8) calc(var(--unit) * 6);
+    }
+
+    .builder-featured__icon {
+      display: none;
+    }
+
+    .builders-row {
+      grid-template-columns: 1fr;
+    }
+
+    .org-card {
+      gap: calc(var(--unit) * 4);
+      padding: calc(var(--unit) * 4);
+    }
+
+    .org-card-avatar {
+      width: 48px;
+      height: 48px;
+    }
+  }
+</style>

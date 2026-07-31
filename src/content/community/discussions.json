@@ -1,0 +1,8 @@
+{ 
+  "name": "Discussions", 
+  "url": "https://github.com/MetrolistGroup/Metrolist/discussions", 
+  "type": "symbol",
+  "icon": "forum", 
+  "description": "Engage with the community and share your thoughts.",
+  "order": 4
+}

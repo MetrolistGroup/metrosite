@@ -1,0 +1,223 @@
+---
+import { t, defaultLocale } from '../../i18n';
+const locale = Astro.locals.locale ?? defaultLocale;
+---
+
+<style>
+	.hero {
+		position: relative;
+		padding: var(--space-section-y) 0 calc(var(--unit) * 16);
+		background-color: var(--md-sys-color-background);
+		overflow: clip;
+	}
+
+	.hero-grid {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		grid-template-columns: 1fr auto;
+		gap: var(--space-grid-gap);
+		align-items: center;
+	}
+
+	.hero-text {
+		display: flex;
+		flex-direction: column;
+		align-items: start;
+		text-align: start;
+		max-width: 640px;
+	}
+
+	.wordmark {
+		font-size: clamp(3rem, 12vw, 6.5rem);
+		line-height: 0.9;
+		font-weight: 500;
+		font-stretch: 90%;
+		letter-spacing: -0.03em;
+		margin: 0;
+	}
+
+	.wordmark .accent {
+		color: var(--md-sys-color-primary);
+	}
+
+	.tagline {
+		font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+		font-weight: 400;
+		color: var(--md-sys-color-on-surface-variant);
+		margin: calc(var(--unit) * 3) 0 calc(var(--unit) * 6) 0;
+		max-width: 520px;
+		line-height: 1.4;
+	}
+
+	.actions {
+		display: flex;
+		gap: calc(var(--unit) * 4);
+		flex-wrap: wrap;
+	}
+
+	.button-primary {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: calc(var(--unit) * 2);
+		background-color: var(--md-sys-color-primary);
+		color: var(--md-sys-color-on-primary);
+		padding: 0 calc(var(--unit) * 8);
+		height: 56px;
+		border-radius: 28px;
+		font-weight: 500;
+		text-decoration: none;
+		transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), opacity 0.2s ease;
+	}
+
+	.button-primary:hover {
+		transform: translateY(-2px);
+		opacity: 0.92;
+	}
+
+	.button-tonal {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: calc(var(--unit) * 2);
+		background-color: var(--md-sys-color-secondary-container);
+		color: var(--md-sys-color-on-secondary-container);
+		padding: 0 calc(var(--unit) * 8);
+		height: 56px;
+		border-radius: 28px;
+		font-weight: 500;
+		text-decoration: none;
+		transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), opacity 0.2s ease;
+	}
+
+	.button-tonal:hover {
+		transform: translateY(-2px);
+		opacity: 0.92;
+	}
+
+	.hero-visual {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.phone-frame {
+		position: relative;
+		width: 270px;
+		aspect-ratio: 9 / 19;
+		border-radius: var(--radius-l);
+		overflow: hidden;
+		background-color: var(--md-sys-color-surface-container-lowest);
+		border: 1px solid var(--md-sys-color-outline-variant);
+		transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1);
+	}
+
+	.phone-frame:hover {
+		transform: translateY(-8px);
+	}
+
+	.phone-frame img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
+	.hero-icon {
+		display: none;
+		width: 144px;
+		height: 144px;
+		border-radius: var(--radius-l);
+		transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1);
+	}
+
+	.hero-icon:hover {
+		transform: scale(1.04) rotate(2deg);
+	}
+
+	@media (max-width: 968px) {
+		.hero-grid {
+			grid-template-columns: 1fr;
+			gap: calc(var(--unit) * 8);
+		}
+
+		.hero-visual {
+			order: -1;
+		}
+
+		.phone-frame {
+			width: 160px;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.hero {
+			padding: calc(var(--unit) * 8) 0 calc(var(--unit) * 10);
+		}
+
+		.hero-grid {
+			gap: calc(var(--unit) * 6);
+		}
+
+		.hero-text {
+			align-items: center;
+			text-align: center;
+			margin: 0 auto;
+		}
+
+		.tagline {
+			margin: calc(var(--unit) * 2) 0 calc(var(--unit) * 4) 0;
+			max-width: 100%;
+		}
+
+		.actions {
+			flex-direction: column;
+			align-items: center;
+			width: 100%;
+			max-width: 320px;
+			gap: calc(var(--unit) * 3);
+		}
+
+		.button-primary {
+			width: 100%;
+		}
+
+		.phone-frame {
+			display: none;
+		}
+
+		.hero-icon {
+			display: block;
+		}
+
+		.docs-link {
+			font-size: 0.875rem;
+		}
+	}
+</style>
+
+<section class="hero">
+	<div class="container hero-grid">
+		<div class="hero-text">
+			<h1 class="wordmark reveal">{t(locale, 'hero.wordmark.lead')}<span class="accent">{t(locale, 'hero.wordmark.accent')}</span></h1>
+			<span class="tagline">{t(locale, 'hero.tagline')}</span>
+			<div class="actions">
+				<a href={'/download'} class="button-primary label-l" data-astro-prefetch>
+					<span class="material-symbols-rounded">download</span>
+					{t(locale, 'hero.cta')}
+				</a>
+				<a href={'/docs'} class="button-tonal label-l" data-astro-prefetch>
+					{t(locale, 'hero.docs')}
+					<span class="material-symbols-rounded">arrow_forward</span>
+				</a>
+			</div>
+		</div>
+		<div class="hero-visual">
+			<div class="phone-frame">
+				<img src="/images/black_page_icon_only.jpg" alt="Metrolist app interface showing the player" />
+			</div>
+			<img src="/images/app-icon.png" alt="Metrolist Icon" class="hero-icon" transition:name="app-icon" />
+		</div>
+	</div>
+</section>

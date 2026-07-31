@@ -1,0 +1,12 @@
+{
+  "name": "Lamp",
+  "role": "Core Developer",
+  "github": "l6t9",
+  "avatar": "https://github.com/l6t9.png",
+  "bio": "Maintainer of the Metrolist desktop client, focused on delivering a polished, native experience across desktop platforms.",
+  "isHead": false,
+  "order": 3,
+  "socials": [
+    { "platform": "website", "url": "https://lamp.delivery" }
+  ]
+}

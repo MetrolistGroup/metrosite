@@ -1,0 +1,12 @@
+{
+  "name": "Nyx",
+  "role": "Core Developer",
+  "github": "nyxiereal",
+  "avatar": "https://github.com/nyxiereal.png",
+  "bio": "Lead developer of the Metrolist Android app, driving core features like Listen Together and shaping the ongoing mobile experience.",
+  "isHead": false,
+  "order": 2,
+  "socials": [
+    { "platform": "website", "url": "https://nyx.meowery.eu/" }
+  ]
+}

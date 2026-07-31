@@ -1,0 +1,152 @@
+---
+import '../styles/global.css';
+import '../styles/tokens.css';
+---
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Social Card Preview</title>
+</head>
+<body class="og-preview-body">
+    <div class="og-card">
+        <div class="content">
+            <div class="text-group">
+                <h1 class="display-l">Metrolist</h1>
+                <p class="headline-s secondary">The refined YT Music client for Android. Built with Material You, focused on your privacy.</p>
+            </div>
+            <div class="brand-group">
+                <div class="logo-wrapper">
+                    <img src="/images/app-icon.png" alt="Logo" class="logo" />
+                </div>
+            </div>
+        </div>
+        <div class="footer-strip">
+            <span class="label-l">OPEN SOURCE · PRIVACY FIRST · AD-FREE</span>
+            <span class="label-l domain">METROLIST.CC</span>
+        </div>
+    </div>
+</body>
+</html>
+
+<style>
+    .og-preview-body {
+        margin: 0;
+        padding: 0;
+        background-color: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+    }
+
+    .og-card {
+        width: 1200px;
+        height: 630px;
+        background-color: var(--md-sys-color-background);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    /* Subtle background pattern */
+    .og-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(circle at 2px 2px, var(--md-sys-color-surface-container-highest) 1px, transparent 0);
+        background-size: 40px 40px;
+        opacity: 0.2;
+        pointer-events: none;
+    }
+
+    .content {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        padding: 0 80px;
+        gap: 60px;
+        z-index: 1;
+    }
+
+    .text-group {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .badge {
+        display: inline-flex;
+        background-color: var(--md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container);
+        padding: 6px 16px;
+        border-radius: 20px;
+        width: fit-content;
+        letter-spacing: 1px;
+    }
+
+    .og-card h1 {
+        font-size: 96px;
+        margin: 0;
+        color: var(--md-sys-color-on-background);
+        font-weight: 700;
+        letter-spacing: -3px;
+    }
+
+    .secondary {
+        color: var(--md-sys-color-on-surface-variant);
+        line-height: 1.4;
+        max-width: 500px;
+    }
+
+    .brand-group {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .logo-wrapper {
+        position: relative;
+        width: 320px;
+        height: 320px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .logo-wrapper::after {
+        content: '';
+        position: absolute;
+        width: 140%;
+        height: 140%;
+        background: radial-gradient(circle, var(--md-sys-color-primary) 0%, transparent 70%);
+        opacity: 0.1;
+        z-index: -1;
+    }
+
+    .logo {
+        width: 280px;
+        height: 280px;
+    }
+
+    .footer-strip {
+        height: 80px;
+        background-color: var(--md-sys-color-surface-container-low);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 80px;
+        border-top: 1px solid var(--md-sys-color-outline-variant);
+        color: var(--md-sys-color-on-surface-variant);
+        opacity: 0.8;
+    }
+
+    .domain {
+        color: var(--md-sys-color-primary);
+        font-weight: 700;
+    }
+</style>

@@ -1,0 +1,392 @@
+---
+import { t, defaultLocale } from '../../i18n';
+import LocaleSelector from './LocaleSelector.astro';
+const locale = Astro.locals.locale ?? defaultLocale;
+---
+
+<header class="header">
+	<div class="container header-content">
+		<div class="header-left">
+			<button class="icon-button mobile-only" aria-label="Menu" id="menu-button">
+				<span class="material-symbols-rounded">menu</span>
+			</button>
+			<a href="/" class="title-l header-brand" transition:name="brand-logo">
+				<img src="/images/app-icon.png" alt="Metrolist icon" class="header-icon" />
+				<span class="desktop-only">Metrolist</span>
+			</a>
+		</div>
+		<nav class="nav">
+			<div class="search-container" id="search-container">
+			<button class="icon-button" aria-label={t(locale, 'search.aria')} id="search-expand-button" aria-haspopup="true" aria-expanded="false" aria-controls="search-bar">
+				<span class="material-symbols-rounded">search</span>
+			</button>
+			<div class="search-bar-expanded">
+					<span class="material-symbols-rounded">search</span>
+					<input type="text" id="search-input" placeholder={t(locale, 'search.placeholder')} autocomplete="off" role="combobox" aria-expanded="false" aria-controls="search-results-container" aria-activedescendant="" />
+					<button class="icon-button" id="search-collapse-button" aria-label={t(locale, 'search.close')}>
+						<span class="material-symbols-rounded">close</span>
+					</button>
+			</div>
+				<div id="search-results-container" class="search-results-dropdown" role="listbox" aria-label={t(locale, 'search.aria')} aria-live="polite" aria-atomic="false"></div>
+			</div>
+
+			<LocaleSelector variant="header" />
+
+			<a href="/download" class="label-l nav-link" data-astro-prefetch>{t(locale, 'nav.download')}</a>
+			<a href="/blog" class="label-l nav-link" data-astro-prefetch>{t(locale, 'nav.blog')}</a>
+			<a href="/docs" class="label-l nav-link" data-astro-prefetch>{t(locale, 'nav.docs')}</a>
+			<a href="/info" class="label-l nav-link" data-astro-prefetch>{t(locale, 'nav.info')}</a>
+			<a href="https://github.com/MetrolistGroup/Metrolist" class="icon-button nav-link github-link" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+				<svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+					<path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.2-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/>
+				</svg>
+			</a>
+		</nav>
+	</div>
+</header>
+
+<style>
+	.header {
+		position: relative;
+		padding: calc(var(--unit) * 2) 0;
+		z-index: 500;
+		background-color: var(--md-sys-color-background);
+	}
+
+	.header-content {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		min-height: 64px;
+	}
+
+	.header-left {
+		display: flex;
+		align-items: center;
+		gap: calc(var(--unit) * 2);
+	}
+
+	.header-brand {
+		font-weight: 500;
+		display: inline-flex;
+		align-items: center;
+		gap: calc(var(--unit) * 2);
+	}
+
+	.header-icon {
+		width: 24px;
+		height: 24px;
+	}
+
+	.desktop-only {
+		display: inline;
+	}
+
+	.nav {
+		display: flex;
+		align-items: center;
+		gap: calc(var(--unit) * 2);
+	}
+
+	.nav-link {
+		color: var(--md-sys-color-on-surface-variant);
+		transition: color 0.2s ease;
+		display: flex;
+		align-items: center;
+		padding: 0 calc(var(--unit) * 2);
+		height: 48px;
+	}
+
+	.nav-link:hover {
+		color: var(--md-sys-color-on-surface);
+	}
+
+	.icon-button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 48px;
+		height: 48px;
+		border-radius: 50%;
+		border: none;
+		background: transparent;
+		color: var(--md-sys-color-on-surface-variant);
+		cursor: pointer;
+		transition: background-color 0.2s ease, color 0.2s ease;
+		padding: 0;
+		text-decoration: none;
+		flex-shrink: 0;
+	}
+
+	.icon-button:hover {
+		background-color: var(--md-sys-color-surface-container-high);
+		color: var(--md-sys-color-on-surface);
+	}
+
+	.mobile-only {
+		display: none;
+	}
+
+	@media (max-width: 768px) {
+		.mobile-only {
+			display: inline-flex;
+		}
+
+		.desktop-only {
+			display: inline;
+		}
+
+		.header-icon {
+			display: none;
+		}
+
+		.nav .nav-link:not(.github-link) {
+			display: none;
+		}
+
+		.nav {
+			gap: 0;
+		}
+	}
+
+	/* Search */
+	.search-container {
+		position: relative;
+		display: flex;
+		align-items: center;
+		z-index: 100;
+	}
+
+	.search-bar-expanded {
+		position: absolute;
+		inset-inline-end: 0;
+		top: 50%;
+		transform: translateY(-50%);
+		height: 56px;
+		width: 56px;
+		background-color: var(--md-sys-color-surface-container-high);
+		border-radius: 28px;
+		display: flex;
+		align-items: center;
+		padding: 0 12px 0 20px;
+		visibility: hidden;
+		transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+		overflow: hidden;
+		z-index: 100;
+	}
+
+	.search-container.active .search-bar-expanded {
+		width: 600px;
+		visibility: visible;
+	}
+
+	.search-bar-expanded.closing {
+		width: 56px !important;
+	}
+
+	.search-bar-expanded .material-symbols-rounded {
+		color: var(--md-sys-color-on-surface-variant);
+		flex-shrink: 0;
+	}
+
+	.search-container.active .search-bar-expanded {
+		animation: barIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+		pointer-events: auto;
+	}
+
+	.search-bar-expanded.closing {
+		animation: barOut 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+	}
+
+	@keyframes barIn {
+		from {
+			opacity: 0;
+			transform: translateY(-50%) scale(0.8);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(-50%) scale(1);
+		}
+	}
+
+	@keyframes barOut {
+		from {
+			opacity: 1;
+			transform: translateY(-50%) scale(1);
+		}
+		to {
+			opacity: 0;
+			transform: translateY(-50%) scale(0.8);
+		}
+	}
+
+	.search-bar-content {
+		display: flex;
+		align-items: center;
+		width: 100%;
+		opacity: 0;
+		transition: opacity 0.15s ease 0.15s;
+	}
+
+	.search-container.active .search-bar-content {
+		animation: contentIn 0.2s ease 0.1s forwards;
+	}
+
+	.search-bar-content.closing {
+		animation: contentOut 0.1s ease forwards;
+	}
+
+	@keyframes contentIn {
+		from { opacity: 0; }
+		to { opacity: 1; }
+	}
+
+	@keyframes contentOut {
+		from { opacity: 1; }
+		to { opacity: 0; }
+	}
+
+	.search-bar-content .material-symbols-rounded {
+		color: var(--md-sys-color-on-surface-variant);
+		flex-shrink: 0;
+	}
+
+	#search-input {
+		flex: 1;
+		height: 100%;
+		border: none;
+		background: transparent;
+		color: var(--md-sys-color-on-surface);
+		font-family: inherit;
+		font-size: 16px;
+		outline: none;
+		padding: 0 12px;
+		margin: 0;
+	}
+
+	#search-input::placeholder {
+		color: var(--md-sys-color-on-surface-variant);
+	}
+
+	.search-results-dropdown {
+		position: absolute;
+		top: calc(100% + calc(var(--unit) * 2));
+		inset-inline-end: 0;
+		width: 600px;
+		max-width: calc(100vw - 32px);
+		background-color: var(--md-sys-color-surface-container-high);
+		border-radius: var(--radius-m);
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+		display: flex;
+		flex-direction: column;
+		max-height: 400px;
+		overflow-y: auto;
+		padding: calc(var(--unit) * 1);
+		gap: calc(var(--unit) * 1);
+		z-index: 100;
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(-16px);
+		pointer-events: none;
+		transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s 0.3s;
+	}
+
+	.search-container.active .search-results-dropdown.visible {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
+		pointer-events: auto;
+		transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s 0s;
+	}
+
+	/* JS-injected HTML styles must remain :global */
+	:global(.search-result-item) {
+		display: flex;
+		flex-direction: column;
+		padding: calc(var(--unit) * 3) calc(var(--unit) * 4);
+		border-radius: var(--radius-s);
+		text-decoration: none;
+		color: var(--md-sys-color-on-surface);
+		transition: background-color 0.2s ease;
+		opacity: 0;
+		transform: translateY(8px);
+	}
+
+	.search-container.active .search-results-dropdown.visible :global(.search-result-item) {
+		animation: resultItemIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+	}
+
+	@keyframes resultItemIn {
+		from {
+			opacity: 0;
+			transform: translateY(8px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	:global(.search-result-item:hover) {
+		background-color: var(--md-sys-color-surface-container-highest);
+	}
+
+	:global(.search-result-header) {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 4px;
+	}
+
+	:global(.search-result-title) {
+		font-weight: 500;
+		font-size: 14px;
+	}
+
+	:global(.search-result-category) {
+		font-size: 10px;
+		font-weight: 600;
+		padding: 2px 6px;
+		border-radius: 10px;
+		background-color: var(--md-sys-color-primary-container);
+		color: var(--md-sys-color-on-primary-container);
+		text-transform: uppercase;
+	}
+
+	:global(.search-result-snippet) {
+		font-size: 13px;
+		color: var(--md-sys-color-on-surface-variant);
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	/* Nav & Brand Transitions */
+	.nav-link, .header-brand {
+		transition: opacity 0.4s cubic-bezier(0.2, 0, 0, 1), transform 0.4s cubic-bezier(0.2, 0, 0, 1);
+	}
+
+	@media (max-width: 768px) {
+		.search-container {
+			position: static;
+		}
+
+		.search-container.active .search-bar-expanded {
+			width: calc(100vw - 72px);
+		}
+
+		.search-results-dropdown {
+			width: auto;
+			inset-inline-start: 72px;
+			inset-inline-end: 16px;
+			top: calc(100% + calc(var(--unit) * 2));
+		}
+
+		:global(body.search-active) .header-brand,
+		:global(body.search-active) .nav-link {
+			opacity: 0;
+			pointer-events: none;
+		}
+	}
+</style>

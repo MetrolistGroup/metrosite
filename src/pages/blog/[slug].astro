@@ -1,0 +1,17 @@
+---
+import { getCollection } from 'astro:content';
+import BlogLayout from '../../layouts/BlogLayout.astro';
+
+const slug = Astro.params.slug;
+const post = slug
+	? (await getCollection('blog')).find(p => p.slug === slug)
+	: null;
+if (!post) {
+	return Astro.redirect('/blog');
+}
+const { Content } = await post.render();
+---
+
+<BlogLayout post={post}>
+	<Content />
+</BlogLayout>

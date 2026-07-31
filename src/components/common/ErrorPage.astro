@@ -1,0 +1,86 @@
+---
+interface Props {
+	code: string;
+	title: string;
+	description: string;
+	homeHref: string;
+	homeLabel: string;
+}
+
+const { code, title, description, homeHref, homeLabel } = Astro.props;
+---
+
+<main class="error-page">
+	<div class="container error-content">
+		<h1 class="display-l error-code">{code}</h1>
+
+		<div class="error-text">
+			<h2 class="headline-m">{title}</h2>
+			<p class="body-l secondary">{description}</p>
+		</div>
+
+		<div class="error-actions">
+			<a href={homeHref} class="button-primary label-l">{homeLabel}</a>
+		</div>
+	</div>
+</main>
+
+<style>
+	.error-page {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 60vh;
+		padding: calc(var(--unit) * 10) 0;
+	}
+
+	.error-content {
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: calc(var(--unit) * 6);
+	}
+
+	.error-code {
+		font-size: clamp(5rem, 15vw, 8rem);
+		font-weight: 700;
+		color: var(--md-sys-color-primary);
+		line-height: 1;
+		letter-spacing: -4px;
+		opacity: 0.9;
+	}
+
+	.error-text {
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--unit) * 1);
+	}
+
+	.secondary {
+		color: var(--md-sys-color-on-surface-variant);
+		opacity: 0.8;
+	}
+
+	.error-actions {
+		margin-top: calc(var(--unit) * 4);
+	}
+
+	.button-primary {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background-color: var(--md-sys-color-primary);
+		color: var(--md-sys-color-on-primary);
+		padding: 0 calc(var(--unit) * 10);
+		height: 56px;
+		border-radius: 28px;
+		font-weight: 500;
+		text-decoration: none;
+		transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+	}
+
+	.button-primary:hover {
+		transform: scale(1.05);
+	}
+</style>

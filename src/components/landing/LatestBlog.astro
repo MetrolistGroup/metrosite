@@ -1,0 +1,137 @@
+---
+import { getCollection } from 'astro:content';
+import { t, defaultLocale } from '../../i18n';
+const locale = Astro.locals.locale ?? defaultLocale;
+
+const posts = (await getCollection('blog'))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 3);
+---
+
+{posts.length > 0 && (
+<section class="latest-blog">
+	<div class="container">
+		<div class="section-header">
+			<h2 class="display-s">{t(locale, 'blog.latest')}</h2>
+			<a href="/blog" class="label-l text-button" data-astro-prefetch>{t(locale, 'blog.viewAll')} <span class="material-symbols-rounded">{locale === 'ar' ? 'arrow_back' : 'arrow_forward'}</span></a>
+		</div>
+		<div class="blog-grid">
+			{posts.map(post => (
+				<a href={`/blog/${post.slug}/`} class="blog-card" data-astro-prefetch>
+
+					{post.data.heroImage && (
+						<div class="card-image">
+							<img src={post.data.heroImage} alt={post.data.title} />
+						</div>
+					)}
+					<div class="card-content">
+						<span class="label-s secondary">{post.data.pubDate.toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+						<h3 class="title-m">{post.data.title}</h3>
+						<p class="body-m secondary">{post.data.description}</p>
+					</div>
+				</a>
+			))}
+		</div>
+	</div>
+</section>
+)}
+
+<style>
+	.latest-blog {
+		padding: var(--space-section-y) 0;
+		background-color: var(--md-sys-color-surface-container-lowest);
+	}
+
+	.section-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: end;
+		margin-bottom: var(--space-grid-gap-small);
+		gap: calc(var(--unit) * 4);
+	}
+
+	.text-button {
+		display: flex;
+		align-items: center;
+		gap: calc(var(--unit) * 2);
+		color: var(--md-sys-color-primary);
+		text-decoration: none;
+		transition: opacity 0.2s ease;
+		white-space: nowrap;
+	}
+
+	.text-button:hover {
+		opacity: 0.8;
+	}
+
+	.text-button .material-symbols-rounded {
+		font-size: 18px;
+	}
+
+	.blog-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+		gap: calc(var(--unit) * 4);
+	}
+
+	.blog-card {
+		background-color: var(--md-sys-color-surface-container-low);
+		border-radius: var(--radius-m);
+		overflow: hidden;
+		text-decoration: none;
+		color: inherit;
+		display: flex;
+		flex-direction: column;
+		transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1), background-color 0.4s cubic-bezier(0.2, 0, 0, 1);
+	}
+
+	.blog-card:hover {
+		transform: translateY(-4px);
+		background-color: var(--md-sys-color-surface-container);
+	}
+
+	.card-image {
+		height: 140px;
+		overflow: hidden;
+	}
+
+	.card-image img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.card-content {
+		padding: var(--space-card-padding-mobile);
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--unit) * 2);
+	}
+
+	.secondary {
+		color: var(--md-sys-color-on-surface-variant);
+	}
+
+	.title-m {
+		margin: 0;
+	}
+
+	.body-m {
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	@media (max-width: 600px) {
+		.section-header {
+			flex-direction: column;
+			align-items: start;
+			gap: calc(var(--unit) * 2);
+		}
+
+		.latest-blog {
+			padding: calc(var(--unit) * 12) 0;
+		}
+	}
+</style>

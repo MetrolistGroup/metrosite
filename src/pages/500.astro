@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ErrorPage from '../components/common/ErrorPage.astro';
+import { t, defaultLocale } from '../i18n';
+
+const locale = Astro.locals.locale ?? defaultLocale;
+---
+
+<BaseLayout title={t(locale, '500.pageTitle')}>
+	<ErrorPage
+		code="500"
+		title={t(locale, '500.title')}
+		description={t(locale, '500.description')}
+		homeHref={'/'}
+		homeLabel={t(locale, '404.goHome')}
+	/>
+</BaseLayout>

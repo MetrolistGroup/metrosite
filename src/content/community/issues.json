@@ -1,0 +1,8 @@
+{ 
+  "name": "Issues", 
+  "url": "https://github.com/MetrolistGroup/Metrolist/issues", 
+  "type": "symbol",
+  "icon": "bug_report", 
+  "description": "Report bugs or suggest new features on GitHub.",
+  "order": 3
+}

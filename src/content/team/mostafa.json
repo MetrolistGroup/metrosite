@@ -1,0 +1,13 @@
+{
+  "name": "Mostafa Al Agamy",
+  "role": "Head Developer",
+  "github": "mostafaalagamy",
+  "avatar": "https://github.com/mostafaalagamy.png",
+  "bio": "Visionary behind Metrolist. Focused on crafting the ultimate YouTube Music experience with Material Design.",
+  "isHead": true,
+  "order": 1,
+  "socials": [
+    { "platform": "twitter", "url": "https://x.com/mostafa_alagamy" },
+    { "platform": "instagram", "url": "https://www.instagram.com/mostafa_alagamy" }
+  ]
+}

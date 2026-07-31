@@ -1,0 +1,22 @@
+# NOTE: the "/*" below is a PATH PATTERN (matches every route), not a comment.
+# Headers here apply globally; more specific blocks further down add caching.
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://avatars.githubusercontent.com https://github.com; font-src 'self'; connect-src 'self' https://api.github.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+  Strict-Transport-Security: max-age=63072000; includeSubDomains
+
+# Fonts — immutable, hash-based filenames
+# (security headers inherited from /* above; this block adds caching)
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Images — safe to cache, reasonable TTL
+/images/*
+  Cache-Control: public, max-age=86400
+
+# Built assets — Astro handles fingerprinting via content hash
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

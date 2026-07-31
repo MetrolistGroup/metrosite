@@ -1,0 +1,179 @@
+---
+import { t, defaultLocale } from '../../i18n';
+const locale = Astro.locals.locale ?? defaultLocale;
+---
+
+<section class="why-metrolist">
+	<div class="container grid-container">
+		<div class="header-text">
+			<h2 class="display-s">{t(locale, 'why.title')}</h2>
+			<p class="headline-s secondary">{t(locale, 'why.subtitle')}</p>
+		</div>
+			
+		<div class="points-grid">
+			<div class="point-card">
+				<div class="icon-box">
+					<span class="material-symbols-rounded">security</span>
+				</div>
+				<div class="point-content">
+					<h4 class="title-l">{t(locale, 'why.privacy.title')}</h4>
+					<p class="body-l secondary">{t(locale, 'why.privacy.desc')}</p>
+				</div>
+			</div>
+			<div class="point-card">
+				<div class="icon-box">
+					<span class="material-symbols-rounded">ad_off</span>
+				</div>
+				<div class="point-content">
+					<h4 class="title-l">{t(locale, 'why.noads.title')}</h4>
+					<p class="body-l secondary">{t(locale, 'why.noads.desc')}</p>
+				</div>
+			</div>
+			<div class="point-card">
+				<div class="icon-box">
+					<span class="material-symbols-rounded">play_circle</span>
+				</div>
+				<div class="point-content">
+					<h4 class="title-l">{t(locale, 'why.background.title')}</h4>
+					<p class="body-l secondary">{t(locale, 'why.background.desc')}</p>
+				</div>
+			</div>
+			<div class="point-card">
+				<div class="icon-box">
+					<span class="material-symbols-rounded">sync</span>
+				</div>
+				<div class="point-content">
+					<h4 class="title-l">{t(locale, 'why.sync.title')}</h4>
+					<p class="body-l secondary">{t(locale, 'why.sync.desc')}</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.why-metrolist {
+		padding: var(--space-section-y) 0;
+		background-color: var(--md-sys-color-background);
+	}
+
+	.grid-container {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-grid-gap);
+		align-items: center;
+	}
+
+	.header-text {
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--unit) * 4);
+		text-align: center;
+		max-width: 800px;
+	}
+
+	.secondary {
+		color: var(--md-sys-color-on-surface-variant);
+	}
+
+	.points-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: calc(var(--unit) * 8);
+		width: 100%;
+	}
+
+	.point-card {
+		display: flex;
+		gap: calc(var(--unit) * 8);
+		align-items: start;
+		background-color: var(--md-sys-color-surface-container-low);
+		padding: calc(var(--unit) * 8);
+		border-radius: 16px;
+		transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+		border: 1px solid transparent;
+	}
+
+	.point-card:hover {
+		background-color: var(--md-sys-color-surface-container-high);
+		border-color: var(--md-sys-color-outline-variant);
+	}
+
+	.icon-box {
+		width: 56px;
+		height: 56px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: var(--md-sys-color-surface-container-high);
+		border-radius: 12px;
+		flex-shrink: 0;
+		transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+		color: var(--md-sys-color-primary);
+	}
+
+	.point-card:hover .icon-box {
+		background-color: var(--md-sys-color-primary-container);
+		color: var(--md-sys-color-on-primary-container);
+	}
+
+	.point-content {
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--unit) * 2);
+	}
+
+	.icon-box .material-symbols-rounded {
+		font-size: 28px;
+	}
+
+	@media (max-width: 968px) {
+		.grid-container {
+			gap: calc(var(--unit) * 8);
+			padding: 0 !important; /* Allow header and grid to manage their own spacing */
+			max-width: none;
+		}
+		
+		.header-text {
+			padding: 0 calc(var(--unit) * 6);
+		}
+
+		.points-grid {
+			display: flex;
+			flex-direction: row;
+			overflow-x: auto;
+			scroll-snap-type: x proximity;
+			scroll-padding: 0 calc(var(--unit) * 6);
+			gap: calc(var(--unit) * 6);
+			padding: 0 calc(var(--unit) * 6) calc(var(--unit) * 4);
+			scrollbar-width: none;
+			-ms-overflow-style: none;
+		}
+
+		.points-grid::-webkit-scrollbar {
+			display: none;
+		}
+
+		.point-card {
+			width: 280px;
+			flex-shrink: 0;
+			scroll-snap-align: start;
+			flex-direction: column;
+			gap: calc(var(--unit) * 4);
+		}
+
+		.point-card:hover {
+			transform: none;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.why-metrolist {
+			padding: calc(var(--unit) * 12) 0;
+		}
+
+		.point-card {
+			padding: calc(var(--unit) * 6);
+		}
+	}
+</style>

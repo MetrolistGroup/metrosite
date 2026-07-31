@@ -1,0 +1,17 @@
+---
+import { getCollection } from 'astro:content';
+import DocsLayout from '../../layouts/DocsLayout.astro';
+
+const slug = Astro.params.slug;
+const doc = slug
+	? (await getCollection('docs')).find(d => d.slug === slug)
+	: null;
+if (!doc) {
+	return Astro.redirect('/docs');
+}
+const { Content } = await doc.render();
+---
+
+<DocsLayout doc={doc}>
+	<Content />
+</DocsLayout>

@@ -1,0 +1,75 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import type { CollectionEntry } from 'astro:content';
+import { defaultLocale } from '../i18n';
+const locale = Astro.locals.locale ?? defaultLocale;
+
+interface Props {
+	post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+const { title, description, pubDate, heroImage } = post.data;
+---
+
+<BaseLayout title={title} description={description} image={heroImage}>
+	<article class="blog-post container">
+		<header class="post-header">
+			{heroImage && (
+				<img 
+					src={heroImage} 
+					alt={title} 
+					class="hero-image" 
+					transition:name={`hero-${post.slug}`}
+				/>
+			)}
+			<div class="meta label-l secondary">
+				<time datetime={pubDate.toISOString()}>
+					{pubDate.toLocaleDateString(locale, {
+						year: 'numeric',
+						month: 'short',
+						day: 'numeric',
+					})}
+				</time>
+			</div>
+			<h1 class="display-l" transition:name={`title-${post.slug}`}>{title}</h1>
+			<p class="headline-l secondary">{description}</p>
+		</header>
+		<hr class="divider" />
+		<div class="prose body-l">
+			<slot />
+		</div>
+	</article>
+</BaseLayout>
+
+<style>
+	.blog-post {
+		padding: var(--space-grid-gap-small) calc(var(--unit) * 4);
+		max-width: 800px;
+	}
+
+	.post-header {
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--unit) * 4);
+		margin-bottom: var(--space-card-padding);
+	}
+
+	.hero-image {
+		max-width: 100%;
+		max-height: 400px;
+		object-fit: contain;
+		margin: 0 auto calc(var(--unit) * 4) auto;
+		display: block;
+	}
+
+	.secondary {
+		color: var(--md-sys-color-on-surface-variant);
+	}
+
+	.divider {
+		border: 0;
+		border-top: 1px solid var(--md-sys-color-outline-variant);
+		margin-bottom: var(--space-card-padding);
+	}
+</style>

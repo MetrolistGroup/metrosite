@@ -1,0 +1,21 @@
+# Build output
+dist/
+
+# Dependencies
+node_modules/
+
+# Astro cache
+.astro/
+
+# Cloudflare cache
+.wrangler/
+
+# Test artifacts
+test-results/
+patches/
+
+# Local env secrets (never commit)
+.env
+.env.*
+!.env.example
+.dev.vars

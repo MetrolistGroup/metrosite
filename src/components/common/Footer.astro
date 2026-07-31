@@ -1,0 +1,91 @@
+---
+import { t, defaultLocale } from '../../i18n';
+const locale = Astro.locals.locale ?? defaultLocale;
+---
+
+<footer class="footer">
+	<div class="container footer-grid">
+		<div class="footer-left">
+			<nav class="footer-links">
+				<a href="https://github.com/MetrolistGroup/Metrolist" target="_blank" rel="noopener noreferrer">{t(locale, 'nav.github')}</a>
+				<a href="/download">{t(locale, 'nav.download')}</a>
+				<a href="/docs">{t(locale, 'nav.docs')}</a>
+				<a href="/blog">{t(locale, 'nav.blog')}</a>
+				<a href="/info">{t(locale, 'nav.info')}</a>
+			</nav>
+		</div>
+		<div class="footer-right">
+			<p class="disclaimer-text">{t(locale, 'footer.disclaimer')}</p>
+		</div>
+	</div>
+</footer>
+
+<style>
+	.footer {
+		padding: var(--space-grid-gap) 0;
+		border-top: 1px solid var(--md-sys-color-surface-container-high);
+		margin-top: calc(var(--unit) * 10);
+	}
+
+	.footer-grid {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: var(--space-card-gap);
+	}
+
+	.footer-links {
+		display: flex;
+		gap: var(--space-card-gap);
+	}
+
+	.footer-links a {
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--md-sys-color-on-surface);
+		opacity: 0.6;
+		transition: all 0.2s ease;
+	}
+
+	.footer-links a:hover {
+		opacity: 1;
+		color: var(--md-sys-color-primary);
+	}
+
+	.footer-right {
+		display: flex;
+		flex-direction: column;
+		align-items: end;
+		gap: calc(var(--unit) * 2);
+	}
+
+	.disclaimer-text {
+		font-size: 11px;
+		color: var(--md-sys-color-on-surface-variant);
+		opacity: 0.5;
+		text-align: end;
+		max-width: 400px;
+	}
+
+	@media (max-width: 768px) {
+		.footer-grid {
+			flex-direction: column;
+			text-align: center;
+			gap: calc(var(--unit) * 4);
+		}
+
+		.footer-links {
+			justify-content: center;
+			flex-wrap: wrap;
+		}
+
+		.footer-right {
+			align-items: center;
+		}
+
+		.disclaimer-text {
+			text-align: center;
+			max-width: 100%;
+		}
+	}
+</style>

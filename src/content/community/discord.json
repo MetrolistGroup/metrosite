@@ -1,0 +1,8 @@
+{ 
+  "name": "Discord", 
+  "url": "https://dsc.gg/metrolist", 
+  "type": "brand",
+  "icon": "discord", 
+  "description": "Official server for support, feedback, and community.",
+  "order": 2
+}

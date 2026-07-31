@@ -1,0 +1,171 @@
+---
+title: "Markdown Reference: Metrosite Content Styles"
+description: "A reference for writing content on Metrosite: headings, lists, code, tables, alerts, and images."
+pubDate: 2026-05-11
+author: "Metrolist Team"
+heroImage: "/images/screenshots/player_materialyou3.png"
+tags: ["Engineering", "Design"]
+---
+
+This is a reference for all content styles available on Metrosite. Use it when writing blog posts or documentation.
+
+---
+
+## Headings
+
+# Heading 1: Page titles
+## Heading 2: Section titles
+### Heading 3: Subsections
+
+Headings use the M3 type scale with primary color for H1 and H2.
+
+---
+
+## Text Formatting
+
+**Bold** for emphasis. *Italic* for subtle emphasis. `Inline code` for references to variables, commands, or paths.
+
+Links are underlined with the primary color:
+
+[Metrolist on GitHub](https://github.com/MetrolistGroup/Metrolist)
+
+---
+
+## Lists
+
+### Unordered
+
+- Simple list item
+- Another item with more text that wraps to show how longer content behaves in lists
+- Nested items:
+  - Sub-item A
+  - Sub-item B
+
+### Ordered
+
+1. First step
+2. Second step
+3. Third step with longer description
+
+---
+
+## Blockquotes
+
+> Use blockquotes for callouts or highlighted text. They have a primary-colored left border and subtle background.
+>
+> Multiple paragraphs work inside blockquotes.
+
+---
+
+## Alerts
+
+Alerts are custom HTML blocks for important notices. Three types:
+
+<div class="alert alert-tip">
+  <div class="alert-header">
+    <span class="material-symbols-rounded">lightbulb</span>
+    <span class="label-l">Tip</span>
+  </div>
+  <div class="alert-content">
+    Tips for best practices and helpful suggestions. Green accent.
+  </div>
+</div>
+
+<div class="alert alert-important">
+  <div class="alert-header">
+    <span class="material-symbols-rounded">priority_high</span>
+    <span class="label-l">Important</span>
+  </div>
+  <div class="alert-content">
+    Critical information users need to know. Primary color accent.
+  </div>
+</div>
+
+<div class="alert alert-warning">
+  <div class="alert-header">
+    <span class="material-symbols-rounded">warning</span>
+    <span class="label-l">Warning</span>
+  </div>
+  <div class="alert-content">
+    Warnings about potential issues or limitations. Yellow accent.
+  </div>
+</div>
+
+---
+
+## Code
+
+### Inline
+
+Use backticks for `inline code` like variables or file paths.
+
+### Blocks
+
+Code blocks have a dark background and monospace font:
+
+```kotlin
+// Material You color generation
+fun generateTonalPalette(sourceColor: Int): TonalPalette {
+    val hct = Hct.fromInt(sourceColor)
+    return TonalPalette.of(hct.hue, hct.chroma)
+}
+```
+
+```css
+/* CSS custom properties */
+:root {
+  --md-sys-color-surface: #0F0F0F;
+  --md-sys-color-on-surface: #E6E6E6;
+}
+```
+
+```bash
+# Build commands
+npm run build
+npm run preview
+```
+
+---
+
+## Tables
+
+| Feature | Status | Notes |
+|---|---|---|
+| Blog posts | ✅ Live | MDX content in `src/content/blog/` |
+| Documentation | ✅ Live | Organized by category |
+| Downloads | ✅ Live | Stable + nightly from GitHub |
+| Changelog | ✅ Live | Auto-parsed from releases |
+
+Tables scroll horizontally on mobile if needed.
+
+---
+
+## Images
+
+Images are centered, scaled to fit the content width, and have rounded corners:
+
+![Shared lyrics screenshot](/images/screenshots/shared_lyrics.png)
+
+Large images scale down on smaller screens automatically.
+
+---
+
+## Mentions
+
+GitHub user mentions render as styled chips:
+
+Thanks to <span class="mention"><img src="https://avatars.githubusercontent.com/nyxiereal?s=64" alt="nyxiereal" class="mention-avatar" />@nyxiereal</span> and <span class="mention"><img src="https://avatars.githubusercontent.com/ThatOneCalculator?s=64" alt="ThatOneCalculator" class="mention-avatar" />@ThatOneCalculator</span> for their contributions.
+
+---
+
+## Horizontal Rules
+
+Use `---` to create section dividers:
+
+---
+
+Three dashes render a full-width divider.
+
+---
+
+That's everything. All styles above work consistently across desktop and mobile, no layout shifts, no broken grids. Just simple, readable content.

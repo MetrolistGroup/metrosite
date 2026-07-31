@@ -1,0 +1,533 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLatestRelease, getNightlyRelease, formatSize } from '../utils/github';
+import { renderChangelog } from '../utils/changelog';
+import { t, defaultLocale } from '../i18n';
+const locale = Astro.locals.locale ?? defaultLocale;
+
+const [stable, nightly] = await Promise.all([
+  getLatestRelease(),
+  getNightlyRelease()
+]);
+
+function getApkAssets(release: any) {
+  return release?.assets?.filter((asset: any) => asset.name.endsWith('.apk')) || [];
+}
+
+const stableApks = getApkAssets(stable);
+const nightlyApks = nightly ? getApkAssets(nightly) : [
+  {
+    name: 'Metrolist-Standard',
+    browser_download_url: 'https://nightly.link/MetrolistGroup/Metrolist/workflows/build/main/app-universal-release.zip',
+    size: 23907532
+  },
+  {
+    name: 'Metrolist-Google-Cast',
+    browser_download_url: 'https://nightly.link/MetrolistGroup/Metrolist/workflows/build/main/app-with-Google-Cast.zip',
+    size: 25690112
+  }
+];
+const primaryStable = stableApks.find((a: any) => a.name === 'Metrolist.apk') || stableApks[0];
+const variantApks = stableApks.filter((a: any) => a.name !== primaryStable.name);
+
+function formatAssetName(name: string) {
+  return name
+    .replace('Metrolist-', '')
+    .replace('app-universal-', '')
+    .replace('-release', '')
+    .replace('.apk', '')
+    .replace('.zip', '')
+    .replace(/-/g, ' ')
+    .replace(/^([a-z])/, (match) => match.toUpperCase());
+}
+
+const formatDate = (dateStr: string) => {
+  return new Date(dateStr).toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' });
+};
+---
+
+<BaseLayout title={t(locale, 'download.title')}>
+  <main class="download-page">
+    <div class="container mini">
+      
+      <!-- Minimal Hero Section -->
+      <section class="hero-section reveal">
+        <div class="app-brand">
+          <img src="/images/app-icon.png" alt="Metrolist" class="app-icon" width="694" height="694" transition:name="app-icon" />
+          <h1 class="display-m">Metrolist {stable?.tag_name || ''}</h1>
+          <p class="label-l secondary">{t(locale, 'download.released')} {stable ? formatDate(stable.published_at) : t(locale, 'download.latest')}</p>
+        </div>
+
+        <div class="main-action">
+          {primaryStable ? (
+            <>
+              <a href={primaryStable.browser_download_url} class="fab-primary">
+                <span class="material-symbols-rounded">download</span>
+                <span class="label-l">{t(locale, 'download.button')}</span>
+              </a>
+              <p class="body-s specs-label">
+                {t(locale, 'download.specs')} • {formatSize(primaryStable.size || 0)} • Android 8.0+
+              </p>
+            </>
+          ) : (
+            <div class="download-unavailable">
+              <span class="material-symbols-rounded" style="font-size:48px;opacity:0.3">cloud_off</span>
+              <p class="body-l">{t(locale, 'download.error')}</p>
+              <a href="https://github.com/MetrolistGroup/Metrolist/releases" target="_blank" class="btn-text-icon">
+                {t(locale, 'download.github')}
+              </a>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <!-- Minimal Content Stack -->
+      <div class="details-stack">
+        
+        <!-- Other Versions (Collapsible-style list) -->
+        {stableApks.length > 1 && (
+          <section class="info-group reveal" style="--index: 1">
+            <h2 class="label-l group-title">{t(locale, 'download.variants')}</h2>
+            <div class="flat-list">
+               {variantApks.map((apk: any) => (
+                <a href={apk.browser_download_url} class="list-item">
+                  <div class="item-text">
+                    <span class="label-s">{formatAssetName(apk.name)}</span>
+                    <span class="label-s secondary">{formatSize(apk.size)}</span>
+                  </div>
+                  <span class="material-symbols-rounded">download</span>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <!-- Integrated Changelog -->
+        {stable?.body && (
+          <section class="info-group reveal" style="--index: 2">
+            <h2 class="label-l group-title">{t(locale, 'download.whatsnew')}</h2>
+            <div class="changelog-card body-m" set:html={renderChangelog(stable.body)} />
+          </section>
+        )}
+
+        <!-- Subtle Nightly Section -->
+        <section class="info-group reveal" style="--index: 3">
+          <div class="nightly-banner">
+            <div class="nightly-text">
+              <h3 class="title-s">{t(locale, 'download.devbuild')}</h3>
+              <p class="label-s secondary">{t(locale, 'download.unstable')} • {t(locale, 'download.updated')} {nightly ? formatDate(nightly.published_at) : t(locale, 'download.latest')}</p>
+            </div>
+            <div class="nightly-actions">
+              {nightlyApks.map((apk: any) => (
+                <a href={apk.browser_download_url} class="btn-text-icon" title={formatAssetName(apk.name)}>
+                  <span class="material-symbols-rounded">science</span>
+                  <span class="label-s">{formatAssetName(apk.name).split(' ')[0]}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <!-- GitHub Link -->
+        <footer class="mini-footer reveal" style="--index: 4">
+          <a href="https://github.com/MetrolistGroup/Metrolist/releases" target="_blank" class="secondary-link label-s">
+            {t(locale, 'download.github')}
+          </a>
+        </footer>
+      </div>
+
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .download-page {
+    padding: var(--space-section-y) 0;
+    background: var(--md-sys-color-background);
+    min-height: 100vh;
+  }
+
+  .mini {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Hero Section */
+  .hero-section {
+    text-align: center;
+    margin-bottom: calc(var(--unit) * 16);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(var(--unit) * 8);
+  }
+
+  .app-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(var(--unit) * 2);
+  }
+
+  .app-icon {
+    width: 96px;
+    height: 96px;
+    margin-bottom: calc(var(--unit) * 2);
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
+  }
+
+  .secondary {
+    color: var(--md-sys-color-on-surface-variant);
+    opacity: 0.8;
+  }
+
+  .main-action {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(var(--unit) * 3);
+  }
+
+  .fab-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    padding: 0 32px;
+    height: 64px;
+    border-radius: 32px;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .fab-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    background: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+  }
+
+  .specs-label {
+    color: var(--md-sys-color-on-surface-variant);
+    opacity: 0.6;
+    letter-spacing: 0.5px;
+  }
+
+  .download-unavailable {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(var(--unit) * 3);
+    padding: calc(var(--unit) * 8);
+    background: var(--md-sys-color-surface-container-low);
+    border-radius: var(--radius-m);
+    text-align: center;
+    color: var(--md-sys-color-on-surface-variant);
+  }
+
+  .download-unavailable .btn-text-icon {
+    color: var(--md-sys-color-primary);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  /* Content Stack */
+  .details-stack {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--unit) * 12);
+  }
+
+  .info-group {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--unit) * 4);
+  }
+
+  .group-title {
+    color: var(--md-sys-color-primary);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    font-size: 11px;
+    opacity: 0.8;
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    padding-bottom: 8px;
+  }
+
+  /* Flat List style */
+  .flat-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--md-sys-color-surface-container-highest);
+    text-decoration: none;
+    color: var(--md-sys-color-on-surface);
+    transition: padding 0.2s ease;
+  }
+
+  .list-item:hover {
+    padding-inline-start: 8px;
+    color: var(--md-sys-color-primary);
+  }
+
+  .item-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .list-item .material-symbols-rounded {
+    font-size: 20px;
+    opacity: 0.5;
+  }
+
+  /* Changelog Card */
+  .changelog-card {
+    background: var(--md-sys-color-surface-container-low);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    color: var(--md-sys-color-on-surface-variant);
+    line-height: 1.7;
+  }
+
+  .changelog-card :global(.changelog-banner) {
+    display: flex;
+    align-items: start;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 16px;
+    border-inline-start: 4px solid #f9bf45;
+    background: rgba(249, 191, 69, 0.05);
+    font-size: 0.9em;
+    font-weight: 500;
+    color: var(--md-sys-color-on-surface);
+  }
+
+  .changelog-card :global(.changelog-banner .material-symbols-rounded) {
+    color: #f9bf45;
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .changelog-card :global(.changelog-section) {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .changelog-card :global(.changelog-section-title) {
+    color: var(--md-sys-color-on-surface);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 0 0 4px 0;
+  }
+
+  .changelog-card :global(ul) {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .changelog-card :global(li) {
+    position: relative;
+    padding: 10px 0 10px 20px;
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    font-size: 0.95em;
+  }
+
+  .changelog-card :global(li:last-child) {
+    border-bottom: none;
+  }
+
+  .changelog-card :global(li::before) {
+    content: "";
+    position: absolute;
+    inset-inline-start: 4px;
+    top: 18px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--md-sys-color-primary);
+    opacity: 0.6;
+  }
+
+  .changelog-card :global(a) {
+    color: var(--md-sys-color-primary);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border 0.2s ease;
+  }
+
+  .changelog-card :global(a:hover) {
+    border-bottom-color: currentColor;
+  }
+
+  .changelog-card :global(.mention) {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--md-sys-color-surface-container-high);
+    padding: 2px 12px 2px 4px;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.9em;
+    font-weight: 500;
+    color: var(--md-sys-color-on-surface);
+    transition: all 0.2s ease;
+    text-decoration: none !important;
+    border: none !important;
+  }
+
+  .changelog-card :global(.mention:hover) {
+    background: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+  }
+
+  .changelog-card :global(.mention)::before {
+    content: "";
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--md-sys-color-surface-variant) var(--avatar) center / cover;
+    flex-shrink: 0;
+  }
+
+  .changelog-card :global(.mention:hover)::before {
+    filter: brightness(1.2);
+  }
+
+  .changelog-card :global(.contributors-row) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .changelog-card :global(.contributor-chip) {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px 4px 4px;
+    border-radius: 20px;
+    background: var(--md-sys-color-surface-container-high);
+    text-decoration: none;
+    color: var(--md-sys-color-on-surface);
+    font-size: 0.85em;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .changelog-card :global(.contributor-chip:hover) {
+    background: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+  }
+
+  .changelog-card :global(.contributor-avatar) {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-block;
+    background: var(--md-sys-color-surface-variant) var(--avatar) center / cover;
+    flex-shrink: 0;
+  }
+
+  .changelog-card :global(.contributor-chip:hover .contributor-avatar) {
+    filter: brightness(1.2);
+  }
+
+  /* Nightly Banner */
+  .nightly-banner {
+    background: var(--md-sys-color-surface-container-low);
+    padding: 20px;
+    border-radius: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .nightly-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .nightly-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-text-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--md-sys-color-on-surface);
+    transition: background 0.2s ease;
+  }
+
+  .btn-text-icon:hover {
+    background: var(--md-sys-color-surface-container-high);
+  }
+
+  .btn-text-icon .material-symbols-rounded {
+    font-size: 20px;
+  }
+
+  /* Footer */
+  .mini-footer {
+    text-align: center;
+    margin-top: calc(var(--unit) * 8);
+    padding-bottom: var(--space-section-y);
+  }
+
+  .secondary-link {
+    text-decoration: none;
+    color: var(--md-sys-color-on-surface-variant);
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+  }
+
+  .secondary-link:hover {
+    opacity: 1;
+  }
+
+  /* Reveal Animations */
+  .reveal {
+    animation: fade-in 0.8s cubic-bezier(0.2, 0, 0, 1) both;
+    animation-delay: calc(var(--index, 0) * 0.1s);
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Mobile */
+  @media (max-width: 600px) {
+    .mini { padding: 0 20px; }
+    .hero-section { margin-bottom: calc(var(--unit) * 12); }
+    .app-icon { width: 80px; height: 80px; }
+    .fab-primary { width: 100%; justify-content: center; }
+    .nightly-banner { flex-direction: column; text-align: center; }
+  }
+</style>

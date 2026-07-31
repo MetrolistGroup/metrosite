@@ -1,0 +1,125 @@
+---
+import { getCollection } from 'astro:content';
+import { t, defaultLocale } from '../../i18n';
+const locale = Astro.locals.locale ?? defaultLocale;
+
+const features = (await getCollection('features'))
+	.sort((a, b) => a.data.order - b.data.order);
+
+function sanitizeSvg(svg: string): string {
+	return svg
+		// Strip <script> blocks
+		.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+		// Strip event handlers with quoted values: onclick="..."
+		.replace(/\bon\w+\s*=\s*"[^"]*"/gi, '')
+		// Strip event handlers with single-quoted values: onclick='...'
+		.replace(/\bon\w+\s*=\s*'[^']*'/gi, '')
+		// Strip unquoted event handlers: onclick=alert(1)
+		.replace(/\bon\w+\s*=\s*[^\s"'>]+/gi, '')
+		// Strip javascript:/vbscript: URIs in href/src
+		.replace(/(?:href|src|xlink:href|action|formaction)\s*=\s*(?:"[^"]*javascript:[^"]*"|'[^']*javascript:[^']*'|[^\s"'>]*javascript:)/gi, (m) => m.replace(/javascript:/gi, 'blocked:'))
+		.replace(/(?:href|src|xlink:href|action|formaction)\s*=\s*(?:"[^"]*vbscript:[^"]*"|'[^']*vbscript:[^']*'|[^\s"'>]*vbscript:)/gi, (m) => m.replace(/vbscript:/gi, 'blocked:'))
+		// Strip data: URIs in href/xlink:href (not src — data:image/svg+xml etc. are legitimate in src)
+		.replace(/(?:href|xlink:href)\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'>]+)/gi, (m) =>
+			/data\s*:/i.test(m) ? '' : m
+		);
+}
+---
+<style>
+	.features {
+		padding: calc(var(--unit) * 12) 0;
+		background-color: var(--md-sys-color-surface-container-lowest);
+	}
+
+	.head {
+		margin-bottom: calc(var(--unit) * 8);
+		text-align: center;
+	}
+
+	.head h2 {
+		margin: 0;
+	}
+
+	.strip {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: calc(var(--unit) * 6);
+	}
+
+	.card {
+		background-color: var(--md-sys-color-surface-container-low);
+		padding: var(--space-card-padding);
+		border-radius: var(--radius-m);
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--unit) * 4);
+		border: 1px solid transparent;
+		transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+	}
+
+	.card:hover {
+		transform: translateY(-4px);
+		background-color: var(--md-sys-color-surface-container);
+		border-color: var(--md-sys-color-outline-variant);
+	}
+
+	.card-header {
+		display: flex;
+		align-items: center;
+		gap: calc(var(--unit) * 4);
+		color: var(--md-sys-color-primary);
+	}
+
+	.icon-wrapper {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		width: 48px;
+		height: 48px;
+		border-radius: var(--radius-s);
+		background-color: var(--md-sys-color-surface-container-high);
+	}
+
+	.title-l {
+		margin: 0;
+	}
+
+	.secondary {
+		color: var(--md-sys-color-on-surface-variant);
+		line-height: 1.5;
+	}
+
+	@media (max-width: 600px) {
+		.features {
+			padding: calc(var(--unit) * 10) 0;
+		}
+
+		.head {
+			padding: 0 calc(var(--unit) * 6);
+		}
+
+		.strip {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
+
+<section class="features">
+	<div class="container">
+		<div class="head">
+			<h2 class="display-s">{t(locale, 'features.title')}</h2>
+		</div>
+		<div class="strip">
+			{features.map(feature => (
+				<div class="card">
+					<div class="card-header">
+						<div class="icon-wrapper" set:html={sanitizeSvg(feature.data.icon)} />
+						<h3 class="title-l">{t(locale, `feature.${feature.id}.title`)}</h3>
+					</div>
+					<p class="body-l secondary">{t(locale, `feature.${feature.id}.desc`)}</p>
+				</div>
+			))}
+		</div>
+	</div>
+</section>

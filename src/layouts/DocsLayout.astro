@@ -1,0 +1,242 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+import { t, defaultLocale } from '../i18n';
+const locale = Astro.locals.locale ?? defaultLocale;
+
+interface Props {
+	doc: CollectionEntry<'docs'>;
+}
+
+const { doc } = Astro.props;
+const { title, description } = doc.data;
+
+const allDocs = await getCollection('docs');
+const categories = ['getting-started', 'features', 'troubleshooting'];
+
+const formatCategory = (cat: string) => {
+	return cat.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+};
+---
+
+<BaseLayout title={title} description={description}>
+	<div class="docs-container container">
+		<button class="sidebar-toggle label-l" id="sidebar-toggle" aria-expanded="false" aria-controls="docs-sidebar">
+			<span class="material-symbols-rounded">menu</span>
+			{t(locale, 'nav.docs')}
+		</button>
+		<aside class="sidebar" id="docs-sidebar">
+			{categories.map(cat => {
+				const docs = allDocs.filter(d => d.data.category === cat);
+				if (docs.length === 0) return null;
+				return (
+					<div class="category">
+						<h3 class="label-l category-label">{cat.replace('-', ' ').toUpperCase()}</h3>
+						<nav>
+							<ul>
+								{docs.map(d => (
+									<li>
+										<a href={`/docs/${d.slug}/`} class={`body-l ${d.slug === doc.slug ? 'active' : ''}`}>
+											{d.data.title}
+										</a>
+									</li>
+								))}
+							</ul>
+						</nav>
+					</div>
+				);
+			})}
+		</aside>
+
+		<main class="doc-content">
+			<nav class="breadcrumbs label-l">
+				<a href="/docs/">{t(locale, 'nav.docs')}</a>
+				<span class="separator">/</span>
+				<span class="category-name">{formatCategory(doc.data.category)}</span>
+			</nav>
+			<header class="doc-header">
+				<h1 class="display-l" transition:name="doc-title">{title}</h1>
+				<p class="headline-l secondary" transition:name="doc-desc">{description}</p>
+			</header>
+			<div class="doc-body">
+				<div class="prose body-l">
+					<slot />
+				</div>
+			</div>
+		</main>
+	</div>
+</BaseLayout>
+
+<style>
+	.docs-container {
+		display: grid;
+		grid-template-columns: 280px 1fr;
+		gap: var(--space-grid-gap);
+		padding-top: var(--space-section-y);
+		padding-bottom: var(--space-section-y);
+		align-items: start;
+	}
+
+	.sidebar {
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--unit) * 10);
+		position: sticky;
+		top: calc(var(--unit) * 24);
+		height: fit-content;
+	}
+
+	.category {
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--unit) * 4);
+	}
+
+	.category-label {
+		color: var(--md-sys-color-primary);
+		letter-spacing: 0.1rem;
+		border-bottom: 1px solid var(--md-sys-color-outline-variant);
+		padding-bottom: calc(var(--unit) * 2);
+		margin-bottom: calc(var(--unit) * 2);
+	}
+
+	.sidebar ul {
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--unit) * 1);
+	}
+
+	.sidebar a {
+		display: block;
+		padding: calc(var(--unit) * 4) calc(var(--unit) * 6);
+		border-radius: var(--radius-s);
+		transition: 
+			background-color 0.3s cubic-bezier(0.2, 0, 0, 1),
+			color 0.3s cubic-bezier(0.2, 0, 0, 1),
+			font-weight 0.3s cubic-bezier(0.2, 0, 0, 1);
+		color: var(--md-sys-color-on-surface-variant);
+	}
+
+	.sidebar a:hover {
+		background-color: var(--md-sys-color-surface-container-high);
+		color: var(--md-sys-color-on-surface);
+	}
+
+	.sidebar a.active {
+		background-color: var(--md-sys-color-primary-container);
+		color: var(--md-sys-color-on-primary-container);
+		font-weight: 500;
+	}
+
+	.doc-content {
+		max-width: 800px;
+	}
+
+	.doc-body {
+		background: var(--md-sys-color-surface-container-low);
+		border-radius: var(--radius-m);
+		padding: calc(var(--unit) * 10);
+	}
+
+	.breadcrumbs {
+		color: var(--md-sys-color-on-surface-variant);
+		margin-bottom: calc(var(--unit) * 4);
+		display: flex;
+		align-items: center;
+		gap: calc(var(--unit) * 2);
+	}
+
+	.breadcrumbs a {
+		transition: color 0.2s ease;
+	}
+
+	.breadcrumbs a:hover {
+		color: var(--md-sys-color-primary);
+	}
+
+	.separator {
+		opacity: 0.5;
+	}
+
+	.doc-header {
+		margin-bottom: var(--space-grid-gap);
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--unit) * 4);
+	}
+
+	.secondary {
+		color: var(--md-sys-color-on-surface-variant);
+	}
+
+	@media (max-width: 1100px) {
+		.docs-container {
+			grid-template-columns: 240px 1fr;
+			gap: var(--space-grid-gap-small);
+		}
+	}
+
+	@media (max-width: 900px) {
+		.docs-container {
+			grid-template-columns: 1fr;
+			gap: var(--space-card-gap);
+			padding-top: var(--space-section-y-mobile);
+		}
+		.sidebar {
+			position: static;
+			border-bottom: 1px solid var(--md-sys-color-outline-variant);
+			padding-bottom: var(--space-card-padding);
+			margin-bottom: var(--space-card-gap);
+			display: none;
+		}
+		.sidebar.open {
+			display: flex;
+		}
+		.sidebar-toggle {
+			display: flex;
+		}
+		.doc-content {
+			max-width: 100%;
+		}
+	}
+
+	.sidebar-toggle {
+		display: none;
+		align-items: center;
+		gap: calc(var(--unit) * 2);
+		padding: calc(var(--unit) * 3) calc(var(--unit) * 4);
+		border-radius: var(--radius-s);
+		background: var(--md-sys-color-surface-container-high);
+		color: var(--md-sys-color-on-surface);
+		border: none;
+		cursor: pointer;
+		width: 100%;
+		margin-bottom: calc(var(--unit) * 2);
+		transition: background-color 0.2s ease;
+	}
+
+	.sidebar-toggle:hover {
+		background: var(--md-sys-color-surface-container-highest);
+	}
+
+	.sidebar-toggle .material-symbols-rounded {
+		font-size: 20px;
+	}
+</style>
+
+<script>
+	function setupDocsSidebar() {
+		const toggle = document.getElementById('sidebar-toggle');
+		const sidebar = document.getElementById('docs-sidebar');
+		if (!toggle || !sidebar) return;
+
+		toggle.addEventListener('click', () => {
+			const isOpen = sidebar.classList.toggle('open');
+			toggle.setAttribute('aria-expanded', String(isOpen));
+		});
+	}
+
+	document.addEventListener('astro:page-load', setupDocsSidebar);
+</script>

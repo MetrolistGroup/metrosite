@@ -1,0 +1,114 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { t, defaultLocale } from '../../i18n';
+const locale = Astro.locals.locale ?? defaultLocale;
+
+const allDocs = await getCollection('docs');
+
+// Group docs by category
+const categories = ['getting-started', 'features', 'troubleshooting'];
+const groupedDocs = categories.reduce((acc, category) => {
+	acc[category] = allDocs
+		.filter((doc) => doc.data.category === category)
+		.sort((a, b) => (a.data.order || 0) - (b.data.order || 0));
+	return acc;
+}, {} as Record<string, typeof allDocs>);
+
+const formatCategory = (cat: string) => {
+	return cat.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+};
+---
+
+<BaseLayout title={t(locale, 'docs.pageTitle')} description={t(locale, 'docs.description')}>
+	<main class="container page-content">
+		<header class="page-header" transition:name="page-header">
+			<h1 class="display-l">{t(locale, 'docs.title')}</h1>
+			<p class="headline-l">{t(locale, 'docs.subtitle')}</p>
+		</header>
+		
+		<div class="docs-grid">
+			{categories.map((category) => (
+				groupedDocs[category] && groupedDocs[category].length > 0 && (
+					<section class="doc-category">
+						<h2 class="category-label label-l">{formatCategory(category).toUpperCase()}</h2>
+						<ul class="doc-list">
+							{groupedDocs[category].map((doc) => (
+								<li>
+									<a href={`/docs/${doc.slug}/`} class="doc-link">
+										<span class="title-l doc-title">{doc.data.title}</span>
+										<span class="body-l doc-desc">{doc.data.description}</span>
+									</a>
+								</li>
+							))}
+						</ul>
+					</section>
+				)
+			))}
+		</div>
+	</main>
+</BaseLayout>
+
+<style>
+	.page-content {
+		padding-top: var(--space-section-y);
+		padding-bottom: var(--space-section-y);
+		max-width: 800px;
+	}
+
+	.page-header {
+		text-align: start;
+		margin-bottom: var(--space-grid-gap);
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--unit) * 2);
+	}
+
+	.docs-grid {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-grid-gap-small);
+	}
+
+	.doc-category {
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--unit) * 4);
+	}
+
+	.category-label {
+		color: var(--md-sys-color-primary);
+		letter-spacing: 0.1rem;
+		border-bottom: 1px solid var(--md-sys-color-outline-variant);
+		padding-bottom: calc(var(--unit) * 2);
+	}
+
+	.doc-list {
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--unit) * 3);
+	}
+
+	.doc-link {
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--unit) * 1);
+		padding: var(--space-card-padding);
+		background-color: var(--md-sys-color-surface-container-low);
+		border-radius: var(--radius-m);
+		transition: background-color 0.4s cubic-bezier(0.2, 0, 0, 1);
+	}
+
+	.doc-link:hover {
+		background-color: var(--md-sys-color-surface-container-high);
+	}
+
+	.doc-title {
+		color: var(--md-sys-color-on-surface);
+	}
+
+	.doc-desc {
+		color: var(--md-sys-color-on-surface-variant);
+	}
+</style>

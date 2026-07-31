@@ -1,0 +1,208 @@
+---
+import { defaultLocale, locales, localeNames } from '../../i18n';
+import { flagSvg } from '../../utils/flags';
+
+const locale = Astro.locals.locale ?? defaultLocale;
+
+function switchLocalePath(target: string): string {
+  const params = new URLSearchParams(Astro.url.search);
+  params.set('lang', target);
+  const qs = params.toString();
+  return `${Astro.url.pathname}?${qs}`;
+}
+---
+
+<div class="locale-selector">
+  <button 
+    class="locale-button label-l" 
+    id="locale-toggle"
+    aria-haspopup="true"
+    aria-expanded="false"
+    aria-controls="locale-menu"
+    aria-label="Select language"
+  >
+    <span class="material-symbols-rounded locale-icon">language</span>
+    <span class="locale-flag locale-flag-button" set:html={flagSvg(locale)} />
+    <span class="locale-current">{localeNames[locale as keyof typeof localeNames]}</span>
+    <span class="material-symbols-rounded chevron">expand_more</span>
+  </button>
+  <div 
+    class="locale-menu" 
+    id="locale-menu"
+    role="menu"
+    aria-labelledby="locale-toggle"
+  >
+    {locales.map((l) => {
+      const isActive = l === locale;
+      return (
+        <a
+          href={switchLocalePath(l)}
+          class="locale-menu-item label-m"
+          role="menuitem"
+          data-active={isActive}
+        >
+          <span class="locale-flag" set:html={flagSvg(l)} />
+          <span class="locale-name">{localeNames[l as keyof typeof localeNames]}</span>
+          {isActive && <span class="material-symbols-rounded check">check</span>}
+        </a>
+      );
+    })}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('click', (e) => {
+    const toggle = (e.target as Element).closest('#locale-toggle');
+    const menu = document.getElementById('locale-menu');
+    const selector = document.querySelector('.locale-selector');
+
+    if (toggle) {
+      const expanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!expanded));
+      menu?.classList.toggle('open', !expanded);
+      return;
+    }
+
+    if (selector && !selector.contains(e.target as Node)) {
+      document.getElementById('locale-toggle')?.setAttribute('aria-expanded', 'false');
+      menu?.classList.remove('open');
+    }
+  });
+</script>
+
+<style>
+  .locale-selector {
+    position: relative;
+  }
+
+  .locale-button {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--unit) * 1);
+    padding: calc(var(--unit) * 2) calc(var(--unit) * 2);
+    border-radius: 24px;
+    border: none;
+    background: transparent;
+    color: var(--md-sys-color-on-surface-variant);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .locale-button:hover {
+    background-color: var(--md-sys-color-surface-container-high);
+  }
+
+  .locale-button:focus-visible {
+    outline: 2px solid var(--md-sys-color-primary);
+    outline-offset: 2px;
+  }
+
+  .locale-flag {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 1px solid var(--md-sys-color-outline-variant);
+  }
+
+  .locale-flag :global(svg) {
+    width: 24px;
+    height: 24px;
+    display: block;
+  }
+
+  .locale-icon {
+    font-size: 18px;
+    opacity: 0.6;
+  }
+
+  .locale-current {
+    font-weight: 600;
+  }
+
+  .locale-flag-button {
+    display: none;
+  }
+
+  .chevron {
+    font-size: 16px;
+    opacity: 0.5;
+    transition: transform 0.2s ease;
+  }
+
+  .locale-button[aria-expanded="true"] .chevron {
+    transform: rotate(180deg);
+  }
+
+  .locale-menu {
+    position: absolute;
+    top: calc(100% + calc(var(--unit) * 1));
+    inset-inline-end: 0;
+    min-width: 160px;
+    background-color: var(--md-sys-color-surface-container);
+    border-radius: var(--radius-m);
+    padding: calc(var(--unit) * 1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s 0.2s;
+    z-index: 1000;
+  }
+
+  .locale-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s 0s;
+  }
+
+  .locale-menu-item {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--unit) * 2);
+    padding: calc(var(--unit) * 2) calc(var(--unit) * 3);
+    border-radius: var(--radius-s);
+    text-decoration: none;
+    color: var(--md-sys-color-on-surface);
+    transition: background-color 0.2s ease;
+  }
+
+  .locale-menu-item:hover {
+    background-color: var(--md-sys-color-surface-container-highest);
+  }
+
+  .locale-menu-item[data-active="true"] {
+    background-color: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+  }
+
+  .locale-name {
+    flex: 1;
+    font-weight: 500;
+  }
+
+  .check {
+    font-size: 16px;
+  }
+
+  @media (max-width: 768px) {
+    .locale-button {
+      padding: calc(var(--unit) * 2);
+    }
+
+    .locale-icon,
+    .locale-current {
+      display: none;
+    }
+
+    .locale-flag-button {
+      display: flex;
+    }
+  }
+</style>

@@ -1,0 +1,441 @@
+---
+import { t, defaultLocale } from '../../i18n';
+const locale = Astro.locals.locale ?? defaultLocale;
+
+const items = [
+  {
+    type: 'video',
+    titleKey: 'showcase.item.lyrics',
+    descKey: 'showcase.item.lyrics.desc',
+  },
+  {
+    type: 'image',
+    src: '/images/screenshots/player_materialyou3.png',
+    alt: 'Metrolist Player with Material You dynamic colors',
+    titleKey: 'showcase.item.materialyou',
+    descKey: 'showcase.item.materialyou.desc',
+  },
+  {
+    type: 'image',
+    src: '/images/screenshots/artist_screen.png',
+    alt: 'Artist profile screen in Metrolist',
+    titleKey: 'showcase.item.explore',
+    descKey: 'showcase.item.explore.desc',
+  },
+  {
+    type: 'image',
+    src: '/images/screenshots/shared_lyrics.png',
+    alt: 'Lyrics sharing interface',
+    titleKey: 'showcase.item.share',
+    descKey: 'showcase.item.share.desc',
+    isSquare: true
+  },
+  {
+    type: 'image',
+    src: '/images/screenshots/player_ss_bw.png',
+    alt: 'Metrolist Player in dark mode',
+    titleKey: 'showcase.item.aesthetics',
+    descKey: 'showcase.item.aesthetics.desc',
+  }
+];
+---
+
+<section class="showcase">
+   <div class="container">
+    <div class="header">
+      <h2 class="display-s">{t(locale, 'showcase.title')}</h2>
+      <p class="body-l secondary">{t(locale, 'showcase.subtitle')}</p>
+    </div>
+  </div>
+
+  <div class="showcase-container">
+    <div class="showcase-track">
+      {items.map((item, i) => (
+        <div class="showcase-card" style={`--index: ${i}`}>
+          <div class={`phone-frame ${item.isSquare ? 'square-content' : ''}`}>
+            {item.type === 'video' ? (
+              <div class="video-wrapper">
+                <video
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  data-adaptive-video
+                >
+                  <noscript>
+                    <source src="/images/screenshots/wbw_lyrics_showcase_med.mp4" type="video/mp4" />
+                  </noscript>
+                </video>
+                <button class="video-control" aria-label="Toggle playback">
+                  <span class="material-symbols-sharp">pause</span>
+                </button>
+              </div>
+            ) : (
+              <img src={item.src} alt={item.alt} loading="lazy" />
+            )}
+          </div>
+          <div class="content">
+            <h3 class="title-m">{t(locale, item.titleKey)}</h3>
+            <p class="body-m secondary">{t(locale, item.descKey)}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  /**
+   * VideoAutoplayHandler
+   * Manages aggressive autoplay for mobile browsers with IntersectionObserver support.
+   */
+  import { setupAdaptiveVideos } from '../../utils/adaptive-video-loader';
+  import { prefersReducedMotion } from '../../utils/video-quality';
+
+  class VideoAutoplayHandler {
+    wrapper: HTMLElement;
+    video: HTMLVideoElement;
+    button: HTMLButtonElement;
+    icon: HTMLElement | null;
+    isManuallyPaused: boolean;
+
+    constructor(wrapper: HTMLElement) {
+      this.wrapper = wrapper;
+      this.video = wrapper.querySelector('video')!;
+      this.button = wrapper.querySelector('.video-control')!;
+      this.icon = this.button?.querySelector('span');
+      this.isManuallyPaused = false;
+
+      if (this.video && this.button && this.icon) {
+        this.init();
+      }
+    }
+
+    init() {
+      // 1. Setup Intersection Observer
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !this.isManuallyPaused) {
+            // Respect reduced-motion: don't auto-start a looping clip.
+            if (prefersReducedMotion()) {
+              this.video.pause();
+              this.updateIcon('play_arrow');
+            } else {
+              // Force load since preload is managed by the adaptive loader
+              if (this.video.readyState === 0) this.video.load();
+              this.play();
+            }
+          } else {
+            this.video.pause();
+          }
+        });
+      }, { threshold: 0.6 }); // Be more aggressive about pausing
+
+      observer.observe(this.video);
+
+      // 2. Setup Page Visibility Logic (Kill lag if user switches tabs)
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          this.video.pause();
+        } else if (!this.isManuallyPaused && observer.takeRecords().some(r => r.isIntersecting)) {
+          this.play();
+        }
+      });
+
+      // 2. Setup Manual Controls
+      this.button.addEventListener('click', (e: MouseEvent) => {
+        e.stopPropagation();
+        if (this.video.paused) {
+          this.isManuallyPaused = false;
+          this.play();
+        } else {
+          this.isManuallyPaused = true;
+          this.video.pause();
+          this.updateIcon('play_arrow');
+        }
+      });
+
+      // 3. Setup One-time Global Interaction Fallback
+      const globalTrigger = () => {
+        if (!this.isManuallyPaused) this.play();
+        window.removeEventListener('touchstart', globalTrigger);
+        window.removeEventListener('click', globalTrigger);
+      };
+      window.addEventListener('touchstart', globalTrigger, { once: true });
+      window.addEventListener('click', globalTrigger, { once: true });
+    }
+
+    async play() {
+      try {
+        await this.video.play();
+        this.updateIcon('pause');
+      } catch (err) {
+        this.updateIcon('play_arrow');
+      }
+    }
+
+    updateIcon(name: string) {
+      if (this.icon) this.icon.textContent = name;
+    }
+  }
+
+    function setupShowcase() {
+    // 0. Assign an adaptive (device-appropriate) source before autoplay logic
+    setupAdaptiveVideos();
+
+    // 1. Staggered Reveal Animation
+    const cards = document.querySelectorAll('.showcase-card');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    cards.forEach(card => observer.observe(card));
+
+    // 2. Video Autoplay
+    document.querySelectorAll('.video-wrapper').forEach(wrapper => {
+      new VideoAutoplayHandler(wrapper as HTMLElement);
+    });
+  }
+
+  // Run on load and Astro transitions
+  document.addEventListener('astro:page-load', setupShowcase);
+</script>
+
+<style>
+  .showcase {
+    padding: var(--space-section-y) 0;
+    background-color: var(--md-sys-color-background);
+    /* Remove overflow: hidden to prevent cropping during hover animations */
+    overflow: clip; 
+    /* Modern Performance Isolation */
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 500px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: var(--space-grid-gap);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(var(--unit) * 2);
+  }
+
+  .secondary {
+    color: var(--md-sys-color-on-surface-variant);
+  }
+
+  .showcase-container {
+    position: relative;
+    width: 100%;
+  }
+
+  .showcase-track {
+    display: flex;
+    gap: calc(var(--unit) * 8);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    --track-padding: calc(max(0px, (100% - 1200px) / 2) + calc(var(--unit) * 6));
+    /* Increased vertical padding to provide "flight space" for lifted hover effects */
+    padding: calc(var(--unit) * 16) var(--track-padding);
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: var(--track-padding);
+  }
+
+  .showcase-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .showcase-card {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--unit) * 4);
+    width: 220px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    position: relative;
+
+    /* Reveal Animation Base State */
+    opacity: 0;
+    transform: translateY(40px);
+    transition: 
+      opacity 1s cubic-bezier(0.2, 0, 0, 1),
+      transform 1s cubic-bezier(0.2, 0, 0, 1);
+    transition-delay: calc(var(--index) * 0.1s);
+  }
+
+  .showcase-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .phone-frame {
+    position: relative;
+    aspect-ratio: 9 / 19;
+    width: 100%;
+    border-radius: var(--radius-m);
+    overflow: hidden;
+    background-color: var(--md-sys-color-surface-container-lowest);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Variables for Interaction */
+    --y-offset: 0px;
+    --hover-lift: 0px;
+    --scale: 1;
+    
+    /* Unified Transform: Original stagger + Hover lift + Subtle scale */
+    transform: translateY(calc(var(--y-offset) + var(--hover-lift))) scale(var(--scale));
+    /* Use Emphasized easing for a natural "physical" feel */
+    transition: 
+      transform 0.5s cubic-bezier(0.2, 0, 0, 1),
+      background-color 0.3s ease,
+      border-color 0.3s ease;
+    
+    will-change: transform;
+    /* Ensure scaling happens from the center to maintain balance */
+    transform-origin: center center;
+  }
+
+  .showcase-card:hover {
+    z-index: 20;
+  }
+
+  .showcase-card:hover .phone-frame {
+    /* Subtle "Lift & Float" instead of just scaling up */
+    --hover-lift: -12px;
+    --scale: 1.02;
+    background-color: var(--md-sys-color-surface-container-low);
+    border-color: var(--md-sys-color-outline);
+  }
+
+  .video-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    /* Performance isolation */
+    contain: strict;
+    transform: translateZ(0);
+    overflow: hidden;
+  }
+
+  video, img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    background-color: #000;
+    /* GPU acceleration for high-res playback */
+    transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+
+  .video-control {
+    position: absolute;
+    right: calc(var(--unit) * 4);
+    bottom: calc(var(--unit) * 4);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), background-color 0.2s ease, opacity 0.2s ease;
+    z-index: 2;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  @media (hover: hover) {
+    .video-wrapper:hover .video-control {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  .video-control:hover {
+    background-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    transform: scale(1.05);
+  }
+
+  .square-content {
+    background-color: #0a0a0a;
+  }
+
+  .square-content img {
+    object-fit: contain;
+    width: 85%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-m);
+  }
+
+  .content {
+    padding: 0 calc(var(--unit) * 2);
+    /* Ensure content doesn't jitter when the frame above it lifts */
+    transition: transform 0.5s cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .showcase-card:hover .content {
+    /* Slight downward push to increase whitespace and focus */
+    transform: translateY(4px);
+  }
+
+  @media (min-width: 769px) {
+    .showcase {
+      padding-bottom: calc(var(--unit) * 20);
+    }
+
+    .showcase-track {
+      max-width: 1200px;
+      margin: 0 auto;
+      justify-content: center;
+      padding-inline: 0;
+      scroll-padding-inline: 0;
+      /* Provide enough room for the staggered + lifted frames */
+      padding-block: calc(var(--unit) * 16);
+      /* Allow content to transcend container during animation */
+      overflow: visible;
+    }
+
+    .showcase-card {
+      width: 215px;
+      gap: calc(var(--unit) * 8);
+    }
+
+    .showcase-card:nth-child(even) .phone-frame {
+      --y-offset: 30px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .showcase {
+      padding: calc(var(--unit) * 10) 0;
+    }
+
+    .header {
+      margin-bottom: calc(var(--unit) * 6);
+    }
+
+    .showcase-track {
+      padding-bottom: calc(var(--unit) * 12);
+      /* Use clip on mobile to allow horizontal scroll but avoid vertical crop */
+      overflow-x: auto;
+      overflow-y: visible;
+    }
+  }
+</style>
