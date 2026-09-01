@@ -1,29 +1,22 @@
+<script setup lang="ts">
+import DownloadDialog from './DownloadDialog.vue'
+</script>
+
 <template>
-  <section class="download">
+  <section class="download" aria-labelledby="download-title">
     <div class="container">
-      <div class="download__card">
-
+      <div class="download__panel">
         <div class="download__copy">
-          <h2 class="download__title">Ready to listen?</h2>
-          <p class="download__sub">
-            Free, open, and always up to date on GitHub.
-            Install takes under a minute.
-          </p>
+          <h2 id="download-title">Put your library on a bigger screen.</h2>
+          <p>Select Android, Linux, macOS, or Windows and get the right Metrolist build for your device.</p>
         </div>
-
         <div class="download__actions">
-          <a href="https://github.com/MetrolistGroup/Metrolist/releases" class="btn btn-filled btn-lg" target="_blank"
-            rel="noopener noreferrer">
-            <span class="icon" aria-hidden="true">download</span>
-            Download APK
-          </a>
-          <a href="https://github.com/MetrolistGroup/Metrolist/releases" class="download__changelog" target="_blank"
-            rel="noopener noreferrer">
-            Latest release on GitHub
-            <span class="icon" style="font-size: 1rem" aria-hidden="true">arrow_forward</span>
+          <DownloadDialog label="Choose a build" button-class="btn btn-filled btn-lg" />
+          <a href="https://github.com/MetrolistGroup/Metrolist" class="btn btn-outlined" target="_blank" rel="noopener noreferrer">
+            <span class="material-symbols-rounded" aria-hidden="true">code</span>
+            Read the source
           </a>
         </div>
-
       </div>
     </div>
   </section>
@@ -31,76 +24,79 @@
 
 <style scoped>
 .download {
-  padding: 40px 0 100px;
+  padding: 84px 0;
+  background: var(--md-sys-color-surface);
 }
 
-.download__card {
-  background: var(--md-primary-container);
-  border-radius: var(--r-2xl);
-  padding: 60px 52px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 40px;
-  flex-wrap: wrap;
+.download__panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 48px;
+  align-items: end;
+  padding: clamp(32px, 6vw, 72px);
+  border-radius: 52px 20px 52px 52px;
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
 }
 
-.download__title {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 900;
-  font-size: clamp(1.75rem, 3vw, 2.5rem);
-  letter-spacing: -0.025em;
-  color: var(--md-on-primary-container);
-  margin-bottom: 10px;
+.download__copy {
+  max-width: 760px;
 }
 
-.download__sub {
-  font-size: 1rem;
-  color: color-mix(in srgb, var(--md-on-primary-container) 72%, transparent);
-  max-width: 38ch;
-  line-height: 1.65;
+.download h2 {
+  margin: 0 0 20px;
+  font-size: clamp(3rem, 6vw, 5.8rem);
+  font-weight: 760;
+  letter-spacing: -0.06em;
+  line-height: 0.94;
+}
+
+.download__copy > p {
+  max-width: 560px;
+  color: color-mix(in srgb, var(--md-sys-color-on-primary-container) 78%, transparent);
+  font-size: 1.04rem;
 }
 
 .download__actions {
   display: flex;
+  min-width: 220px;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 16px;
-  flex-shrink: 0;
+  gap: 10px;
 }
 
-/* Override filled button to sit on tonal background correctly */
-.download__card .btn-filled {
-  background: var(--md-primary);
-  color: var(--md-on-primary);
-  box-shadow: var(--el-1);
+.download__actions .btn-outlined {
+  border-color: color-mix(in srgb, var(--md-sys-color-on-primary-container) 46%, transparent);
+  color: var(--md-sys-color-on-primary-container);
 }
 
-.download__card .btn-filled:hover {
-  box-shadow: var(--el-3);
+@media (max-width: 920px) {
+  .download__panel {
+    grid-template-columns: 1fr;
+  }
+
+  .download__actions {
+    width: min(100%, 300px);
+  }
 }
 
-.download__changelog {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--md-on-primary-container);
-  text-decoration: none;
-  opacity: 0.72;
-  transition: opacity var(--t-fast);
-}
+@media (max-width: 620px) {
+  .download {
+    padding: 54px 0;
+  }
 
-.download__changelog:hover {
-  opacity: 1;
-}
+  .download__panel {
+    gap: 28px;
+    padding: 30px 24px;
+    border-radius: 36px 14px 36px 36px;
+  }
 
-@media (max-width: 700px) {
-  .download__card {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 40px 28px;
+  .download__actions {
+    width: 100%;
+  }
+
+  .download__actions :deep(.btn),
+  .download__actions > .btn {
+    width: 100%;
   }
 }
 </style>

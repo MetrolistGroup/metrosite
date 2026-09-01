@@ -1,65 +1,40 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
+import DownloadDialog from './DownloadDialog.vue'
 
-const isScrolled = ref(false)
 const isMenuOpen = ref(false)
-
-function handleScroll() {
-  isScrolled.value = window.scrollY > 16
-}
-
-onMounted(() => {
-  window.addEventListener('scroll', handleScroll, { passive: true })
-})
-
-onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
-})
 </script>
 
 <template>
-  <header :class="['navbar', { 'navbar--scrolled': isScrolled }]">
+  <header class="navbar">
     <div class="container navbar__inner">
-
-      <!-- Logo + wordmark -->
-      <RouterLink to="/" class="navbar__brand">
-        <img src="/logo.svg" alt="" width="32" height="32" />
-        <span class="navbar__wordmark">Metrolist</span>
+      <RouterLink to="/" class="navbar__brand" aria-label="Metrolist home" @click="isMenuOpen = false">
+        <img class="navbar__brand-mark" src="/logo.svg" alt="" width="58" height="58" />
+        <span>Metrolist</span>
       </RouterLink>
 
-      <!-- Desktop navigation -->
       <nav class="navbar__links" aria-label="Main navigation">
-        <RouterLink :to="{ path: '/', hash: '#highlights' }" class="nav-link">Features</RouterLink>
-        <RouterLink to="/faq" class="nav-link">FAQ</RouterLink>
-        <a href="https://github.com/MetrolistGroup/Metrolist/releases" class="nav-link" target="_blank"
-          rel="noopener noreferrer">Download</a>
-        <a href="https://github.com/MetrolistGroup/Metrolist" class="btn btn-tonal btn-sm" target="_blank"
-          rel="noopener noreferrer">
-          <span class="icon" aria-hidden="true">code</span>
-          GitHub
-        </a>
+        <RouterLink :to="{ path: '/', hash: '#desktop' }">Desktop</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#features' }">Features</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#platforms' }">Platforms</RouterLink>
+        <RouterLink to="/faq">FAQ</RouterLink>
+        <DownloadDialog label="Download" button-class="btn btn-filled btn-sm" />
       </nav>
 
-      <!-- Mobile hamburger -->
-      <button class="navbar__hamburger" :aria-expanded="isMenuOpen" aria-label="Toggle navigation menu"
-        @click="isMenuOpen = !isMenuOpen">
-        <span class="icon">{{ isMenuOpen ? 'close' : 'menu' }}</span>
+      <button class="icon-button navbar__menu" type="button" :aria-expanded="isMenuOpen" aria-controls="mobile-navigation" :aria-label="isMenuOpen ? 'Close navigation' : 'Open navigation'" @click="isMenuOpen = !isMenuOpen">
+        <span class="material-symbols-rounded" aria-hidden="true">{{ isMenuOpen ? 'close' : 'menu' }}</span>
       </button>
     </div>
 
-    <!-- Mobile drawer -->
-    <Transition name="drawer">
-      <div v-if="isMenuOpen" class="navbar__drawer" role="navigation" aria-label="Mobile navigation">
-        <RouterLink :to="{ path: '/', hash: '#highlights' }" class="drawer-link" @click="isMenuOpen = false">
-          Features
-        </RouterLink>
-        <RouterLink to="/faq" class="drawer-link" @click="isMenuOpen = false">FAQ</RouterLink>
-        <a href="https://github.com/MetrolistGroup/Metrolist/releases" class="drawer-link" target="_blank"
-          rel="noopener noreferrer" @click="isMenuOpen = false">Download</a>
-        <a href="https://github.com/MetrolistGroup/Metrolist" class="drawer-link" target="_blank"
-          rel="noopener noreferrer" @click="isMenuOpen = false">GitHub</a>
+    <nav v-if="isMenuOpen" id="mobile-navigation" class="navbar__drawer" aria-label="Mobile navigation">
+      <div class="container">
+        <RouterLink :to="{ path: '/', hash: '#desktop' }" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">desktop_windows</span>Desktop</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#features' }" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">tune</span>Features</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#platforms' }" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">devices</span>Platforms</RouterLink>
+        <RouterLink to="/faq" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">help</span>FAQ</RouterLink>
+        <DownloadDialog label="Download" button-class="navbar__drawer-download" @open="isMenuOpen = false" />
       </div>
-    </Transition>
+    </nav>
   </header>
 </template>
 
@@ -68,131 +43,114 @@ onUnmounted(() => {
   position: sticky;
   top: 0;
   z-index: 100;
-  transition: background var(--t-std), box-shadow var(--t-std);
-}
-
-.navbar--scrolled {
-  background: color-mix(in srgb, var(--md-surface) 88%, transparent);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: var(--el-1);
+  background: var(--md-sys-color-surface-container-low);
 }
 
 .navbar__inner {
   display: flex;
   align-items: center;
-  height: 64px;
-  min-height: 64px;
-  gap: 8px;
-  contain: layout style;
+  min-height: 80px;
+  gap: 24px;
 }
 
-/* Brand */
 .navbar__brand {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  text-decoration: none;
+  gap: 12px;
   margin-right: auto;
-}
-
-.navbar__brand img {
-  border-radius: var(--r-sm);
-  object-fit: contain;
-}
-
-.navbar__wordmark {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 900;
-  font-size: 1.25rem;
-  color: var(--md-on-surface);
+  color: var(--md-sys-color-on-surface);
+  font-size: 1.1rem;
+  font-weight: 760;
   letter-spacing: -0.025em;
+  text-decoration: none;
 }
 
-/* Desktop links */
+.navbar__brand-mark {
+  width: 58px;
+  height: 58px;
+}
+
 .navbar__links {
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-.nav-link {
-  display: inline-flex;
-  align-items: center;
-  padding: 8px 16px;
-  border-radius: var(--r-full);
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--md-on-surface-variant);
+.navbar__links > a:not(.btn) {
+  padding: 10px 14px;
+  border-radius: var(--md-sys-shape-corner-full);
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 0.86rem;
+  font-weight: 650;
   text-decoration: none;
-  transition: background var(--t-fast), color var(--t-fast);
 }
 
-.nav-link:hover {
-  background: color-mix(in srgb, var(--md-on-surface) 8%, transparent);
-  color: var(--md-on-surface);
+.navbar__links > a:not(.btn):hover,
+.navbar__links > a.router-link-active:not(.btn) {
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
 }
 
-/* Hamburger */
-.navbar__hamburger {
+.navbar__links :deep(.btn) {
+  margin-left: 10px;
+}
+
+.navbar__menu {
   display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--md-on-surface);
-  padding: 8px;
-  border-radius: var(--r-full);
-  transition: background var(--t-fast);
-  -webkit-tap-highlight-color: transparent;
 }
 
-.navbar__hamburger:hover {
-  background: color-mix(in srgb, var(--md-on-surface) 8%, transparent);
-}
-
-/* Mobile drawer */
 .navbar__drawer {
+  display: none;
+  padding: 6px 0 18px;
+  border-radius: 0 0 var(--md-sys-shape-corner-extra-large) var(--md-sys-shape-corner-extra-large);
+  background: var(--md-sys-color-surface-container-low);
+}
+
+.navbar__drawer .container {
+  display: grid;
+  gap: 4px;
+}
+
+.navbar__drawer a,
+.navbar__drawer :deep(.navbar__drawer-download) {
   display: flex;
-  flex-direction: column;
-  padding: 8px 16px 16px;
-  background: var(--md-sc-low);
-  border-bottom: 1px solid var(--md-outline-variant);
-}
-
-.drawer-link {
-  display: block;
-  padding: 14px 16px;
-  border-radius: var(--r-md);
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--md-on-surface);
+  align-items: center;
+  gap: 16px;
+  min-height: 52px;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: transparent;
+  color: var(--md-sys-color-on-surface);
+  cursor: pointer;
+  font-weight: 650;
+  text-align: left;
   text-decoration: none;
-  transition: background var(--t-fast);
 }
 
-.drawer-link:hover {
-  background: color-mix(in srgb, var(--md-on-surface) 8%, transparent);
+.navbar__drawer a:hover,
+.navbar__drawer a.router-link-active,
+.navbar__drawer :deep(.navbar__drawer-download:hover) {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
 }
 
-/* Drawer animation */
-.drawer-enter-active,
-.drawer-leave-active {
-  transition: opacity var(--t-std), transform var(--t-std);
-}
+@media (max-width: 800px) {
+  .navbar__inner {
+    min-height: 72px;
+  }
 
-.drawer-enter-from,
-.drawer-leave-to {
-  opacity: 0;
-  transform: translateY(-8px);
-}
+  .navbar__brand-mark {
+    width: 52px;
+    height: 52px;
+  }
 
-/* Responsive */
-@media (max-width: 640px) {
   .navbar__links {
     display: none;
   }
 
-  .navbar__hamburger {
+  .navbar__menu,
+  .navbar__drawer {
     display: flex;
   }
 }

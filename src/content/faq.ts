@@ -5,29 +5,35 @@ export type FaqItem = {
 
 export const FAQ_ITEMS: FaqItem[] = [
   {
-    question: 'Is the app safe to use?',
-    answer: 'Yes. Metrolist is open-source (GPL-3.0), meaning the code is public and auditable.',
+    question: 'Which platforms does Metrolist support?',
+    answer: 'Metrolist supports Android 6 and newer, Linux (x64 and ARM64), macOS (Intel and Apple Silicon), and Windows 10 (x64 and ARM64) and newer. Download the package for your platform from the download modal.',
   },
   {
-    question: "Why isn't it on the Play Store?",
-    answer:
-      'Google does not allow third-party YouTube clients on the Play Store. You can safely download updates from GitHub.',
+    question: 'Can I move from the original Metrolist app?',
+    answer: 'Yes, Metrolist uses the same database as the original Metrolist app, so you can simply install the new app onto the old one to quickly move your data and settings.',
   },
   {
-    question: 'How to update?',
-    answer:
-      'Use the in-app updater, or download the latest APK from GitHub Releases and install it over the old version.',
+    question: 'Can I log in with my YouTube Music account?',
+    answer: 'Yes, account login lets Metrolist sync your playlists, library, albums, artists, and songs. It also allows for premium audio quality playback if you have a YouTube Music Premium subscription.',
   },
   {
-    question: 'Can I log in with my Google account?',
-    answer: 'Yes, Metrolist supports account login to sync your playlists and library.',
+    question: 'Is Metrolist safe to use?',
+    answer: 'Metrolist is open source under GPL-3.0, so its code is public and auditable. Using 3-rd party clients is technically against YouTube\'s Terms of Service, but there have been no reports of bans for using Metrolist in the entire history of the project.',
+  },
+  {
+    question: 'How do I update Metrolist?',
+    answer: 'Use the in-app update option when available, or install the newest build for your platform from GitHub Releases.',
+  },
+  {
+    question: "Why isn't Metrolist on the Play Store?",
+    answer: 'Google does not allow third-party YouTube clients on the Play Store. If you installed Metrolist from the Play Store, you have been using a 3-rd party client and should uninstall it, report the app, and install the official app.',
+  },
+  {
+    question: 'Can I import my existing Spotify playlists?',
+    answer: 'Yes, go to Account > Settings > Backup and import > Spotify, and follow the instructions.',
   },
   {
     question: 'Is there an iOS version?',
-    answer: 'No, Metrolist is Android-only. iOS users can try YTMusicUltimate.',
-  },
-  {
-    question: 'Is there a desktop version?',
-    answer: 'No. Try YouTube Music in your browser, or Pear-desktop as an alternative.',
+    answer: 'No, iOS support would require a lot of work, and would not be worth the effort. It would essentially be an entirely new app, with a completely different codebase and UI.',
   },
 ]

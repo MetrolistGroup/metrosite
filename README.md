@@ -1,11 +1,11 @@
 # Metrolist website
 
-Source code for the official Metrolist website
+Source code for the official [Metrolist](https://github.com/MetrolistGroup/Metrolist) website.
 
-## Tech used
-- Vue 3 - framework
-- Material Design web - UI library
-- Vite - bundler and build tool
-- Cloudflare workers - hosting
+## Tech
 
-Metrolist by [@mostafaalagamy](https://github.com/mostafaalagamy), website by [@nyxiereal](https://github.com/nyxiereal) with improvements from [contributors](https://github.com/MetrolistGroup/metrosite/graphs/contributors)
+- Vue 3
+- Vite
+- Cloudflare Workers
+
+Metrolist is made by [Mo Agamy](https://github.com/mostafaalagamy) and contributors. The website is made by [Nyx](https://github.com/nyxiereal) with improvements from [contributors](https://github.com/MetrolistGroup/metrosite/graphs/contributors).

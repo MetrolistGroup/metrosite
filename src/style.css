@@ -1,89 +1,59 @@
-/* ======================================================
-   Metrolist - Material 3 Expressive Design System
-   Seed colour: #6C4BCC  (Vivid Violet)
-   Generated with the M3 Theme Builder tonal palette tool
-====================================================== */
+@font-face {
+  font-family: 'Google Sans Flex';
+  src: url('/fonts/GoogleSansFlex.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Material Symbols Rounded';
+  src: url('/fonts/MaterialSymbolsRounded.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+}
 
 :root {
   color-scheme: dark;
-
-  /* -- Primary -- */
-  --md-primary: #D0BCFF;
-  --md-on-primary: #371E55;
-  --md-primary-container: #4F2C6F;
-  --md-on-primary-container: #EEDCFF;
-
-  /* -- Secondary -- */
-  --md-secondary: #CCC7E0;
-  --md-on-secondary: #302E47;
-  --md-secondary-container: #49435E;
-  --md-on-secondary-container: #E8DEFF;
-
-  /* -- Tertiary (warm rose - music energy) -- */
-  --md-tertiary: #FFB3D9;
-  --md-on-tertiary: #5E0A35;
-  --md-tertiary-container: #85184E;
-  --md-on-tertiary-container: #FFD9E5;
-
-  /* -- Surfaces -- */
-  --md-background: #1C1B1F;
-  --md-on-background: #E7E0EC;
-  --md-surface: #1C1B1F;
-  --md-on-surface: #E7E0EC;
-  --md-surface-variant: #49454F;
-  --md-on-surface-variant: #CAC4D0;
-  --md-outline: #938F99;
-  --md-outline-variant: #49454F;
-
-  /* -- Surface containers (low → high = brighter → darker) -- */
-  --md-sc-lowest: #0F0E12;
-  --md-sc-low: #2B2930;
-  --md-sc: #362F38;
-  --md-sc-high: #413A41;
-  --md-sc-highest: #4B464B;
-
-  /* -- Shapes - M3 Expressive favours generous rounding -- */
-  --r-xs: 4px;
-  --r-sm: 8px;
-  --r-md: 12px;
-  --r-lg: 16px;
-  --r-xl: 28px;
-  /* "Extra Large" - default card shape in M3 Exp */
-  --r-2xl: 32px;
-  --r-full: 9999px;
-
-  /* -- Elevation shadows (tinted purple for dark mode) -- */
-  --el-1: 0 1px 2px rgba(0, 0, 0, .3), 0 1px 3px 1px rgba(0, 0, 0, .15);
-  --el-2: 0 1px 2px rgba(0, 0, 0, .3), 0 2px 6px 2px rgba(0, 0, 0, .15);
-  --el-3: 0 4px 8px 3px rgba(0, 0, 0, .3), 0 1px 3px rgba(0, 0, 0, .15);
-
-  /* -- Motion -- */
-  --t-fast: 150ms cubic-bezier(0.2, 0, 0, 1);
-  --t-std: 250ms cubic-bezier(0.2, 0, 0, 1);
-  --t-slow: 400ms cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-color-background: #121113;
+  --md-sys-color-on-background: #ebe4eb;
+  --md-sys-color-surface: #121113;
+  --md-sys-color-surface-dim: #0e0d0f;
+  --md-sys-color-surface-container-lowest: #0b0a0c;
+  --md-sys-color-surface-container-low: #1a181c;
+  --md-sys-color-surface-container: #211e23;
+  --md-sys-color-surface-container-high: #2b272d;
+  --md-sys-color-surface-container-highest: #37323a;
+  --md-sys-color-on-surface: #ebe4eb;
+  --md-sys-color-on-surface-variant: #cec4cf;
+  --md-sys-color-primary: #d9b9ff;
+  --md-sys-color-on-primary: #3b1f55;
+  --md-sys-color-primary-container: #533571;
+  --md-sys-color-on-primary-container: #efddff;
+  --md-sys-color-secondary: #e9c661;
+  --md-sys-color-on-secondary: #3d3000;
+  --md-sys-color-secondary-container: #544500;
+  --md-sys-color-on-secondary-container: #ffe796;
+  --md-sys-color-tertiary: #ffb59d;
+  --md-sys-color-on-tertiary: #572012;
+  --md-sys-color-tertiary-container: #743424;
+  --md-sys-color-on-tertiary-container: #ffdbd0;
+  --md-sys-color-outline: #9a919c;
+  --md-sys-color-outline-variant: #4d464f;
+  --md-sys-color-error: #ffb4ab;
+  --md-sys-shape-corner-extra-small: 4px;
+  --md-sys-shape-corner-small: 8px;
+  --md-sys-shape-corner-medium: 12px;
+  --md-sys-shape-corner-large: 16px;
+  --md-sys-shape-corner-large-increased: 20px;
+  --md-sys-shape-corner-extra-large: 28px;
+  --md-sys-shape-corner-extra-large-increased: 36px;
+  --md-sys-shape-corner-full: 999px;
+  --md-sys-motion-standard: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-expressive: cubic-bezier(0.05, 0.7, 0.1, 1);
 }
 
-/* -- Skip link (a11y) */
-.skip-link {
-  position: absolute;
-  top: -100px;
-  left: 24px;
-  padding: 10px 16px;
-  background: var(--md-primary);
-  color: var(--md-on-primary);
-  font-weight: 600;
-  border-radius: var(--r-sm);
-  z-index: 1000;
-  transition: top var(--t-fast);
-}
-
-.skip-link:focus {
-  top: 24px;
-  outline: 2px solid var(--md-on-primary);
-  outline-offset: 2px;
-}
-
-/* -- Reset */
 *,
 *::before,
 *::after {
@@ -94,127 +64,219 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 96px;
 }
 
 body {
-  font-family: 'Nunito Sans', sans-serif;
-  font-size: 1rem;
-  line-height: 1.6;
-  background: var(--md-background);
-  color: var(--md-on-background);
+  min-width: 320px;
   overflow-x: hidden;
+  background: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-background);
+  font-family: 'Google Sans Flex', system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: 'Nunito', sans-serif;
+button,
+a {
+  font: inherit;
 }
 
-/* -- Material Symbols helper */
-.icon {
-  font-family: 'Material Symbols Rounded';
-  font-weight: normal;
-  font-style: normal;
-  font-size: 1.5rem;
-  line-height: 1;
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+::selection {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+}
+
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 1000;
+  padding: 12px 18px;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-180%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+:focus-visible {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 3px;
+}
+
+.container {
+  width: min(100% - 40px, 1240px);
+  margin-inline: auto;
+}
+
+.material-symbols-rounded {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  font-family: 'Material Symbols Rounded';
+  font-size: 24px;
+  font-style: normal;
+  font-weight: normal;
+  font-feature-settings: 'liga';
+  letter-spacing: normal;
+  line-height: 1;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
   user-select: none;
-  pointer-events: none;
-  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-/* -- Layout */
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 24px;
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-primary);
+  font-size: 0.75rem;
+  font-weight: 720;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-/* Below-the-fold sections: skip rendering until near viewport (faster LCP, less CLS) */
-#highlights,
-.faq,
-.download,
-.footer {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 400px;
-}
-
-/* -- M3 Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 24px;
-  border: none;
-  border-radius: var(--r-full);
-  font-family: 'Nunito Sans', sans-serif;
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  text-decoration: none;
+  gap: 9px;
+  min-height: 44px;
+  padding: 10px 20px;
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-full);
+  color: inherit;
   cursor: pointer;
-  transition:
-    box-shadow var(--t-std),
-    background-color var(--t-std),
-    transform var(--t-fast);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
   white-space: nowrap;
-  -webkit-tap-highlight-color: transparent;
 }
 
-.btn:active {
-  transform: scale(0.96);
+.btn .material-symbols-rounded {
+  font-size: 20px;
 }
 
-/* Filled */
 .btn-filled {
-  background: var(--md-primary);
-  color: var(--md-on-primary);
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
 }
 
 .btn-filled:hover {
-  box-shadow: var(--el-2);
-  background: color-mix(in srgb, var(--md-primary) 92%, white);
+  background: #e3caff;
 }
 
-/* Tonal */
 .btn-tonal {
-  background: var(--md-secondary-container);
-  color: var(--md-on-secondary-container);
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
 }
 
 .btn-tonal:hover {
-  box-shadow: var(--el-1);
-  background: color-mix(in srgb, var(--md-secondary-container) 88%, var(--md-secondary));
+  background: #645300;
 }
 
-/* Outlined */
 .btn-outlined {
-  background: transparent;
-  color: var(--md-primary);
-  border: 1.5px solid var(--md-outline-variant);
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-primary);
 }
 
 .btn-outlined:hover {
-  background: color-mix(in srgb, var(--md-primary) 8%, transparent);
-  border-color: var(--md-outline);
+  background: var(--md-sys-color-surface-container-highest);
 }
 
-/* Large variant */
 .btn-lg {
-  padding: 14px 28px;
+  min-height: 56px;
+  padding: 14px 26px;
   font-size: 1rem;
 }
 
-/* Small variant */
 .btn-sm {
-  padding: 8px 18px;
-  font-size: 0.875rem;
+  min-height: 40px;
+  padding: 9px 18px;
+  font-size: 0.86rem;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  background: var(--md-sys-color-surface-container-highest);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-medium);
+  background: var(--md-sys-color-surface-container-low);
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+#desktop,
+#features,
+#platforms,
+.faq,
+.download,
+.footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 700px;
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: min(100% - 28px, 1240px);
+  }
+
+  .btn-lg {
+    padding-inline: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -1,477 +1,357 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { ref, computed } from 'vue'
+import DownloadDialog from '../components/DownloadDialog.vue'
 
 const route = useRoute()
 const copied = ref(false)
-
-const code = computed(() => {
-  const c = route.query.code
-  return typeof c === 'string' ? c : ''
-})
-
-const openInAppUrl = computed(() =>
-  code.value
-    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/listen?code=${encodeURIComponent(code.value)}`
-    : '#'
-)
+const code = computed(() => typeof route.query.code === 'string' ? route.query.code : '')
+const openInAppUrl = computed(() => code.value ? `${window.location.origin}/listen?code=${encodeURIComponent(code.value)}` : '#')
 
 async function copyCode() {
   if (!code.value) return
+
   try {
     await navigator.clipboard.writeText(code.value)
-    copied.value = true
-    setTimeout(() => { copied.value = false }, 2000)
   } catch {
-    // fallback: select and copy
-    const el = document.createElement('input')
-    el.value = code.value
-    document.body.appendChild(el)
-    el.select()
+    const input = document.createElement('input')
+    input.value = code.value
+    document.body.appendChild(input)
+    input.select()
     document.execCommand('copy')
-    document.body.removeChild(el)
-    copied.value = true
-    setTimeout(() => { copied.value = false }, 2000)
+    input.remove()
   }
+
+  copied.value = true
+  window.setTimeout(() => { copied.value = false }, 2000)
 }
 </script>
 
 <template>
   <main id="main" class="listen">
-    <div class="listen__bg" aria-hidden="true" />
     <div class="container listen__inner">
-      <RouterLink to="/" class="listen__back">
-        <span class="icon" aria-hidden="true">arrow_back</span>
-        Back to home
-      </RouterLink>
+      <nav class="listen__nav" aria-label="Listen page navigation">
+        <RouterLink to="/" class="listen__brand">
+          <span><img src="/logo.svg" alt="" width="28" height="28" /></span>
+          Metrolist
+        </RouterLink>
+        <RouterLink to="/" class="btn btn-outlined">
+          <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+          Home
+        </RouterLink>
+      </nav>
 
-      <header class="listen__header">
-        <p class="listen__kicker">Join the room</p>
-        <h1 class="listen__title">Listen together</h1>
-        <p class="listen__sub">
-          Open this link on a device with Metrolist to sync playback with friends in real time.
-        </p>
+      <header class="listen__hero">
+        <div>
+          <p class="section-label"><span class="material-symbols-rounded" aria-hidden="true">groups</span>Listen Together</p>
+          <h1>Join the <span>same room.</span></h1>
+          <p>Open this invitation on a device with Metrolist to keep playback synchronized with friends.</p>
+        </div>
+        <span class="listen__hero-icon material-symbols-rounded" aria-hidden="true">groups</span>
       </header>
 
-      <!-- Room code — hero moment -->
-      <div v-if="code" class="listen__code-block" :class="{ 'listen__code-block--copied': copied }">
-        <span class="listen__code-label">Room code</span>
-        <div class="listen__code-display">
-          <span class="listen__code-value">{{ code }}</span>
-          <button type="button" class="listen__copy-btn" :aria-label="copied ? 'Copied' : 'Copy code'"
-            @click="copyCode">
-            <span class="icon" aria-hidden="true">{{ copied ? 'check' : 'content_copy' }}</span>
-            {{ copied ? 'Copied' : 'Copy' }}
-          </button>
+      <section v-if="code" class="listen__room" aria-labelledby="room-code-title">
+        <div>
+          <span id="room-code-title">Room code</span>
+          <strong>{{ code }}</strong>
         </div>
-      </div>
-      <div v-else class="listen__code-empty">
-        <span class="icon" aria-hidden="true">link_off</span>
-        <p>No room code in this link. Use a Listen link shared from Metrolist.</p>
-      </div>
+        <button type="button" class="btn btn-tonal btn-lg" :aria-label="copied ? 'Room code copied' : 'Copy room code'" @click="copyCode">
+          <span class="material-symbols-rounded" aria-hidden="true">{{ copied ? 'check' : 'content_copy' }}</span>
+          {{ copied ? 'Copied' : 'Copy code' }}
+        </button>
+      </section>
 
-      <!-- Two-column: Open in app + Download -->
-      <div class="listen__cards">
-        <article class="listen__card listen__card--open" data-step="1">
-          <div class="listen__card-icon-wrap listen__card-icon-wrap--primary">
-            <span class="icon" aria-hidden="true">music_note</span>
-          </div>
-          <h2 class="listen__card-title">Open in Metrolist</h2>
-          <p class="listen__card-body">
-            Set Metrolist as the default for <strong>metrolist.meowery.eu</strong> so Listen links open in the app.
-          </p>
-          <ol class="listen__steps">
-            <li>Tap <strong>Open in Metrolist</strong> below (or any Listen link).</li>
-            <li>Choose <strong>Metrolist</strong> → <strong>Always</strong>.</li>
-            <li>Or: <strong>Settings → Apps → Metrolist → Open by default</strong> → enable for this domain.</li>
+      <section v-else class="listen__empty">
+        <span class="material-symbols-rounded" aria-hidden="true">link_off</span>
+        <div><h2>No room code found</h2><p>Use a Listen Together link shared from Metrolist.</p></div>
+      </section>
+
+      <div class="listen__guides">
+        <article>
+          <div class="listen__guide-top"><span class="material-symbols-rounded" aria-hidden="true">open_in_new</span><small>Step 1</small></div>
+          <h2>Open in Metrolist</h2>
+          <p>Set Metrolist as the default app for links from <strong>metrolist.meowery.eu</strong>.</p>
+          <ol>
+            <li>Choose Open in Metrolist below.</li>
+            <li>Select Metrolist, then choose Always.</li>
+            <li>If asked, allow supported links in your system app settings.</li>
           </ol>
-          <a v-if="code" :href="openInAppUrl" class="btn btn-filled btn-lg listen__cta" target="_self"
-            rel="noopener noreferrer">
-            <span class="icon" aria-hidden="true">open_in_new</span>
+          <a v-if="code" :href="openInAppUrl" class="btn btn-filled btn-lg">
+            <span class="material-symbols-rounded" aria-hidden="true">open_in_new</span>
             Open in Metrolist
           </a>
         </article>
 
-        <article class="listen__card listen__card--download" data-step="2">
-          <div class="listen__card-icon-wrap listen__card-icon-wrap--tertiary">
-            <span class="icon" aria-hidden="true">download</span>
-          </div>
-          <h2 class="listen__card-title">No app yet?</h2>
-          <p class="listen__card-body">
-            Install Metrolist from GitHub, then come back and open the link above.
-          </p>
-          <a href="https://github.com/MetrolistGroup/Metrolist/releases" class="btn btn-filled btn-lg" target="_blank"
-            rel="noopener noreferrer">
-            <span class="icon" aria-hidden="true">download</span>
-            Download Metrolist
-          </a>
+        <article>
+          <div class="listen__guide-top"><span class="material-symbols-rounded" aria-hidden="true">download</span><small>Step 2</small></div>
+          <h2>Install the app</h2>
+          <p>Metrolist is available for Android, Linux, macOS, and Windows from GitHub.</p>
+          <DownloadDialog label="Choose a build" button-class="btn btn-outlined btn-lg" />
         </article>
-      </div>
-
-      <div class="listen__features">
-        <span class="listen__pill">
-          <span class="icon" aria-hidden="true">groups</span>
-          Synchronized
-        </span>
-        <span class="listen__pill">
-          <span class="icon" aria-hidden="true">bolt</span>
-          Blazingly fast
-        </span>
       </div>
     </div>
   </main>
 </template>
 
 <style scoped>
-/* M3 Expressive: ambient bg, bold type, generous shape */
 .listen {
-  position: relative;
   min-height: 100vh;
-  min-height: 100dvh;
-  padding: 24px 0 48px;
-  overflow-x: hidden;
-}
-
-@media (min-width: 480px) {
-  .listen {
-    padding: 40px 0 100px;
-  }
-}
-
-.listen__bg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background:
-    radial-gradient(ellipse 70% 60% at 90% 20%, var(--md-primary-container) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 70% at 10% 80%, var(--md-tertiary-container) 0%, transparent 50%),
-    radial-gradient(ellipse 50% 50% at 50% 50%, var(--md-secondary-container) 0%, transparent 60%);
-  pointer-events: none;
+  padding-bottom: 80px;
+  background: var(--md-sys-color-surface);
 }
 
 .listen__inner {
-  position: relative;
-  z-index: 1;
-  max-width: 680px;
-  margin: 0 auto;
-  padding: 0 20px;
+  max-width: 1040px;
 }
 
-@media (min-width: 480px) {
-  .listen__inner {
-    padding: 0 24px;
-  }
-}
-
-.listen__back {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 28px;
-  padding: 8px 14px;
-  border-radius: var(--r-full);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--md-primary);
-  text-decoration: none;
-  transition: background var(--t-fast), color var(--t-fast);
-}
-
-@media (min-width: 480px) {
-  .listen__back {
-    margin-bottom: 40px;
-  }
-}
-
-.listen__back:hover {
-  background: color-mix(in srgb, var(--md-primary) 14%, transparent);
-  color: var(--md-on-primary-container);
-}
-
-.listen__back .icon {
-  font-size: 1.25rem;
-}
-
-/* Header — display typography */
-.listen__header {
-  margin-bottom: 28px;
-}
-
-@media (min-width: 480px) {
-  .listen__header {
-    margin-bottom: 44px;
-  }
-}
-
-.listen__kicker {
-  font-size: 0.875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--md-primary);
-  margin-bottom: 8px;
-}
-
-.listen__title {
-  font-family: 'Climate Crisis', cursive;
-  font-size: clamp(2.5rem, 8vw, 4rem);
-  font-weight: 400;
-  line-height: 0.95;
-  letter-spacing: -0.02em;
-  background: linear-gradient(135deg, var(--md-primary) 0%, var(--md-tertiary) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 16px;
-}
-
-.listen__sub {
-  font-size: 1.125rem;
-  color: var(--md-on-surface-variant);
-  line-height: 1.6;
-  max-width: 42ch;
-}
-
-/* Room code — hero block, extra-large shape */
-.listen__code-block {
-  background: var(--md-primary-container);
-  color: var(--md-on-primary-container);
-  border-radius: var(--r-2xl);
-  padding: 24px 20px;
-  margin-bottom: 24px;
-  animation: listen-enter 0.5s cubic-bezier(0.2, 0, 0, 1) backwards;
-}
-
-@media (min-width: 480px) {
-  .listen__code-block {
-    padding: 32px 36px;
-    margin-bottom: 32px;
-  }
-}
-
-.listen__code-block--copied {
-  background: color-mix(in srgb, var(--md-primary-container) 95%, var(--md-primary));
-}
-
-.listen__code-label {
-  display: block;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  opacity: 0.9;
-  margin-bottom: 12px;
-}
-
-.listen__code-display {
+.listen__nav {
   display: flex;
   align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  min-height: 80px;
 }
 
-.listen__code-value {
-  font-family: ui-monospace, 'SF Mono', monospace;
-  font-size: clamp(1.75rem, 4vw, 2.25rem);
-  font-weight: 800;
-  letter-spacing: 0.2em;
+.listen__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--md-sys-color-on-surface);
+  font-size: 1.08rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.listen__brand > span {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 16px 16px 8px 16px;
+  background: var(--md-sys-color-primary-container);
+}
+
+.listen__brand img {
+  width: 27px;
+  height: 27px;
+}
+
+.listen__hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px;
+  gap: 48px;
+  align-items: end;
+  padding: clamp(32px, 6vw, 64px);
+  border-radius: 44px 44px 16px 44px;
+  background: var(--md-sys-color-surface-container-low);
+}
+
+.listen h1 {
+  margin: 24px 0;
+  font-size: clamp(3.8rem, 8vw, 7rem);
+  font-weight: 760;
+  letter-spacing: -0.065em;
+  line-height: 0.9;
+}
+
+.listen h1 span {
+  color: var(--md-sys-color-primary);
+}
+
+.listen__hero > div > p:last-child {
+  max-width: 600px;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 1.06rem;
+}
+
+.listen__hero-icon {
+  width: 160px;
+  height: 160px;
+  border-radius: 48px 48px 18px 48px;
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  font-size: 76px;
+}
+
+.listen__room,
+.listen__empty {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  min-height: 170px;
+  margin-top: 16px;
+  padding: 30px 36px;
+  border-radius: 16px 40px 40px 40px;
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+
+.listen__room > div {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.listen__room > div > span {
+  font-size: 0.76rem;
+  font-weight: 730;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.listen__room strong {
+  font-family: ui-monospace, monospace;
+  font-size: clamp(2.2rem, 7vw, 4.2rem);
+  letter-spacing: 0.12em;
   line-height: 1;
 }
 
-.listen__copy-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 22px;
-  border: none;
-  border-radius: var(--r-full);
-  background: rgba(255, 255, 255, 0.22);
-  color: inherit;
-  font-family: 'Nunito Sans', sans-serif;
-  font-size: 0.9375rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background var(--t-fast), transform var(--t-fast);
-  -webkit-tap-highlight-color: transparent;
+.listen__empty {
+  justify-content: flex-start;
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
 }
 
-.listen__copy-btn:hover {
-  background: rgba(255, 255, 255, 0.32);
+.listen__empty > .material-symbols-rounded {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--md-sys-shape-corner-large-increased);
+  background: var(--md-sys-color-surface-container-highest);
+  color: var(--md-sys-color-primary);
+  font-size: 30px;
 }
 
-.listen__copy-btn:active {
-  transform: scale(0.97);
-}
-
-.listen__copy-btn .icon {
+.listen__empty h2 {
+  margin-bottom: 4px;
   font-size: 1.25rem;
-  pointer-events: none;
 }
 
-.listen__code-empty {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 20px;
-  margin-bottom: 24px;
-  border-radius: var(--r-xl);
-  background: var(--md-sc-low);
-  color: var(--md-on-surface-variant);
-  animation: listen-enter 0.5s cubic-bezier(0.2, 0, 0, 1) 0.05s backwards;
+.listen__empty p {
+  color: var(--md-sys-color-on-surface-variant);
 }
 
-@media (min-width: 480px) {
-  .listen__code-empty {
-    padding: 24px 28px;
-    margin-bottom: 32px;
-  }
-}
-
-.listen__code-empty .icon {
-  font-size: 1.5rem;
-  flex-shrink: 0;
-  opacity: 0.8;
-}
-
-.listen__code-empty p {
-  margin: 0;
-  font-size: 0.9375rem;
-  line-height: 1.5;
-}
-
-/* Cards — two-column on larger screens, staggered motion */
-.listen__cards {
+.listen__guides {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-  margin-bottom: 28px;
-}
-
-@media (min-width: 620px) {
-  .listen__cards {
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 36px;
-  }
-}
-
-.listen__card {
-  border-radius: var(--r-2xl);
-  padding: 24px 20px;
-  background: var(--md-sc);
-  animation: listen-enter 0.5s cubic-bezier(0.2, 0, 0, 1) backwards;
-}
-
-@media (min-width: 480px) {
-  .listen__card {
-    padding: 32px 28px;
-  }
-}
-
-.listen__card[data-step="1"] {
-  animation-delay: 0.08s;
-}
-
-.listen__card[data-step="2"] {
-  animation-delay: 0.14s;
-}
-
-.listen__card-icon-wrap {
-  width: 52px;
-  height: 52px;
-  border-radius: var(--r-lg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 18px;
-}
-
-.listen__card-icon-wrap .icon {
-  font-size: 1.75rem;
-}
-
-.listen__card-icon-wrap--primary {
-  background: color-mix(in srgb, var(--md-primary) 28%, transparent);
-  color: var(--md-primary);
-}
-
-.listen__card-icon-wrap--tertiary {
-  background: color-mix(in srgb, var(--md-tertiary) 28%, transparent);
-  color: var(--md-tertiary);
-}
-
-.listen__card-title {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 900;
-  font-size: 1.25rem;
-  color: var(--md-on-surface);
-  margin-bottom: 10px;
-}
-
-.listen__card-body {
-  font-size: 0.9375rem;
-  color: var(--md-on-surface-variant);
-  line-height: 1.65;
-  margin-bottom: 16px;
-}
-
-.listen__card-body strong {
-  color: var(--md-on-surface);
-}
-
-.listen__steps {
-  margin: 0 0 22px 1.2em;
-  padding: 0;
-  font-size: 0.875rem;
-  color: var(--md-on-surface-variant);
-  line-height: 1.75;
-}
-
-.listen__steps li {
-  margin-bottom: 6px;
-}
-
-.listen__steps strong {
-  color: var(--md-on-surface);
-}
-
-.listen__cta {
-  margin-top: 4px;
-}
-
-/* Pills — tonal chips */
-.listen__features {
-  display: flex;
-  flex-wrap: wrap;
+  grid-template-columns: 1fr 1fr;
   gap: 12px;
+  margin-top: 12px;
 }
 
-.listen__pill {
-  display: inline-flex;
+.listen__guides article {
+  display: flex;
+  min-height: 440px;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 32px;
+  border-radius: 40px 40px 16px 40px;
+  background: var(--md-sys-color-surface-container-high);
+}
+
+.listen__guides article:nth-child(2) {
+  border-radius: 40px 16px 40px 40px;
+  background: var(--md-sys-color-tertiary-container);
+  color: var(--md-sys-color-on-tertiary-container);
+}
+
+.listen__guide-top {
+  display: flex;
+  width: 100%;
   align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  border-radius: var(--r-full);
-  background: var(--md-secondary-container);
-  color: var(--md-on-secondary-container);
-  font-size: 0.875rem;
-  font-weight: 700;
-  animation: listen-enter 0.5s cubic-bezier(0.2, 0, 0, 1) 0.2s backwards;
+  justify-content: space-between;
 }
 
-.listen__pill .icon {
-  font-size: 1.125rem;
+.listen__guide-top > span {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--md-sys-shape-corner-large-increased);
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  font-size: 30px;
 }
 
-@keyframes listen-enter {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
+.listen__guide-top small {
+  padding: 7px 12px;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  font-size: 0.72rem;
+  font-weight: 720;
+  text-transform: uppercase;
+}
+
+.listen__guides h2 {
+  margin: 34px 0 10px;
+  font-size: 1.6rem;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+}
+
+.listen__guides p,
+.listen__guides ol {
+  color: color-mix(in srgb, currentColor 76%, transparent);
+  font-size: 0.92rem;
+}
+
+.listen__guides p strong,
+.listen__guides li::marker {
+  color: currentColor;
+}
+
+.listen__guides ol {
+  margin: 20px 0 28px 1.2rem;
+}
+
+.listen__guides li + li {
+  margin-top: 8px;
+}
+
+.listen__guides .btn {
+  margin-top: auto;
+}
+
+@media (max-width: 760px) {
+  .listen {
+    padding-bottom: 54px;
   }
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  .listen__nav {
+    min-height: 72px;
+  }
+
+  .listen__nav .btn {
+    min-width: 48px;
+    padding-inline: 14px;
+  }
+
+  .listen__hero {
+    grid-template-columns: 1fr;
+    padding: 32px 24px;
+    border-radius: 32px 32px 14px 32px;
+  }
+
+  .listen__hero-icon {
+    width: 92px;
+    height: 92px;
+    border-radius: 28px 28px 10px 28px;
+    font-size: 46px;
+  }
+
+  .listen__room,
+  .listen__empty {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 26px 24px;
+  }
+
+  .listen__guides {
+    grid-template-columns: 1fr;
+  }
+
+  .listen__guides article {
+    min-height: 0;
+    padding: 28px 24px;
+  }
+
+  .listen__guides .btn {
+    margin-top: 26px;
   }
 }
 </style>
