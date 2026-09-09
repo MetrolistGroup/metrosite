@@ -85,7 +85,7 @@ async function copyCode() {
         <article>
           <div class="listen__guide-top"><span class="material-symbols-rounded" aria-hidden="true">download</span><small>Step 2</small></div>
           <h2>Install the app</h2>
-          <p>Metrolist is available for Android, Linux, macOS, and Windows from GitHub.</p>
+          <p>Metrolist is available for Android, iOS, Linux, macOS, and Windows from GitHub.</p>
           <DownloadDialog label="Choose a build" button-class="btn btn-outlined btn-lg" />
         </article>
       </div>

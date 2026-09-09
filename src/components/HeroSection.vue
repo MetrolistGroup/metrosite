@@ -1,25 +1,43 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { totalReleaseDownloads, type ReleaseAsset } from '../content/downloads'
 import DownloadDialog from './DownloadDialog.vue'
+
+type Release = {
+  tag_name?: string
+  draft?: boolean
+  prerelease?: boolean
+  assets?: ReleaseAsset[]
+}
 
 const repoStats = ref<{ downloads: string; stars: string; version: string }>()
 const compactNumber = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 })
 
+async function loadReleases() {
+  const releases: Release[] = []
+  for (let page = 1; ; page++) {
+    const response = await fetch(`https://api.github.com/repos/MetrolistGroup/Metrolist/releases?per_page=100&page=${page}`)
+    if (!response.ok) throw new Error(`GitHub returned ${response.status}`)
+    const batch = await response.json() as Release[]
+    releases.push(...batch)
+    if (batch.length < 100) return releases
+  }
+}
+
 onMounted(async () => {
   try {
-    const [repoResponse, releaseResponse] = await Promise.all([
+    const [repoResponse, releases] = await Promise.all([
       fetch('https://api.github.com/repos/MetrolistGroup/Metrolist'),
-      fetch('https://api.github.com/repos/MetrolistGroup/Metrolist/releases/latest'),
+      loadReleases(),
     ])
-    if (!repoResponse.ok || !releaseResponse.ok) return
+    if (!repoResponse.ok || !releases.length) return
 
     const repo = await repoResponse.json() as { stargazers_count?: number }
-    const release = await releaseResponse.json() as { tag_name?: string; assets?: { download_count?: number }[] }
-    const downloads = (release.assets ?? []).reduce((total, asset) => total + (asset.download_count ?? 0), 0)
+    const latestRelease = releases.find(({ draft, prerelease }) => !draft && !prerelease)
     repoStats.value = {
-      downloads: compactNumber.format(downloads),
+      downloads: compactNumber.format(totalReleaseDownloads(releases)),
       stars: compactNumber.format(repo.stargazers_count ?? 0),
-      version: release.tag_name ?? 'Latest',
+      version: latestRelease?.tag_name ?? 'Latest',
     }
   } catch {
     // GitHub stats are optional; skeletons remain if the API is unavailable.
@@ -34,7 +52,7 @@ onMounted(async () => {
         <div class="hero__copy">
           <h1 id="hero-title">Metrolist brings your music to <span>every screen.</span></h1>
           <p class="hero__lede">
-            An open-source YouTube Music client for Android, Linux, macOS, and Windows, with ad-free playback and a layout that fits each platform.
+            An open-source YouTube Music client for Android, iOS, Linux, macOS, and Windows, with ad-free playback and a layout that fits each platform.
           </p>
           <div class="hero__actions">
             <DownloadDialog button-class="btn btn-filled btn-lg" />
@@ -45,13 +63,13 @@ onMounted(async () => {
           </div>
         </div>
 
-        <aside class="hero__signal" aria-label="Desktop release summary">
+        <aside class="hero__signal" aria-label="Release summary">
           <span class="hero__signal-icon material-symbols-rounded" aria-hidden="true">desktop_windows</span>
           <div>
             <strong>Desktop has entered the playlist.</strong>
             <p>One Kotlin Multiplatform foundation, fit for every screen.</p>
           </div>
-          <dl class="hero__stats" aria-label="Original Metrolist repository statistics">
+          <dl class="hero__stats" aria-label="Metrolist repository statistics">
             <div><dt>Downloads</dt><dd><span v-if="repoStats">{{ repoStats.downloads }}</span><span v-else class="hero__stat-skeleton" /></dd></div>
             <div><dt>Stars</dt><dd><span v-if="repoStats">{{ repoStats.stars }}</span><span v-else class="hero__stat-skeleton" /></dd></div>
             <div><dt>Latest</dt><dd><span v-if="repoStats">{{ repoStats.version }}</span><span v-else class="hero__stat-skeleton" /></dd></div>

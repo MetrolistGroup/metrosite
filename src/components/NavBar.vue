@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 import DownloadDialog from './DownloadDialog.vue'
 
 const isMenuOpen = ref(false)
+const menuButton = ref<HTMLButtonElement>()
+const route = useRoute()
+const currentAnchor = (hash: string) => route.path === '/' && route.hash === hash ? 'location' : 'false'
 </script>
 
 <template>
-  <header class="navbar">
+  <header class="navbar" @keydown.esc="isMenuOpen = false; menuButton?.focus()">
     <div class="container navbar__inner">
       <RouterLink to="/" class="navbar__brand" aria-label="Metrolist home" @click="isMenuOpen = false">
         <img class="navbar__brand-mark" src="/logo.svg" alt="" width="58" height="58" />
@@ -14,23 +18,23 @@ const isMenuOpen = ref(false)
       </RouterLink>
 
       <nav class="navbar__links" aria-label="Main navigation">
-        <RouterLink :to="{ path: '/', hash: '#desktop' }">Desktop</RouterLink>
-        <RouterLink :to="{ path: '/', hash: '#features' }">Features</RouterLink>
-        <RouterLink :to="{ path: '/', hash: '#platforms' }">Platforms</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#desktop' }" :aria-current="currentAnchor('#desktop')">Showcase</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#features' }" :aria-current="currentAnchor('#features')">Features</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#platforms' }" :aria-current="currentAnchor('#platforms')">Platforms</RouterLink>
         <RouterLink to="/faq">FAQ</RouterLink>
         <DownloadDialog label="Download" button-class="btn btn-filled btn-sm" />
       </nav>
 
-      <button class="icon-button navbar__menu" type="button" :aria-expanded="isMenuOpen" aria-controls="mobile-navigation" :aria-label="isMenuOpen ? 'Close navigation' : 'Open navigation'" @click="isMenuOpen = !isMenuOpen">
+      <button ref="menuButton" class="icon-button navbar__menu" type="button" :aria-expanded="isMenuOpen" aria-controls="mobile-navigation" :aria-label="isMenuOpen ? 'Close navigation' : 'Open navigation'" @click="isMenuOpen = !isMenuOpen">
         <span class="material-symbols-rounded" aria-hidden="true">{{ isMenuOpen ? 'close' : 'menu' }}</span>
       </button>
     </div>
 
     <nav v-if="isMenuOpen" id="mobile-navigation" class="navbar__drawer" aria-label="Mobile navigation">
       <div class="container">
-        <RouterLink :to="{ path: '/', hash: '#desktop' }" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">desktop_windows</span>Desktop</RouterLink>
-        <RouterLink :to="{ path: '/', hash: '#features' }" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">tune</span>Features</RouterLink>
-        <RouterLink :to="{ path: '/', hash: '#platforms' }" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">devices</span>Platforms</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#desktop' }" :aria-current="currentAnchor('#desktop')" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">devices</span>Showcase</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#features' }" :aria-current="currentAnchor('#features')" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">tune</span>Features</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#platforms' }" :aria-current="currentAnchor('#platforms')" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">devices</span>Platforms</RouterLink>
         <RouterLink to="/faq" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">help</span>FAQ</RouterLink>
         <DownloadDialog label="Download" button-class="navbar__drawer-download" @open="isMenuOpen = false" />
       </div>
@@ -86,7 +90,8 @@ const isMenuOpen = ref(false)
 }
 
 .navbar__links > a:not(.btn):hover,
-.navbar__links > a.router-link-active:not(.btn) {
+.navbar__links > a[aria-current='location'],
+.navbar__links > a.router-link-active:not([href*='#']):not(.btn) {
   background: var(--md-sys-color-surface-container-high);
   color: var(--md-sys-color-on-surface);
 }
@@ -129,7 +134,8 @@ const isMenuOpen = ref(false)
 }
 
 .navbar__drawer a:hover,
-.navbar__drawer a.router-link-active,
+.navbar__drawer a[aria-current='location'],
+.navbar__drawer a.router-link-active:not([href*='#']),
 .navbar__drawer :deep(.navbar__drawer-download:hover) {
   background: var(--md-sys-color-secondary-container);
   color: var(--md-sys-color-on-secondary-container);

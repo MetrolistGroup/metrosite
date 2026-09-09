@@ -17,7 +17,7 @@ const links = [
           <img src="/logo.svg" alt="" width="50" height="50" loading="lazy" />
           <strong>Metrolist</strong>
         </RouterLink>
-        <p>Open-source music for Android and desktop, built with Kotlin Multiplatform.</p>
+        <p>Open-source music for Android, iOS, and desktop, built with Kotlin Multiplatform.</p>
       </div>
 
       <nav class="footer__links" aria-label="Footer navigation">

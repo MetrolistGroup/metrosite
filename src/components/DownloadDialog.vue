@@ -12,9 +12,11 @@ const props = withDefaults(defineProps<{
   label?: string
   buttonClass?: string
   platform?: DownloadPlatformKey
+  showTrigger?: boolean
 }>(), {
   label: 'Download Metrolist',
   buttonClass: 'btn btn-filled',
+  showTrigger: true,
 })
 
 const emit = defineEmits<{ open: [] }>()
@@ -30,6 +32,7 @@ const titleId = useId()
 function detectedPlatform(): DownloadPlatformKey {
   const agent = navigator.userAgent.toLowerCase()
   if (agent.includes('android')) return 'android'
+  if (/iphone|ipad|ipod/.test(agent) || (agent.includes('macintosh') && navigator.maxTouchPoints > 1)) return 'ios'
   if (agent.includes('win')) return 'windows'
   if (agent.includes('mac')) return 'macos'
   return 'linux'
@@ -73,6 +76,7 @@ async function loadLatestRelease() {
 }
 
 async function copyCommand() {
+  if (!selectedArchitecture.value.command) return
   try {
     await navigator.clipboard.writeText(selectedArchitecture.value.command)
     copied.value = true
@@ -82,11 +86,15 @@ async function copyCommand() {
   }
 }
 
-function open() {
+function open(platformKey?: DownloadPlatformKey) {
+  const platform = DOWNLOAD_PLATFORMS.find(({ key }) => key === platformKey)
+  if (platform) selectPlatform(platform)
   emit('open')
   dialog.value?.showModal()
   void loadLatestRelease()
 }
+
+defineExpose({ open })
 
 function closeOnBackdrop(event: MouseEvent) {
   if (event.target === dialog.value) dialog.value.close()
@@ -98,7 +106,7 @@ function formatSize(bytes?: number) {
 </script>
 
 <template>
-  <button type="button" :class="buttonClass" aria-haspopup="dialog" @click="open">
+  <button v-if="showTrigger" type="button" :class="buttonClass" aria-haspopup="dialog" @click="open()">
     <span class="material-symbols-rounded" aria-hidden="true">download</span>
     {{ label }}
   </button>
@@ -162,14 +170,16 @@ function formatSize(bytes?: number) {
           </div>
 
           <div>
-            <div class="download-dialog__command-title">
-              <h3>Command</h3>
-              <button type="button" @click="copyCommand">
-                <span class="material-symbols-rounded" aria-hidden="true">{{ copied ? 'check' : 'content_copy' }}</span>
-                {{ copied ? 'Copied' : 'Copy' }}
-              </button>
-            </div>
-            <code>{{ selectedArchitecture.command }}</code>
+            <template v-if="selectedArchitecture.command">
+              <div class="download-dialog__command-title">
+                <h3>Command</h3>
+                <button type="button" @click="copyCommand">
+                  <span class="material-symbols-rounded" aria-hidden="true">{{ copied ? 'check' : 'content_copy' }}</span>
+                  {{ copied ? 'Copied' : 'Copy' }}
+                </button>
+              </div>
+              <code>{{ selectedArchitecture.command }}</code>
+            </template>
             <p class="download-dialog__status" aria-live="polite">
               <template v-if="isLoading">Finding the latest public build…</template>
               <template v-else-if="selectedAsset">{{ releaseName }}<template v-if="selectedAsset.size"> · {{ formatSize(selectedAsset.size) }}</template></template>
@@ -234,7 +244,7 @@ function formatSize(bytes?: number) {
 
 .download-dialog__platforms {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 8px;
   margin-top: 28px;
 }

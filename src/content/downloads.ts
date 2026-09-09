@@ -1,15 +1,16 @@
-export type DownloadPlatformKey = 'android' | 'linux' | 'macos' | 'windows'
+export type DownloadPlatformKey = 'android' | 'ios' | 'linux' | 'macos' | 'windows'
 
 export type ReleaseAsset = {
   name: string
   browser_download_url: string
   size?: number
+  download_count?: number
 }
 
 export type DownloadArchitecture = {
   key: string
   name: string
-  command: string
+  command?: string
   patterns: readonly RegExp[]
 }
 
@@ -46,6 +47,25 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
     ],
   },
   {
+    key: 'ios',
+    icon: 'apple',
+    name: 'iOS',
+    detail: 'iOS 17 and newer',
+    package: 'IPA',
+    instructions: [
+      'Download the unsigned IPA.',
+      'Open it in AltStore, SideStore, TrollStore, or Sideloadly.',
+      'Follow your sideloading app’s prompts to sign and install Metrolist.',
+    ],
+    architectures: [
+      {
+        key: 'universal',
+        name: 'iPhone & iPad',
+        patterns: [/metrolist.*\.ipa$/i],
+      },
+    ],
+  },
+  {
     key: 'linux',
     icon: 'linux',
     name: 'Linux',
@@ -73,7 +93,7 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
   },
   {
     key: 'macos',
-    icon: 'apple',
+    icon: 'macos',
     name: 'macOS',
     detail: 'Apple silicon and Intel',
     package: 'DMG',
@@ -124,6 +144,10 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
     ],
   },
 ]
+
+export function totalReleaseDownloads(releases: { assets?: ReleaseAsset[] }[]) {
+  return releases.flatMap(({ assets }) => assets ?? []).reduce((total, asset) => total + (asset.download_count ?? 0), 0)
+}
 
 export function findDownloadAsset(platformKey: DownloadPlatformKey, architectureKey: string, assets: ReleaseAsset[]) {
   const architecture = DOWNLOAD_PLATFORMS

@@ -8,7 +8,7 @@ import DownloadDialog from './DownloadDialog.vue'
       <div class="download__panel">
         <div class="download__copy">
           <h2 id="download-title">Put your library on a bigger screen.</h2>
-          <p>Select Android, Linux, macOS, or Windows and get the right Metrolist build for your device.</p>
+          <p>Select Android, iOS, Linux, macOS, or Windows and get the right Metrolist build for your device.</p>
         </div>
         <div class="download__actions">
           <DownloadDialog label="Choose a build" button-class="btn btn-filled btn-lg" />
