@@ -58,7 +58,7 @@ const features = [
 .features h2, .platforms h2 { font-size: clamp(2.7rem, 5vw, 4.7rem); font-weight: 760; letter-spacing: -0.055em; line-height: 1; }
 .features__head > p, .platforms header > p:last-child { color: var(--md-sys-color-on-surface-variant); font-size: 1.05rem; }
 .features__grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
-.features__card { position: relative; isolation: isolate; display: flex; grid-column: span 2; flex-direction: column; justify-content: space-between; min-height: 295px; gap: 36px; padding: 28px; overflow: hidden; border: 1px solid #ffffff05; border-radius: 28px; background: var(--md-sys-color-surface-container); }
+.features__card { position: relative; isolation: isolate; display: flex; grid-column: span 2; flex-direction: column; justify-content: space-between; min-height: 295px; gap: 36px; padding: 28px; overflow: hidden; border-radius: 28px; background: var(--md-sys-color-surface-container); }
 .features__card--1, .features__card--2 { grid-column: span 3; min-height: 395px; }
 .features__card--1 { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); border-radius: 28px 72px 28px 28px; }
 .features__card--2 { background: #302d21; border-radius: 28px 28px 72px 28px; }
@@ -83,7 +83,7 @@ const features = [
 .platforms::before { position: absolute; inset: 0; z-index: -1; background: url('/images/platform-pattern.svg') left top / 666px auto repeat; content: ''; pointer-events: none; }
 .platforms__layout { display: grid; grid-template-columns: minmax(280px, 0.7fr) minmax(0, 1.3fr); gap: clamp(56px, 9vw, 130px); align-items: start; }
 .platforms header > p:last-child { max-width: 520px; margin-top: 24px; }
-.platforms__list { display: grid; gap: 6px; padding: 10px; border: 1px solid #ffffff0a; border-radius: 36px; background: rgb(24 22 27 / 88%); backdrop-filter: blur(28px); }
+.platforms__list { display: grid; gap: 6px; padding: 10px; border-radius: 36px; background: rgb(24 22 27 / 88%); backdrop-filter: blur(28px); }
 .platforms__list button { display: grid; grid-template-columns: 54px minmax(120px, 1fr) auto; gap: 16px; align-items: center; min-height: 82px; padding: 10px 12px; border: 0; border-radius: 20px; background: transparent; color: var(--md-sys-color-on-surface); cursor: pointer; font: inherit; text-align: left; }
 .platforms__list button:hover { background: var(--md-sys-color-surface-container-high); }
 .platforms__icon { display: grid; width: 52px; height: 52px; place-items: center; border-radius: 16px; background: var(--md-sys-color-surface-container-highest); }

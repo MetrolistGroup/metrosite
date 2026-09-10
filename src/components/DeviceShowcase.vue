@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 import { DESKTOP_PLATFORMS, SHOWCASE_VIEWS, type DesktopPlatform, type ShowcaseDevice, type ShowcaseView } from '../content/showcase'
 import ShowcaseScreen from './ShowcaseScreen.vue'
 
@@ -10,17 +10,13 @@ const folded = ref(false)
 const desktop = computed(() => DESKTOP_PLATFORMS.find(item => item.key === platform.value)!)
 const dialog = ref<HTMLDialogElement>()
 const selectedDevice = ref<ShowcaseDevice>('desktop')
-const modelView = ref(false)
-const modelReady = ref(false)
-const modelFailed = ref(false)
-const modelLoading = ref(false)
 const labels = computed(() => ({ ios: 'iPhone 17 Pro Max · iOS 27', desktop: desktop.value.device, android: `Pixel 10 Pro Fold · ${folded.value ? 'Cover screen' : 'Unfolded'}`, wear: 'Google Pixel Watch 4 · Wear OS' }))
 const screenProps = computed(() => ({ view: view.value, platform: platform.value, folded: folded.value }))
 let previousOverflow = ''
 
-function openScreenshot(device: ShowcaseDevice) {
+async function openScreenshot(device: ShowcaseDevice) {
   selectedDevice.value = device
-  modelView.value = false
+  await nextTick()
   previousOverflow = document.body.style.overflow
   document.body.style.overflow = 'hidden'
   dialog.value?.showModal()
@@ -28,19 +24,6 @@ function openScreenshot(device: ShowcaseDevice) {
 
 function restoreScroll() {
   document.body.style.overflow = previousOverflow
-}
-
-async function showWatchModel() {
-  modelView.value = true
-  modelLoading.value = true
-  modelFailed.value = false
-  try {
-    await import('@google/model-viewer')
-    modelReady.value = true
-  } catch {
-    modelFailed.value = true
-    modelLoading.value = false
-  }
 }
 
 onBeforeUnmount(() => { if (dialog.value?.open) restoreScroll() })
@@ -83,8 +66,8 @@ onBeforeUnmount(() => { if (dialog.value?.open) restoreScroll() })
                   <button class="computer__screen" type="button" :aria-label="`Enlarge ${desktop.name} app preview`" aria-haspopup="dialog" @click="openScreenshot('desktop')"><ShowcaseScreen device="desktop" v-bind="screenProps" /></button>
                 </div>
               </div>
-              <div v-if="platform === 'windows'" class="monitor-stand" aria-hidden="true" />
-              <div v-else class="laptop-base" aria-hidden="true"><span /></div>
+              <div class="monitor-stand" aria-hidden="true" />
+              <div class="computer__base" aria-hidden="true"><span /></div>
             </div>
             <figcaption><strong>{{ desktop.device }}</strong><span>{{ desktop.name }} · Made for the big screen</span></figcaption>
           </figure>
@@ -97,13 +80,30 @@ onBeforeUnmount(() => { if (dialog.value?.open) restoreScroll() })
             <figcaption><strong>Pixel Watch 4</strong><span>Player preview</span></figcaption>
           </figure>
 
-          <figure class="device device--fold">
-            <div class="fold-footprint"><div class="phone phone--fold" :class="{ 'phone--folded': folded }">
-              <span class="fold-hinge" aria-hidden="true" /><span class="hardware-button hardware-button--power" aria-hidden="true" /><span class="hardware-button hardware-button--volume" aria-hidden="true" />
-              <button class="device-screen" type="button" :aria-label="`Enlarge Pixel 10 Pro Fold ${folded ? 'cover screen' : 'unfolded'} app preview`" aria-haspopup="dialog" @click="openScreenshot('android')"><ShowcaseScreen device="android" v-bind="screenProps" /></button>
-              <span class="punch-camera" aria-hidden="true" /><span v-if="!folded" class="fold-crease" aria-hidden="true" />
-            </div></div>
-            <figcaption><strong>Pixel 10 Pro Fold</strong><span>{{ folded ? 'Cover screen' : 'Unfolded. More to explore.' }}</span></figcaption>
+          <figure class="device device--fold" :class="{ 'is-folded': folded }">
+            <div class="fold-footprint">
+              <button class="fold-device" type="button" :aria-label="`Enlarge Pixel 10 Pro Fold ${folded ? 'cover screen' : 'unfolded'} app preview`" aria-haspopup="dialog" @click="openScreenshot('android')">
+                <div class="fold-body" aria-hidden="true">
+                  <div class="fold-leaf fold-leaf--right">
+                    <div class="fold-face fold-face--right">
+                      <div class="fold-viewport"><div class="fold-capture"><ShowcaseScreen device="android" :view="view" :platform="platform" :folded="false" /></div></div>
+                      <span class="punch-camera" /><span class="hardware-button hardware-button--power" /><span class="hardware-button hardware-button--volume" />
+                    </div>
+                  </div>
+                  <span class="fold-hinge" />
+                  <div class="fold-leaf fold-leaf--turning">
+                    <div class="fold-face fold-face--left">
+                      <div class="fold-viewport"><div class="fold-capture"><ShowcaseScreen device="android" :view="view" :platform="platform" :folded="false" /></div></div>
+                    </div>
+                    <div class="fold-face fold-face--cover">
+                      <div class="fold-viewport"><ShowcaseScreen device="android" :view="view" :platform="platform" :folded="true" /></div>
+                      <span class="punch-camera" />
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </div>
+            <figcaption><strong>Pixel 10 Pro Fold</strong><span class="fold-caption"><span :aria-hidden="folded">Unfolded. More to explore.</span><span :aria-hidden="!folded">Cover screen</span></span></figcaption>
           </figure>
         </div>
 
@@ -115,17 +115,9 @@ onBeforeUnmount(() => { if (dialog.value?.open) restoreScroll() })
   </section>
 
   <Teleport to="body">
-    <dialog ref="dialog" class="preview-dialog" aria-labelledby="preview-dialog-title" @close="restoreScroll" @click="(event) => { if (event.target === dialog) dialog?.close() }">
-      <div class="preview-dialog__content">
-        <header><div><span class="section-label">{{ modelView ? 'Interactive hardware' : `${selectedDevice === 'wear' ? 'Now Playing' : viewName} preview` }}</span><h2 id="preview-dialog-title">{{ labels[selectedDevice] }}</h2></div><form method="dialog"><button class="icon-button" aria-label="Close preview" autofocus><span class="material-symbols-rounded" aria-hidden="true">close</span></button></form></header>
-        <div v-if="modelView" class="preview-dialog__model">
-          <p v-if="modelLoading && !modelFailed" role="status">Loading the 3D model…</p>
-          <p v-if="modelFailed" role="status">The 3D model couldn't load. The app preview is still available.</p>
-          <model-viewer v-if="modelReady && !modelFailed" src="/models/pixel-watch-4.glb" alt="Interactive Obsidian Google Pixel Watch 4; drag to rotate, pinch or scroll to zoom" variant-name="Obsidian" camera-controls camera-orbit="-12deg 80deg 105%" field-of-view="25deg" environment-image="neutral" shadow-intensity="1" interaction-prompt="none" @load="modelLoading = false" @error="modelFailed = true; modelLoading = false" />
-        </div>
-        <div v-else class="preview-dialog__screen" :class="{ 'preview-dialog__screen--desktop': selectedDevice === 'desktop', 'preview-dialog__screen--phone': selectedDevice === 'ios' || (selectedDevice === 'android' && folded), 'preview-dialog__screen--fold': selectedDevice === 'android' && !folded, 'preview-dialog__screen--watch': selectedDevice === 'wear' }"><ShowcaseScreen :device="selectedDevice" v-bind="screenProps" /></div>
-        <footer><p>{{ modelView ? 'Drag to rotate · Pinch or scroll to zoom · Stock watch face' : selectedDevice === 'wear' ? 'Illustrative watch UI; an app capture will replace this preview.' : selectedDevice === 'desktop' ? 'App capture shared across the Windows, Linux, and macOS previews.' : 'Metrolist app capture. Device hardware is illustrated in the showcase.' }}</p><button v-if="selectedDevice === 'wear'" type="button" class="btn btn-outlined" @click="modelView ? modelView = false : showWatchModel()">{{ modelView ? 'App preview' : 'Explore watch in 3D' }}</button></footer>
-      </div>
+    <dialog ref="dialog" class="preview-dialog" :aria-label="`${labels[selectedDevice]} · ${selectedDevice === 'wear' ? 'Now Playing' : viewName} preview`" @close="restoreScroll" @click="(event) => { if (event.target === dialog) dialog?.close() }">
+      <form method="dialog" class="preview-dialog__close"><button class="icon-button" aria-label="Close preview" autofocus><span class="material-symbols-rounded" aria-hidden="true">close</span></button></form>
+      <div class="preview-dialog__screen" :class="{ 'preview-dialog__screen--desktop': selectedDevice === 'desktop', 'preview-dialog__screen--phone': selectedDevice === 'ios', 'preview-dialog__screen--cover': selectedDevice === 'android' && folded, 'preview-dialog__screen--fold': selectedDevice === 'android' && !folded, 'preview-dialog__screen--watch': selectedDevice === 'wear' }"><ShowcaseScreen :key="selectedDevice" :device="selectedDevice" v-bind="screenProps" /></div>
     </dialog>
   </Teleport>
 </template>
@@ -137,7 +129,7 @@ onBeforeUnmount(() => { if (dialog.value?.open) restoreScroll() })
 .showcase h2 { font-size: clamp(2.7rem, 5.1vw, 4.7rem); letter-spacing: -0.055em; font-weight: 760; line-height: 1; }
 .showcase h2 span { color: var(--md-sys-color-primary); }
 .showcase__heading > p { max-width: 32ch; padding-bottom: 5px; color: var(--md-sys-color-on-surface-variant); font-size: 1.06rem; }
-.showcase__studio { overflow: hidden; border: 1px solid #ffffff0d; border-radius: 36px; background: var(--md-sys-color-surface-container-low); }
+.showcase__studio { overflow: hidden; border-radius: 36px; background: var(--md-sys-color-surface-container-low); }
 .showcase__toolbar { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 24px 28px; }
 .segmented, .view-switch { display: flex; gap: 4px; padding: 5px; border-radius: 999px; background: var(--md-sys-color-surface-container-lowest); }
 .segmented button, .view-switch button { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 17px; border: 0; border-radius: 999px; background: transparent; color: var(--md-sys-color-on-surface-variant); cursor: pointer; font-size: 0.82rem; font-weight: 650; transition: background 180ms, color 180ms; }
@@ -161,16 +153,24 @@ onBeforeUnmount(() => { if (dialog.value?.open) restoreScroll() })
 .dynamic-island { position: absolute; z-index: 1; top: 2.2%; left: 35%; width: 30%; height: 2.5%; border-radius: 99px; background: #030304; box-shadow: 0 1px 1px #ffffff09; pointer-events: none; }
 .dynamic-island i { position: absolute; top: 24%; right: 10%; height: 50%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #253255, #090b14 55%); border: 1px solid #141622; }
 .device--desktop { align-self: end; }
-.computer { position: relative; padding-bottom: 17px; }
-.computer__lid { position: relative; padding: 12px 7px 8px; border: 1px solid #77737b; border-radius: 14px 14px 7px 7px; background: linear-gradient(120deg, #4c494f, #1e1d22 40%, #65606a); box-shadow: 0 20px 40px #0006, inset 0 0 0 2px #151418; }
-.computer__display { display: flex; flex-direction: column; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 4px; background: #141217; }
-.webcam { position: absolute; top: 4px; left: calc(50% - 2px); width: 4px; height: 4px; border: 1px solid #303947; border-radius: 50%; background: #0a0b10; }
+/* Reserve the monitor's height even as its stand retracts into a laptop base. */
+.computer { --stand-space: 70px; --base-height: 17px; --morph: 700ms cubic-bezier(0.4, 0, 0.2, 1); position: relative; padding-bottom: var(--stand-space); perspective: 1200px; }
+.computer__lid { position: relative; z-index: 1; padding: 12px 7px 8px; border: 1px solid #77737b; border-radius: 14px 14px 7px 7px; background: linear-gradient(120deg, #4c494f, #1e1d22 40%, #65606a); box-shadow: 0 20px 40px #0006, inset 0 0 0 2px #151418; transform-origin: center bottom; transform: translateY(0) rotateX(0deg); transition: transform var(--morph), border-color var(--morph), border-radius var(--morph); }
+.computer__lid::before, .computer__base::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(120deg, #c1ceb5, #707e66 50%, #d3ddc9); opacity: 0; transition: opacity var(--morph); }
+.computer__display { position: relative; display: flex; flex-direction: column; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 4px; background: #141217; }
+.webcam { position: absolute; z-index: 1; top: 4px; left: calc(50% - 2px); width: 4px; height: 4px; border: 1px solid #303947; border-radius: 50%; background: #0a0b10; }
 .computer__screen { display: block; flex: 1; min-height: 0; width: 100%; padding: 0; border: 0; background: #141217; cursor: zoom-in; }
-.monitor-stand { position: relative; width: 18%; height: 60px; margin: 0 auto; background: linear-gradient(90deg, #48464d, #79767e 48%, #333137); clip-path: polygon(15% 0, 85% 0, 100% 100%, 0 100%); }
-.computer--windows { padding-bottom: 10px; }.computer--windows::after { content: ''; position: absolute; bottom: 5px; left: 33%; width: 34%; height: 8px; border: 1px solid #8b8592; border-radius: 50% 50% 4px 4px; background: linear-gradient(#77727f, #3c3841); box-shadow: 0 10px 15px #0008; }
-.laptop-base { position: absolute; left: -4%; right: -4%; bottom: 5px; height: 17px; border-top: 2px solid #b8b4bf; border-radius: 2px 2px 45% 45%; background: linear-gradient(#8d8994, #4b4651 65%, #27232d); box-shadow: 0 12px 16px #0006; }
-.laptop-base span { display: block; width: 18%; height: 5px; margin: -1px auto 0; border-radius: 0 0 8px 8px; background: #45414b; }
-.computer--macos .computer__lid { border-color: #bcc8b2; background: linear-gradient(120deg, #c1ceb5, #707e66 50%, #d3ddc9); }.computer--macos .laptop-base { border-color: #d2ddc8; background: linear-gradient(#b0bda3, #68765c); }
+.monitor-stand { position: absolute; bottom: 10px; left: 41%; width: 18%; height: calc(var(--stand-space) - 10px); background: linear-gradient(90deg, #48464d, #79767e 48%, #333137); clip-path: polygon(15% 0, 85% 0, 100% 100%, 0 100%); transform-origin: center bottom; transition: transform var(--morph); }
+.computer__base { position: absolute; z-index: 2; bottom: 5px; left: 33%; width: 34%; height: 8px; border: 1px solid #8b8592; border-radius: 50% 50% 4px 4px; background: linear-gradient(#8d8994, #4b4651 65%, #27232d); box-shadow: 0 12px 16px #0006; transition: left var(--morph), width var(--morph), height var(--morph), border-radius var(--morph), border-color var(--morph); }
+.computer__base span { position: relative; display: block; width: 18%; height: 5px; margin: -1px auto 0; border-radius: 0 0 8px 8px; background: #45414b; opacity: 0; transition: opacity var(--morph); }
+.computer:not(.computer--windows) .computer__lid { transform: translateY(calc(var(--stand-space) - var(--base-height) - 9px)) rotateX(-8deg); }
+.computer:not(.computer--windows) .monitor-stand { transform: scaleY(0.12); }
+.computer:not(.computer--windows) .computer__base { left: -4%; width: 108%; height: var(--base-height); border-color: #b8b4bf; border-radius: 2px 2px 45% 45%; }
+.computer:not(.computer--windows) .computer__base span { opacity: 1; }
+.computer--macos .computer__lid { border-color: #bcc8b2; border-radius: 18px 18px 8px 8px; }
+.computer.computer--macos .computer__lid { transform: translateY(calc(var(--stand-space) - var(--base-height) - 9px)) rotateX(-3deg); }
+.computer.computer--macos .computer__base { border-color: #d2ddc8; border-radius: 4px 4px 35% 35%; }
+.computer--macos .computer__lid::before, .computer--macos .computer__base::before { opacity: 1; }
 .pixel-watch { position: relative; display: grid; width: 100%; aspect-ratio: 0.6; align-items: center; filter: drop-shadow(0 14px 10px #0007); transform: rotate(-7deg); }
 .watch-strap { position: absolute; top: 0; bottom: 0; left: 18%; right: 18%; border: 1px solid #575d53; border-radius: 22%; background: linear-gradient(90deg, #242923, #41483b 45%, #252b23); }
 .watch-strap::after { content: ''; position: absolute; left: 43%; bottom: 4%; width: 14%; height: 18%; background: radial-gradient(ellipse, #131711 30%, transparent 40%) center / 100% 7px; }
@@ -178,45 +178,66 @@ onBeforeUnmount(() => { if (dialog.value?.open) restoreScroll() })
 .watch-screen { position: absolute; inset: 5%; width: 90%; height: 90%; padding: 0; border: 2px solid #020302; border-radius: 50%; overflow: hidden; background: #090b09; cursor: zoom-in; }
 .watch-crown { position: absolute; right: -6%; top: 40%; width: 8%; height: 18%; border: 1px solid #969e8f; border-radius: 2px 4px 4px 2px; background: repeating-linear-gradient(0deg, #495043 0 1px, #89917f 1px 2px); }
 .device--watch figcaption { margin-top: 25px; }.device--watch figcaption strong { font-size: 0.65rem; }
-.fold-footprint { display: flex; align-items: end; justify-content: center; aspect-ratio: 1; }
-.phone--fold { --screen-ratio: 2076 / 2152; width: 100%; border-radius: 5.5% / 5.3%; background: linear-gradient(100deg, #71796e, #b1b9a9 2%, #454d41 5%, #3a4036 93%, #c3ccbb); border-color: #aab29e; transform: perspective(1000px) rotateY(-9deg) rotateZ(1.5deg); transition: width 450ms var(--md-sys-motion-expressive); }
-.phone--fold .hardware-button { background: linear-gradient(90deg, #46513d, #b2bfa6, #57654c); }.phone--fold .hardware-button--power { top: 20%; height: 10%; }.hardware-button--volume { top: 35%; right: -3px; height: 18%; }
-.fold-hinge { position: absolute; top: 7%; bottom: 7%; left: -3px; width: 4px; border-radius: 2px; background: linear-gradient(90deg, #424c3b, #c4ccbc, #4d5846); }
-.punch-camera { position: absolute; top: 4%; right: 23%; width: 5px; height: 5px; border-radius: 50%; border: 1px solid #292c33; background: radial-gradient(circle at 35% 35%, #2c3751, #030405 60%); pointer-events: none; }
-.fold-crease { position: absolute; top: 8px; bottom: 8px; left: 49%; width: 2%; background: linear-gradient(90deg, transparent, #0002, #ffffff06, transparent); pointer-events: none; }
-.phone--folded { --screen-ratio: 1080 / 2364; width: 47.5%; border-radius: 10% / 4.6%; }.phone--folded .punch-camera { right: calc(50% - 2px); }
-.showcase__footer { position: relative; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 28px; border-top: 1px solid #ffffff09; }
+/* Both faces stay mounted; only the hinge and centering transforms change, never page layout. */
+.fold-footprint { position: relative; aspect-ratio: 2076 / 2152; perspective: 1100px; }
+.fold-device { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; cursor: zoom-in; transform-style: preserve-3d; }
+.fold-body { position: absolute; inset: 0; transform-style: preserve-3d; transform: translateX(0) rotateY(-9deg) rotateZ(1.5deg); transition: transform 850ms cubic-bezier(0.4, 0, 0.2, 1); }
+.fold-leaf { position: absolute; top: 0; bottom: 0; width: 50%; transform-style: preserve-3d; }
+.fold-leaf--right { right: 0; }
+.fold-leaf--turning { left: 0; transform-origin: right center; transform: rotateY(0deg); transition: transform 850ms cubic-bezier(0.4, 0, 0.2, 1); }
+.fold-face { position: absolute; inset: 0; backface-visibility: hidden; background: linear-gradient(100deg, #71796e, #b1b9a9 2%, #454d41 5%, #3a4036 93%, #c3ccbb); box-shadow: 0 18px 28px #0005; }
+.fold-face--left { border-radius: 11% 0 0 11% / 5.3% 0 0 5.3%; transform: translateZ(1px); }
+.fold-face--right { border-radius: 0 11% 11% 0 / 0 5.3% 5.3% 0; }
+.fold-face--cover { border-radius: 11% / 5.3%; transform: rotateY(180deg) translateZ(1px); }
+.fold-viewport { position: absolute; inset: 2px; overflow: hidden; border-radius: inherit; background: #141217; }
+.fold-face--left .fold-viewport { right: 0; }.fold-face--right .fold-viewport { left: 0; }
+.fold-capture { position: absolute; inset-block: 0; width: 200%; }.fold-face--right .fold-capture { right: 0; }
+.fold-face::after { content: ''; position: absolute; inset: 2px; border-radius: inherit; background: linear-gradient(90deg, #0008, #0001); opacity: 0; pointer-events: none; transition: opacity 850ms cubic-bezier(0.4, 0, 0.2, 1); }
+.fold-face--cover::after { opacity: 0.7; }
+.is-folded .fold-body { transform: translateX(-25%) rotateY(-9deg) rotateZ(1.5deg); }
+.is-folded .fold-leaf--turning { transform: rotateY(180deg); }
+.is-folded .fold-face--left::after, .is-folded .fold-face--right::after { opacity: 1; }.is-folded .fold-face--cover::after { opacity: 0; }
+.fold-body .hardware-button { background: linear-gradient(90deg, #46513d, #b2bfa6, #57654c); }.fold-body .hardware-button--power { top: 20%; height: 10%; }.hardware-button--volume { top: 35%; right: -3px; height: 18%; }
+.fold-hinge { position: absolute; top: 2%; bottom: 2%; left: calc(50% - 2px); width: 4px; border-radius: 2px; background: linear-gradient(90deg, #0003, #c4ccbc33, #0004); }
+.punch-camera { position: absolute; top: 4%; right: calc(50% - 2px); width: 5px; height: 5px; border-radius: 50%; border: 1px solid #292c33; background: radial-gradient(circle at 35% 35%, #2c3751, #030405 60%); pointer-events: none; }
+.fold-caption { display: grid; }.fold-caption > span { grid-area: 1 / 1; }.fold-caption > span[aria-hidden='true'] { visibility: hidden; }
+.showcase__footer { position: relative; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 28px; }
 .showcase__footer p { display: flex; align-items: center; gap: 8px; color: var(--md-sys-color-on-surface-variant); font-size: 0.75rem; }.showcase__footer .material-symbols-rounded { font-size: 16px; }
-.fold-toggle { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 44px; padding: 8px 16px; border: 1px solid var(--md-sys-color-outline-variant); border-radius: 999px; background: var(--md-sys-color-surface-container); color: var(--md-sys-color-primary); cursor: pointer; font-size: 0.8rem; font-weight: 650; }
-.fold-toggle:hover { background: var(--md-sys-color-surface-container-high); }.fold-toggle__icon { width: 20px; height: 18px; border: 1.5px solid currentColor; border-radius: 3px; background: linear-gradient(90deg, transparent 47%, currentColor 48% 52%, transparent 53%); transition: width 250ms; }.fold-toggle__icon.is-folded { width: 11px; background: none; }
+.fold-toggle { display: flex; flex-shrink: 0; align-items: center; justify-content: center; gap: 10px; width: 180px; min-height: 44px; white-space: nowrap; padding: 8px 16px; border: 0; border-radius: 999px; background: var(--md-sys-color-surface-container); color: var(--md-sys-color-primary); cursor: pointer; font-size: 0.8rem; font-weight: 650; }
+.fold-toggle:hover { background: var(--md-sys-color-surface-container-high); }.fold-toggle__icon { flex: 0 0 20px; height: 18px; border: 1.5px solid currentColor; border-radius: 3px; background: linear-gradient(90deg, transparent 47%, currentColor 48% 52%, transparent 53%); transition: transform 850ms var(--md-sys-motion-standard); }.fold-toggle__icon.is-folded { transform: scaleX(0.55); }
 .showcase__note { margin-top: 14px; color: var(--md-sys-color-on-surface-variant); font-size: 0.7rem; text-align: center; }
 .showcase__benefits { display: flex; justify-content: center; flex-wrap: wrap; gap: 16px 38px; margin-top: 28px; font-size: 0.8rem; color: var(--md-sys-color-on-surface-variant); }.showcase__benefits > span { display: flex; align-items: center; gap: 8px; }.showcase__benefits i { width: 7px; height: 7px; border-radius: 2px; background: var(--md-sys-color-primary); transform: rotate(45deg); }.showcase__benefits > span:nth-child(2) i { background: var(--md-sys-color-secondary); }.showcase__benefits > span:nth-child(3) i { background: var(--md-sys-color-tertiary); }
-.preview-dialog { width: calc(100% - 32px); max-width: 1280px; max-height: calc(100dvh - 32px); margin: auto; padding: 24px; border: 1px solid var(--md-sys-color-outline-variant); border-radius: 28px; background: var(--md-sys-color-surface-container-low); color: var(--md-sys-color-on-surface); }
-.preview-dialog::backdrop { background: #050307e8; backdrop-filter: blur(10px); }
-.preview-dialog__content { display: grid; gap: 20px; }.preview-dialog header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }.preview-dialog h2 { margin-top: 8px; font-size: clamp(1rem, 2vw, 1.4rem); letter-spacing: -0.03em; }.preview-dialog .section-label { min-height: 24px; font-size: 0.6rem; padding: 4px 8px; }.preview-dialog form { flex-shrink: 0; }
-.preview-dialog__screen { justify-self: center; overflow: hidden; border: 1px solid #ffffff14; border-radius: 4px; box-shadow: 0 18px 50px #0005; }
-.preview-dialog__screen--desktop { width: min(100%, calc((100dvh - 240px) * 2000 / 1091)); aspect-ratio: 2000 / 1091; }
-.preview-dialog__screen--phone { width: min(100%, calc((100dvh - 240px) * 1320 / 2868)); aspect-ratio: 1320 / 2868; }
-.preview-dialog__screen--fold { width: min(100%, calc((100dvh - 240px) * 2076 / 2152)); aspect-ratio: 2076 / 2152; }
-.preview-dialog__screen--watch { width: min(100%, 420px, calc(100dvh - 240px)); aspect-ratio: 1; border-radius: 50%; }
-.preview-dialog footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }.preview-dialog footer p { color: var(--md-sys-color-on-surface-variant); font-size: 0.75rem; }
-.preview-dialog__model { position: relative; min-height: 280px; height: min(520px, 55dvh); }.preview-dialog__model p { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }.preview-dialog model-viewer { width: 100%; height: 100%; --poster-color: transparent; }
+.preview-dialog { position: fixed; inset: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 64px 20px; overflow: hidden; border: 0; background: transparent; color: var(--md-sys-color-on-surface); opacity: 0; transition: opacity 280ms, display 280ms allow-discrete, overlay 280ms allow-discrete; }
+.preview-dialog[open] { display: grid; place-items: center; opacity: 1; }
+.preview-dialog::backdrop { background: #050307c9; backdrop-filter: blur(8px); opacity: 0; transition: opacity 280ms, display 280ms allow-discrete, overlay 280ms allow-discrete; }
+.preview-dialog[open]::backdrop { opacity: 1; }
+.preview-dialog__close { position: absolute; z-index: 1; top: 12px; right: 12px; }
+.preview-dialog__screen { width: min(100%, calc((100dvh - 128px) * var(--preview-ratio))); aspect-ratio: var(--preview-ratio); overflow: hidden; border-radius: 4px; box-shadow: 0 24px 80px #0006; transform: scale(0.92); transition: transform 280ms var(--md-sys-motion-expressive); }
+.preview-dialog[open] .preview-dialog__screen { transform: scale(1); }
+.preview-dialog__screen--desktop { --preview-ratio: 2000 / 1091; }
+.preview-dialog__screen--phone { --preview-ratio: 1320 / 2868; }
+.preview-dialog__screen--cover { --preview-ratio: 1080 / 2364; }
+.preview-dialog__screen--fold { --preview-ratio: 2076 / 2152; }
+.preview-dialog__screen--watch { --preview-ratio: 1; max-width: 560px; border-radius: 50%; }
+@starting-style {
+  .preview-dialog[open], .preview-dialog[open]::backdrop { opacity: 0; }
+  .preview-dialog[open] .preview-dialog__screen { transform: scale(0.92); }
+}
 @media (min-width: 1101px) { .device--iphone { padding-bottom: 9px; }.device--desktop { padding-bottom: 36px; }.device--fold { padding-bottom: 8px; } }
 @media (max-width: 1100px) {
   .device-stage { grid-template-columns: minmax(0, 1fr) minmax(0, 0.6fr) minmax(0, 1.4fr); gap: 36px 7%; padding: 20px 6% 28px; }
   .device--desktop { grid-row: 1; grid-column: 1 / -1; width: 85%; justify-self: center; }.device--iphone { grid-row: 2; max-width: 200px; width: 100%; justify-self: center; }.device--watch { grid-row: 2; width: 100%; max-width: 115px; justify-self: center; }.device--fold { grid-row: 2; width: 100%; max-width: 300px; justify-self: center; }
   .device figcaption strong { font-size: 0.8rem; }.device figcaption > span { font-size: 0.65rem; }.device--watch figcaption strong { font-size: 0.7rem; }.device--desktop figcaption { margin-top: 15px; min-height: 0; }
-  .monitor-stand { height: 45px; }.stage-orbit { height: 45%; top: 35%; }
+  .computer { --stand-space: 55px; }.stage-orbit { height: 45%; top: 35%; }
 }
 @media (max-width: 700px) {
   .showcase { padding: 24px 0 64px; }.showcase__heading { grid-template-columns: 1fr; gap: 20px; }.showcase__heading > p { max-width: 40ch; font-size: 0.96rem; }.showcase__heading .section-label { font-size: 0.6rem; }
   .showcase__studio { border-radius: 24px; }.showcase__toolbar { flex-direction: column; gap: 12px; padding: 18px 12px 8px; }.segmented { width: 100%; max-width: 370px; }.segmented button { flex: 1; padding-inline: 10px; }.view-switch button { min-height: 40px; padding: 8px 20px; }
   .device-stage { grid-template-columns: 30% 17% 43%; column-gap: 5%; row-gap: 28px; padding: 20px 16px 12px; }.device--desktop { width: 96%; }.device figcaption { margin-top: 18px; min-height: 52px; }.device figcaption strong, .device--watch figcaption strong { font-size: 0.65rem; }.device figcaption > span { font-size: 0.57rem; }.device--desktop figcaption { min-height: 0; }
   .punch-camera { width: 4px; height: 4px; }.hardware-button { width: 2px; }.watch-screen { border-width: 1px; }
-  .computer__lid { padding: 9px 5px 5px; border-radius: 10px 10px 5px 5px; }.webcam { top: 3px; width: 3px; height: 3px; }.monitor-stand { height: 30px; }.laptop-base { height: 12px; }.computer { padding-bottom: 12px; }
-  .showcase__footer { padding: 12px 16px; }.showcase__footer p { font-size: 0.65rem; max-width: 19ch; }.showcase__footer p .material-symbols-rounded { display: none; }.fold-toggle { padding-inline: 12px; font-size: 0.72rem; white-space: nowrap; }.showcase__benefits { gap: 12px 20px; font-size: 0.7rem; }
-  .preview-dialog { padding: 16px; width: calc(100% - 20px); max-height: calc(100dvh - 20px); border-radius: 22px; }.preview-dialog__content { gap: 16px; }
+  .computer__lid { padding: 9px 5px 5px; border-radius: 10px 10px 5px 5px; }.webcam { top: 3px; width: 3px; height: 3px; }.computer { --stand-space: 40px; --base-height: 12px; }
+  .showcase__footer { padding: 12px 16px; }.showcase__footer p { font-size: 0.65rem; max-width: 19ch; }.showcase__footer p .material-symbols-rounded { display: none; }.fold-toggle { width: 150px; padding-inline: 12px; font-size: 0.72rem; white-space: nowrap; }.showcase__benefits { gap: 12px 20px; font-size: 0.7rem; }
 }
-@media (prefers-reduced-motion: reduce) { .phone--fold, .fold-toggle__icon { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .computer__lid, .computer__lid::before, .computer__base, .computer__base::before, .computer__base span, .monitor-stand, .fold-body, .fold-leaf, .fold-face::after, .fold-toggle__icon, .preview-dialog, .preview-dialog::backdrop, .preview-dialog__screen { transition: none; } }
 @media (forced-colors: active) { .segmented button[aria-pressed='true'], .view-switch button[aria-pressed='true'] { outline: 2px solid Highlight; }.phone, .computer__lid, .watch-case { border-color: CanvasText; } }
 </style>

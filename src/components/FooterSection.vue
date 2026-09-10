@@ -76,7 +76,6 @@ const links = [
   flex-wrap: wrap;
   gap: 8px;
   padding: 24px 0;
-  border-block: 1px solid var(--md-sys-color-outline-variant);
 }
 
 .footer__links a {

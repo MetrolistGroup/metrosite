@@ -65,7 +65,6 @@ import DownloadDialog from './DownloadDialog.vue'
 }
 
 .download__actions .btn-outlined {
-  border-color: color-mix(in srgb, var(--md-sys-color-on-primary-container) 46%, transparent);
   color: var(--md-sys-color-on-primary-container);
 }
 
