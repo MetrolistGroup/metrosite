@@ -6,6 +6,7 @@
       "name": "metrosite",
       "dependencies": {
         "@cloudflare/workers-types": "^4.20260702.1",
+        "material-shapes-ts": "^0.3.0",
         "vue": "^3.5.42",
         "vue-router": "^4.6.4",
         "wrangler": "^4.130.0",
@@ -291,6 +292,8 @@
     "lightningcss-win32-x64-msvc": ["lightningcss-win32-x64-msvc@1.33.0", "", { "os": "win32", "cpu": "x64" }, "sha512-OlEICDx/Xl0FqSp4bry8zFnCvGpig3Gl4gCquvYwHuqJKEC1+n9NgDniFvqHGmMv1ZkqDJrDqKKSykTDX+ehuA=="],
 
     "magic-string": ["magic-string@0.30.21", "", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.5" } }, "sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ=="],
+
+    "material-shapes-ts": ["material-shapes-ts@0.3.0", "", { "peerDependencies": { "vue": "^3.3.0" }, "optionalPeers": ["vue"] }, "sha512-YVmrPL/TP9AtXtcQabGccSi0lrNBTCCAOpRySwEhkJYuxr6Hyh4ejIWx3xKxTDS4CrsdItYCS1OAapk5HhOTVQ=="],
 
     "miniflare": ["miniflare@5.20260908.0-alpha", "", { "dependencies": { "@cspotcode/source-map-support": "0.8.1", "sharp": "0.35.2", "undici": "7.29.0", "workerd": "1.20260908.1", "ws": "8.21.0", "youch": "4.1.0-beta.10" } }, "sha512-BHIknb0u6vLIvb+R8PsUAzgoWWk3OlW85DrV2SG0EydfSpIba28YT0rH6xZThjnSwDxzNuW3FDRNSWvbiI/DVw=="],
 

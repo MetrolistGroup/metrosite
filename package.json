@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@cloudflare/workers-types": "^4.20260702.1",
+    "material-shapes-ts": "^0.3.0",
     "vue": "^3.5.42",
     "vue-router": "^4.6.4",
     "wrangler": "^4.130.0"
