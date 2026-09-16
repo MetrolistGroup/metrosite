@@ -6,7 +6,7 @@ export type FaqItem = {
 export const FAQ_ITEMS: FaqItem[] = [
   {
     question: 'Which platforms does Metrolist support?',
-    answer: 'Metrolist supports Android 6 and newer, iOS 17 and newer, Linux (x64 and ARM64), macOS (Intel and Apple Silicon), and Windows 10 (x64 and ARM64) and newer. Download the package for your platform from the download modal.',
+    answer: 'Metrolist supports Android 6 and newer, iOS 17 and newer, Linux x64, macOS (Intel and Apple Silicon), and Windows 10 x64 and newer. Download the package for your platform from the download modal.',
   },
   {
     question: 'Can I move from the original Metrolist app?',

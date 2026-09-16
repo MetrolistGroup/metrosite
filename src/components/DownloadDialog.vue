@@ -98,10 +98,7 @@ function formatSize(bytes?: number) {
   <Teleport to="body">
     <dialog ref="dialog" class="download-dialog" :aria-labelledby="titleId" @click="closeOnBackdrop">
       <div class="download-dialog__header">
-        <div>
-          <p>Download Metrolist</p>
-          <h2 :id="titleId">Choose your build</h2>
-        </div>
+        <h2 :id="titleId">Choose your build</h2>
         <form method="dialog">
           <button class="icon-button" type="submit" aria-label="Close download selector">
             <span class="material-symbols-rounded" aria-hidden="true">close</span>
@@ -123,7 +120,7 @@ function formatSize(bytes?: number) {
         </button>
       </div>
 
-      <div class="download-dialog__architectures">
+      <div v-if="selectedPlatform.architectures.length > 1" class="download-dialog__architectures">
         <span>Architecture</span>
         <div role="group" :aria-label="`${selectedPlatform.name} architecture`">
           <button

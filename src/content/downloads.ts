@@ -61,7 +61,7 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
       {
         key: 'universal',
         name: 'Universal',
-        patterns: [/metrolist-android.*universal.*\.apk$/i, /metrolist-android-(?!.*(?:arm64|aarch64|x86_64|x64|amd64)).*\.apk$/i],
+        patterns: [/^Metrolist\.apk$/i, /^Metrolist-izzy\.apk$/i],
       }
     ],
   },
@@ -80,7 +80,7 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
       {
         key: 'universal',
         name: 'iPhone & iPad',
-        patterns: [/metrolist.*\.ipa$/i],
+        patterns: [/^Metrolist-iOS\.ipa$/i],
       },
     ],
   },
@@ -99,12 +99,7 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
       {
         key: 'x86_64',
         name: 'x86_64',
-        patterns: [/metrolist-desktop-linux-.*(?:x86_64|x64|amd64).*\.appimage$/i, /metrolist-desktop-linux-(?!.*(?:arm64|aarch64)).*\.appimage$/i],
-      },
-      {
-        key: 'arm64',
-        name: 'ARM64',
-        patterns: [/metrolist-desktop-linux-.*(?:arm64|aarch64).*\.appimage$/i],
+        patterns: [/^Metrolist-Linux-64\.appimage$/i],
       },
     ],
   },
@@ -123,12 +118,12 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
       {
         key: 'arm64',
         name: 'Apple silicon',
-        patterns: [/metrolist-desktop-macos-.*(?:arm64|aarch64).*\.dmg$/i, /metrolist-desktop-macos-(?!.*(?:x64|x86_64|intel)).*\.dmg$/i],
+        patterns: [/^Metrolist-macOS-arm\.dmg$/i],
       },
       {
         key: 'x86_64',
         name: 'Intel',
-        patterns: [/metrolist-desktop-macos-.*(?:x64|x86_64|intel).*\.dmg$/i],
+        patterns: [/^Metrolist-macos-intel\.dmg$/i],
       },
     ],
   },
@@ -147,12 +142,7 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
       {
         key: 'x64',
         name: 'x64',
-        patterns: [/metrolist-installer-windows-.*(?:x64|x86_64|amd64).*\.exe$/i, /metrolist-installer-windows-(?!.*(?:arm64|aarch64)).*\.exe$/i, /metrolist-desktop-windows\.zip$/i],
-      },
-      {
-        key: 'arm64',
-        name: 'ARM64',
-        patterns: [/metrolist-installer-windows-.*(?:arm64|aarch64).*\.exe$/i, /metrolist-desktop-windows-.*(?:arm64|aarch64).*\.zip$/i],
+        patterns: [/^Metrolist-Windows-64\.exe$/i, /^Metrolist-Windows-64\.zip$/i],
       },
     ],
   },

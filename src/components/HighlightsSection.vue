@@ -118,7 +118,7 @@ const features = [
 .platforms__layout { display: grid; grid-template-columns: minmax(280px, 0.7fr) minmax(0, 1.3fr); gap: clamp(56px, 9vw, 130px); align-items: start; }
 .platforms header > p:last-child { max-width: 520px; margin-top: 24px; }
 .platforms__list { display: grid; gap: 3px; border-radius: 16px; }
-.platforms__list button { display: grid; grid-template-columns: 54px minmax(120px, 1fr); gap: 16px; align-items: center; min-height: 82px; padding: 10px 12px; border: 0; border-radius: 4px; background: rgb(24 22 27 / 88%); color: var(--md-sys-color-on-surface); cursor: pointer; font: inherit; text-align: left; backdrop-filter: blur(28px); transition: background 120ms, box-shadow 160ms var(--md-sys-motion-expressive); }
+.platforms__list button { display: grid; grid-template-columns: 54px minmax(120px, 1fr); gap: 16px; align-items: center; min-height: 82px; padding: 10px 12px; border: 0; border-radius: 4px; background: rgb(24 22 27 / 68%); color: var(--md-sys-color-on-surface); cursor: pointer; font: inherit; text-align: left; -webkit-backdrop-filter: blur(28px); backdrop-filter: blur(28px); transition: background 120ms, box-shadow 160ms var(--md-sys-motion-expressive); }
 .platforms__list button:first-child { border-radius: 16px 16px 4px 4px; }
 .platforms__list button:last-child { border-radius: 4px 4px 16px 16px; }
 .platforms__list button:hover, .platforms__list button:focus-visible { background: var(--md-sys-color-surface-container-high); box-shadow: 0 8px 20px #0004; }
