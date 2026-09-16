@@ -16,7 +16,7 @@ const features = [
   { icon: 'block', shape: 'Arch', iconBackground: 'var(--md-sys-color-primary)', iconColor: 'var(--md-sys-color-on-primary)', title: 'Just you and the music.', label: 'Ad-free listening', body: 'Stream songs and videos from YouTube Music with background playback and no interruptions.' },
   { icon: 'lyrics', shape: 'Slanted', iconBackground: 'var(--md-sys-color-secondary-container)', iconColor: 'var(--md-sys-color-on-secondary-container)', title: 'Know every word.', label: 'Synchronized lyrics', body: 'Follow synchronized lyrics with word-by-word timing, translation, and romanization where available.' },
   { icon: 'groups', shape: 'Sunny', iconBackground: 'var(--md-sys-color-tertiary-container)', iconColor: 'var(--md-sys-color-on-tertiary-container)', title: 'Good music. Better company.', label: 'Listen Together', body: 'Create a room, share queue suggestions, and keep playback synchronized with friends.' },
-  { icon: 'devices', shape: 'Ghostish', iconBackground: 'var(--md-sys-color-primary-container)', iconColor: 'var(--md-sys-color-on-primary-container)', title: 'Give it a bigger stage.', label: 'Cast wherever', body: 'Send playback to Chromecast, DLNA, and FCast devices directly from the player.' },
+  { icon: 'devices', shape: 'Ghostish', iconBackground: 'var(--md-sys-color-primary-container)', iconColor: 'var(--md-sys-color-on-primary-container)', title: 'Give your songs a bigger stage.', label: 'Cast wherever', body: 'Send playback to Chromecast, DLNA, and FCast devices directly from the player.' },
   { icon: 'download_for_offline', shape: 'Cookie7Sided', iconBackground: 'var(--md-sys-color-secondary-container)', iconColor: 'var(--md-sys-color-on-secondary-container)', title: 'Go touch grass once in a while.', label: 'Ready offline', body: 'Download songs or cache them as you listen so your library stays available without a connection.' },
   { icon: 'tune', shape: 'Pentagon', iconBackground: 'var(--md-sys-color-primary-container)', iconColor: 'var(--md-sys-color-on-primary-container)', title: 'Find your sweet spot.', label: 'Playback your way', body: 'Use skip silence, a sleep timer, audio normalization, tempo and pitch controls, and an equalizer.' },
 ] as const
@@ -27,6 +27,8 @@ const features = [
 
   <section id="features" class="features" aria-labelledby="features-title">
     <div class="container">
+      <div class="features__progress" aria-hidden="true" />
+      <h2 id="features-title" class="sr-only">Metrolist features</h2>
       <div class="features__grid">
         <article v-for="(feature, index) in features" :key="feature.label" class="features__card" :class="`features__card--${index + 1}`">
           <div class="features__top"><ShapeBackdrop :shape="feature.shape" :color="feature.iconBackground" class="features__icon"><span class="features__icon-glyph material-symbols-rounded" :style="{ color: feature.iconColor }" aria-hidden="true">{{ feature.icon }}</span></ShapeBackdrop><span class="features__label">{{ feature.label }}</span><button v-if="index === 1" type="button" class="lyrics-toggle" :aria-label="lyricsPaused ? 'Resume lyrics animation' : 'Pause lyrics animation'" :aria-pressed="lyricsPaused" @click="lyricsPaused = !lyricsPaused"><span aria-hidden="true">{{ lyricsPaused ? '▶' : 'Ⅱ' }}</span></button></div>
@@ -48,7 +50,7 @@ const features = [
       <div class="platforms__list">
         <button v-for="platform in DOWNLOAD_PLATFORMS" :key="platform.name" type="button" aria-haspopup="dialog" @click="openDownload(platform.key)">
           <span class="platforms__icon"><img :src="`/icons/${platform.icon}.svg`" alt="" /></span>
-          <span class="platforms__name"><strong>{{ platform.name }}</strong><small>{{ platform.detail }}</small></span><span class="chip">{{ platform.package }}</span>
+          <span class="platforms__name"><strong>{{ platform.name }}</strong><small>{{ platform.detail }}</small></span>
         </button>
       </div>
       <DownloadDialog ref="downloadDialog" :show-trigger="false" />
@@ -58,11 +60,12 @@ const features = [
 
 <style scoped>
 .features, .platforms { padding: 92px 0; }
-.features { background: var(--md-sys-color-surface-container-low); }
-.features__head { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(240px, 0.6fr); gap: 36px; align-items: end; margin-bottom: 36px; }
-.section-label { margin-bottom: 22px; }
-.features h2, .platforms h2 { font-size: clamp(2.7rem, 5vw, 4.7rem); font-weight: 760; letter-spacing: -0.055em; line-height: 1; }
-.features__head > p, .platforms header > p:last-child { color: var(--md-sys-color-on-surface-variant); font-size: 1.05rem; }
+.features { background: linear-gradient(to bottom, var(--md-sys-color-surface), var(--md-sys-color-surface-container-low) 32px); }
+.features > .container { position: relative; }
+.features__progress { position: absolute; top: -99px; inset-inline: 0; height: 14px; background: var(--md-sys-color-primary); opacity: 0.6; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 14'%3E%3Cpath d='M0 7Q7 0 14 7T28 7' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E") repeat-x left center / 28px 14px; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 14'%3E%3Cpath d='M0 7Q7 0 14 7T28 7' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E") repeat-x left center / 28px 14px; animation: progress-wave 900ms linear infinite; }
+@keyframes progress-wave { to { -webkit-mask-position: 28px center; mask-position: 28px center; } }
+.platforms h2 { font-size: clamp(2.7rem, 5vw, 4.7rem); font-weight: 760; letter-spacing: -0.055em; line-height: 1; }
+.platforms header > p:last-child { color: var(--md-sys-color-on-surface-variant); font-size: 1.05rem; }
 .features__grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
 .features__card { position: relative; isolation: isolate; display: flex; grid-column: span 2; flex-direction: column; justify-content: space-between; min-height: 250px; gap: 20px; padding: 28px; overflow: hidden; border-radius: 28px; background: var(--md-sys-color-surface-container); transition: box-shadow 160ms var(--md-sys-motion-expressive); }
 .features__card:hover { box-shadow: 0 16px 32px #0004; }
@@ -103,6 +106,7 @@ const features = [
 }
 @media (prefers-reduced-motion: reduce) {
   .features__card, .platforms__list button { transition: none; }
+  .features__progress { animation: none; }
   .lyrics-toggle { display: none; }
   .lyrics-line, .lyrics-word { animation: none; }
   .lyrics-line:not(:first-child) { visibility: hidden; }
@@ -113,18 +117,20 @@ const features = [
 .platforms::before { position: absolute; inset: 0; z-index: -1; background: url('/images/platform-pattern.svg') left top / 666px auto repeat; content: ''; pointer-events: none; }
 .platforms__layout { display: grid; grid-template-columns: minmax(280px, 0.7fr) minmax(0, 1.3fr); gap: clamp(56px, 9vw, 130px); align-items: start; }
 .platforms header > p:last-child { max-width: 520px; margin-top: 24px; }
-.platforms__list { display: grid; gap: 6px; padding: 10px; border-radius: 36px; background: rgb(24 22 27 / 88%); backdrop-filter: blur(28px); }
-.platforms__list button { display: grid; grid-template-columns: 54px minmax(120px, 1fr) auto; gap: 16px; align-items: center; min-height: 82px; padding: 10px 12px; border: 0; border-radius: 20px; background: transparent; color: var(--md-sys-color-on-surface); cursor: pointer; font: inherit; text-align: left; transition: background 120ms, box-shadow 160ms var(--md-sys-motion-expressive); }
+.platforms__list { display: grid; gap: 3px; border-radius: 16px; }
+.platforms__list button { display: grid; grid-template-columns: 54px minmax(120px, 1fr); gap: 16px; align-items: center; min-height: 82px; padding: 10px 12px; border: 0; border-radius: 4px; background: rgb(24 22 27 / 88%); color: var(--md-sys-color-on-surface); cursor: pointer; font: inherit; text-align: left; backdrop-filter: blur(28px); transition: background 120ms, box-shadow 160ms var(--md-sys-motion-expressive); }
+.platforms__list button:first-child { border-radius: 16px 16px 4px 4px; }
+.platforms__list button:last-child { border-radius: 4px 4px 16px 16px; }
 .platforms__list button:hover, .platforms__list button:focus-visible { background: var(--md-sys-color-surface-container-high); box-shadow: 0 8px 20px #0004; }
 .platforms__icon { display: grid; width: 52px; height: 52px; place-items: center; border-radius: 16px; background: var(--md-sys-color-surface-container-highest); }
 .platforms__icon img { width: 23px; height: 23px; object-fit: contain; }
 .platforms__name { display: flex; flex-direction: column; }.platforms__name strong { font-size: 1rem; font-weight: 720; }.platforms__name small { color: var(--md-sys-color-on-surface-variant); font-size: 0.8rem; }
 @media (max-width: 940px) {
-  .features, .platforms { padding: 72px 0; }.features__head, .platforms__layout { grid-template-columns: 1fr; gap: 28px; }
+  .features, .platforms { padding: 72px 0; }.features__progress { top: -79px; }.platforms__layout { grid-template-columns: 1fr; gap: 28px; }
   .features__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }.features__card, .features__card--1, .features__card--2, .features__card--3, .features__card--6 { grid-column: auto; min-height: 280px; }.features__card--6 { flex-direction: column; align-items: start; }.features__card--6 .features__copy { max-width: none; }
 }
 @media (max-width: 600px) {
   .features__grid { grid-template-columns: 1fr; }.features__card { padding: 24px; min-height: 250px; gap: 28px; }.features__card--1, .features__card--2 { min-height: 360px; }
-  .platforms__list button { grid-template-columns: 52px 1fr; gap: 12px; }.platforms__list .chip { grid-column: 2; justify-self: start; min-height: 32px; padding-block: 4px; }
+  .platforms__list button { grid-template-columns: 52px 1fr; gap: 12px; }
 }
 </style>

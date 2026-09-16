@@ -4,13 +4,11 @@ export type ReleaseAsset = {
   name: string
   browser_download_url: string
   size?: number
-  download_count?: number
 }
 
 export type DownloadArchitecture = {
   key: string
   name: string
-  command?: string
   patterns: readonly RegExp[]
 }
 
@@ -24,7 +22,29 @@ export type DownloadPlatform = {
   architectures: readonly DownloadArchitecture[]
 }
 
-// ponytail: install commands are placeholders; replace them when each package is published.
+export type LatestRelease = {
+  name?: string
+  tag_name?: string
+  assets?: ReleaseAsset[]
+}
+
+let latestReleaseRequest: Promise<LatestRelease> | undefined
+
+export function getLatestRelease() {
+  if (!latestReleaseRequest) {
+    latestReleaseRequest = fetch('https://api.github.com/repos/MetrolistGroup/Metrolist/releases/latest')
+      .then(response => {
+        if (!response.ok) throw new Error(`GitHub returned ${response.status}`)
+        return response.json() as Promise<LatestRelease>
+      })
+      .catch(error => {
+        latestReleaseRequest = undefined
+        throw error
+      })
+  }
+  return latestReleaseRequest
+}
+
 export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
   {
     key: 'android',
@@ -41,7 +61,6 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
       {
         key: 'universal',
         name: 'Universal',
-        command: 'adb install Metrolist-android.apk',
         patterns: [/metrolist-android.*universal.*\.apk$/i, /metrolist-android-(?!.*(?:arm64|aarch64|x86_64|x64|amd64)).*\.apk$/i],
       }
     ],
@@ -80,13 +99,11 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
       {
         key: 'x86_64',
         name: 'x86_64',
-        command: 'chmod +x Metrolist-x86_64.AppImage && ./Metrolist-x86_64.AppImage',
         patterns: [/metrolist-desktop-linux-.*(?:x86_64|x64|amd64).*\.appimage$/i, /metrolist-desktop-linux-(?!.*(?:arm64|aarch64)).*\.appimage$/i],
       },
       {
         key: 'arm64',
         name: 'ARM64',
-        command: 'chmod +x Metrolist-arm64.AppImage && ./Metrolist-arm64.AppImage',
         patterns: [/metrolist-desktop-linux-.*(?:arm64|aarch64).*\.appimage$/i],
       },
     ],
@@ -106,13 +123,11 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
       {
         key: 'arm64',
         name: 'Apple silicon',
-        command: 'hdiutil attach Metrolist-arm64.dmg && open /Volumes/Metrolist',
         patterns: [/metrolist-desktop-macos-.*(?:arm64|aarch64).*\.dmg$/i, /metrolist-desktop-macos-(?!.*(?:x64|x86_64|intel)).*\.dmg$/i],
       },
       {
         key: 'x86_64',
         name: 'Intel',
-        command: 'hdiutil attach Metrolist-x64.dmg && open /Volumes/Metrolist',
         patterns: [/metrolist-desktop-macos-.*(?:x64|x86_64|intel).*\.dmg$/i],
       },
     ],
@@ -132,22 +147,16 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
       {
         key: 'x64',
         name: 'x64',
-        command: 'winget install --id MetrolistGroup.Metrolist --architecture x64',
         patterns: [/metrolist-installer-windows-.*(?:x64|x86_64|amd64).*\.exe$/i, /metrolist-installer-windows-(?!.*(?:arm64|aarch64)).*\.exe$/i, /metrolist-desktop-windows\.zip$/i],
       },
       {
         key: 'arm64',
         name: 'ARM64',
-        command: 'winget install --id MetrolistGroup.Metrolist --architecture arm64',
         patterns: [/metrolist-installer-windows-.*(?:arm64|aarch64).*\.exe$/i, /metrolist-desktop-windows-.*(?:arm64|aarch64).*\.zip$/i],
       },
     ],
   },
 ]
-
-export function totalReleaseDownloads(releases: { assets?: ReleaseAsset[] }[]) {
-  return releases.flatMap(({ assets }) => assets ?? []).reduce((total, asset) => total + (asset.download_count ?? 0), 0)
-}
 
 export function findDownloadAsset(platformKey: DownloadPlatformKey, architectureKey: string, assets: ReleaseAsset[]) {
   const architecture = DOWNLOAD_PLATFORMS

@@ -13,20 +13,20 @@ export const DESKTOP_PLATFORMS = [
   { key: 'macos', name: 'macOS', device: 'MacBook Neo' },
 ] as const
 
-// Prefer device-specific captures and WebP, with original PNGs as fallbacks.
-export function screenshotFiles(device: ShowcaseDevice, view: ShowcaseView, platform: DesktopPlatform, folded: boolean): string[] {
+// Prefer device-specific captures, with shared captures as fallbacks.
+export function screenshotFiles(device: ShowcaseDevice, view: ShowcaseView, platform: DesktopPlatform, folded: boolean, thumbnail = false): string[] {
   const stems = {
     desktop: [`desktop-${platform}-${view}`, `desktop-${view}`],
     ios: [`ios-${view}`, `iphone-17-${view}-dark`],
     android: [`android-${folded ? '' : 'unfolded-'}${view}`, `pixel-10-pro-fold-${folded ? 'folded' : 'unfolded'}-${view}-dark`],
     wear: ['wear-player', 'wear-home'],
   }[device]
-  return stems.flatMap(stem => [`${stem}.webp`, `${stem}.png`])
+  return stems.map(stem => `${stem}${thumbnail ? '-thumb' : ''}.webp`)
 }
 
 export function findScreenshot(files: string[], available: Record<string, string>): string | undefined {
   for (const file of files) {
-    const image = available[`/public/images/kmp/${file}`]
+    const image = available[`/src/assets/kmp/${file}`]
     if (image) return image
   }
 }

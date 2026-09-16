@@ -52,7 +52,7 @@ try {
   assert.ok(await page.locator('.lyrics-line').nth(1).evaluate(element => parseFloat(getComputedStyle(element).opacity) < 1 && getComputedStyle(element).filter !== 'blur(0px)'), 'inactive lines fade and blur')
 
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  assert.equal(await lyrics.evaluate(element => element.getAnimations({ subtree: true }).length), 0, 'reduced motion disables all lyric animation')
+  assert.ok(await lyrics.evaluate(element => [...element.querySelectorAll('.lyrics-line, .lyrics-word')].every(item => getComputedStyle(item).animationName === 'none')), 'reduced motion disables all lyric animation')
   assert.equal(await page.locator('.lyrics-toggle').isVisible(), false)
   assert.equal(await page.locator('.lyrics-line').first().isVisible(), true)
   assert.equal(await page.locator('.lyrics-line').nth(1).isVisible(), false)

@@ -55,7 +55,7 @@ async function copyCode() {
           <span id="room-code-title">Room code</span>
           <strong>{{ code }}</strong>
         </div>
-        <button type="button" class="btn btn-tonal btn-lg" :aria-label="copied ? 'Room code copied' : 'Copy room code'" @click="copyCode">
+        <button type="button" class="btn btn-tonal btn-lg" @click="copyCode">
           <span class="material-symbols-rounded" aria-hidden="true">{{ copied ? 'check' : 'content_copy' }}</span>
           {{ copied ? 'Copied' : 'Copy code' }}
         </button>
@@ -70,7 +70,7 @@ async function copyCode() {
         <article>
           <div class="listen__guide-top"><span class="material-symbols-rounded" aria-hidden="true">open_in_new</span><small>Step 1</small></div>
           <h2>Open in Metrolist</h2>
-          <p>Set Metrolist as the default app for links from <strong>metrolist.meowery.eu</strong>.</p>
+          <p>Set Metrolist as the default app for links from <strong>metrolist.cc</strong>.</p>
           <ol>
             <li>Choose Open in Metrolist below.</li>
             <li>Select Metrolist, then choose Always.</li>

@@ -105,6 +105,9 @@ const currentAnchor = (hash: string) => route.path === '/' && route.hash === has
 }
 
 .navbar__drawer {
+  position: absolute;
+  top: 100%;
+  inset-inline: 0;
   display: none;
   padding: 6px 0 18px;
   border-radius: 0 0 var(--md-sys-shape-corner-extra-large) var(--md-sys-shape-corner-extra-large);

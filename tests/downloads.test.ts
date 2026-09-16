@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { findDownloadAsset, totalReleaseDownloads, type ReleaseAsset } from '../src/content/downloads'
+import { findDownloadAsset, type ReleaseAsset } from '../src/content/downloads'
 
 const assets: ReleaseAsset[] = [
   { name: 'Metrolist-Desktop-windows.zip', browser_download_url: 'portable' },
@@ -22,11 +22,4 @@ test('matches platform architectures and prefers the Windows installer', () => {
   expect(findDownloadAsset('macos', 'x86_64', assets)?.browser_download_url).toBe('macos-intel')
   expect(findDownloadAsset('windows', 'x64', assets)?.browser_download_url).toBe('windows-x64')
   expect(findDownloadAsset('windows', 'arm64', assets)?.browser_download_url).toBe('windows-arm64')
-})
-
-test('counts downloads across every release', () => {
-  expect(totalReleaseDownloads([
-    { assets: [{ ...assets[0]!, download_count: 12 }, { ...assets[1]!, download_count: 8 }] },
-    { assets: [{ ...assets[2]!, download_count: 5 }] },
-  ])).toBe(25)
 })

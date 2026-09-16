@@ -15,10 +15,12 @@ const dialog = ref<HTMLDialogElement>()
 const selectedDevice = ref<ShowcaseDevice>('desktop')
 const selected = computed(() => previews.find(item => item.device === selectedDevice.value)!)
 const screenProps = computed(() => ({ view: view.value, platform: 'windows' as const, folded: true }))
+const dialogContentMounted = ref(false)
 let previousOverflow = ''
 
 async function openScreenshot(device: ShowcaseDevice) {
   selectedDevice.value = device
+  dialogContentMounted.value = true
   await nextTick()
   previousOverflow = document.body.style.overflow
   document.body.style.overflow = 'hidden'
@@ -47,9 +49,10 @@ onBeforeUnmount(() => { if (dialog.value?.open) restoreScroll() })
           <figcaption>
             <span class="preview-tile__label"><span v-if="preview.device === 'desktop'" class="material-symbols-rounded" aria-hidden="true">desktop_windows</span><img v-else :src="`/icons/${preview.icon}.svg`" alt="" width="22" height="22" /><strong>{{ preview.name }}</strong></span>
             <span class="preview-tile__detail">{{ preview.detail }}</span>
+            <span v-if="preview.device === 'wear'" class="preview-tile__disclaimer">Illustrative player preview</span>
           </figcaption>
           <button class="preview-tile__screen" type="button" :aria-label="`Enlarge ${preview.name} app preview`" aria-haspopup="dialog" @click="openScreenshot(preview.device)">
-            <ShowcaseScreen :device="preview.device" v-bind="screenProps" />
+            <ShowcaseScreen :device="preview.device" v-bind="screenProps" thumbnail aria-hidden="true" />
           </button>
         </figure>
       </div>
@@ -60,7 +63,7 @@ onBeforeUnmount(() => { if (dialog.value?.open) restoreScroll() })
   <Teleport to="body">
     <dialog ref="dialog" class="preview-dialog" :aria-label="`${selected.name} · ${selectedDevice === 'wear' ? 'Now Playing · Illustrative' : viewName} preview`" @close="restoreScroll" @click="(event) => { if (event.target === dialog) dialog?.close() }">
       <form method="dialog" class="preview-dialog__close"><button class="icon-button" aria-label="Close preview" autofocus><span class="material-symbols-rounded" aria-hidden="true">close</span></button></form>
-      <div class="preview-dialog__screen" :class="{ 'preview-dialog__screen--watch': selectedDevice === 'wear' }" :style="{ '--preview-ratio': selected.ratio }"><ShowcaseScreen :key="selectedDevice" :device="selectedDevice" v-bind="screenProps" /></div>
+      <div class="preview-dialog__screen" :class="{ 'preview-dialog__screen--watch': selectedDevice === 'wear' }" :style="{ '--preview-ratio': selected.ratio }"><ShowcaseScreen v-if="dialogContentMounted" :key="selectedDevice" :device="selectedDevice" v-bind="screenProps" /></div>
     </dialog>
   </Teleport>
 </template>

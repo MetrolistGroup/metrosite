@@ -1,46 +1,26 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { totalReleaseDownloads, type ReleaseAsset } from '../content/downloads'
+import { getLatestRelease } from '../content/downloads'
 import DownloadDialog from './DownloadDialog.vue'
 
-type Release = {
-  tag_name?: string
-  draft?: boolean
-  prerelease?: boolean
-  assets?: ReleaseAsset[]
-}
-
-const repoStats = ref<{ downloads: string; stars: string; version: string }>()
+const repoStats = ref({ stars: '—', version: 'Latest' })
 const compactNumber = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 })
-
-async function loadReleases() {
-  const releases: Release[] = []
-  for (let page = 1; ; page++) {
-    const response = await fetch(`https://api.github.com/repos/MetrolistGroup/Metrolist/releases?per_page=100&page=${page}`)
-    if (!response.ok) throw new Error(`GitHub returned ${response.status}`)
-    const batch = await response.json() as Release[]
-    releases.push(...batch)
-    if (batch.length < 100) return releases
-  }
-}
 
 onMounted(async () => {
   try {
-    const [repoResponse, releases] = await Promise.all([
+    const [repoResponse, release] = await Promise.all([
       fetch('https://api.github.com/repos/MetrolistGroup/Metrolist'),
-      loadReleases(),
+      getLatestRelease(),
     ])
-    if (!repoResponse.ok || !releases.length) return
+    if (!repoResponse.ok) return
 
     const repo = await repoResponse.json() as { stargazers_count?: number }
-    const latestRelease = releases.find(({ draft, prerelease }) => !draft && !prerelease)
     repoStats.value = {
-      downloads: compactNumber.format(totalReleaseDownloads(releases)),
       stars: compactNumber.format(repo.stargazers_count ?? 0),
-      version: latestRelease?.tag_name ?? 'Latest',
+      version: release.tag_name ?? 'Latest',
     }
   } catch {
-    // GitHub stats are optional; skeletons remain if the API is unavailable.
+    // Repository statistics are optional.
   }
 })
 </script>
@@ -63,18 +43,18 @@ onMounted(async () => {
           </div>
         </div>
 
-        <aside class="hero__signal" aria-label="Release summary">
+        <div class="hero__signal">
           <span class="hero__signal-icon material-symbols-rounded" aria-hidden="true">desktop_windows</span>
           <div>
             <strong>Desktop has entered the playlist.</strong>
             <p>One Kotlin Multiplatform foundation, fit for every screen.</p>
           </div>
           <dl class="hero__stats" aria-label="Metrolist repository statistics">
-            <div><dt>Downloads</dt><dd><span v-if="repoStats">{{ repoStats.downloads }}</span><span v-else class="hero__stat-skeleton" /></dd></div>
-            <div><dt>Stars</dt><dd><span v-if="repoStats">{{ repoStats.stars }}</span><span v-else class="hero__stat-skeleton" /></dd></div>
-            <div><dt>Latest</dt><dd><span v-if="repoStats">{{ repoStats.version }}</span><span v-else class="hero__stat-skeleton" /></dd></div>
+            <div><dt>License</dt><dd>GPL-3.0</dd></div>
+            <div><dt>Stars</dt><dd>{{ repoStats.stars }}</dd></div>
+            <div><dt>Latest</dt><dd>{{ repoStats.version }}</dd></div>
           </dl>
-        </aside>
+        </div>
       </div>
     </div>
   </section>
@@ -127,24 +107,29 @@ onMounted(async () => {
 }
 
 .hero__signal {
+  position: relative;
+  isolation: isolate;
   display: flex;
   min-height: 330px;
   flex-direction: column;
   justify-content: space-between;
   align-self: end;
   padding: 28px;
+  overflow: hidden;
   border-radius: 28px 64px 28px 64px;
   background: var(--md-sys-color-secondary-container);
   color: var(--md-sys-color-on-secondary-container);
 }
 
 .hero__signal-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: var(--md-sys-shape-corner-large-increased);
-  background: var(--md-sys-color-secondary);
-  color: var(--md-sys-color-on-secondary);
-  font-size: 32px;
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: -1;
+  color: currentColor;
+  font-size: clamp(96px, 10vw, 136px);
+  opacity: 0.12;
+  transform: rotate(-8deg);
 }
 
 .hero__signal strong {
@@ -183,15 +168,6 @@ onMounted(async () => {
   font-weight: 760;
 }
 
-.hero__stat-skeleton {
-  display: block;
-  width: 70%;
-  height: 14px;
-  margin-top: 3px;
-  border-radius: 4px;
-  background: color-mix(in srgb, var(--md-sys-color-on-secondary-container) 18%, transparent);
-}
-
 @media (max-width: 900px) {
   .hero__layout {
     grid-template-columns: 1fr;
@@ -215,6 +191,7 @@ onMounted(async () => {
 
   .hero h1 {
     font-size: clamp(3rem, 14vw, 5rem);
+    line-height: 1;
   }
 
   .hero__signal {

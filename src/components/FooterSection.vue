@@ -4,7 +4,7 @@ const links = [
   { label: 'Releases', href: 'https://github.com/MetrolistGroup/Metrolist/releases' },
   { label: 'Issues', href: 'https://github.com/MetrolistGroup/Metrolist/issues' },
   { label: 'Translations', href: 'https://hosted.weblate.org/projects/Metrolist/' },
-  { label: 'Privacy', href: 'https://metrolist.cc/privacy' },
+  { label: 'Privacy', href: '/privacy' },
   { label: 'GPL-3.0', href: 'https://github.com/MetrolistGroup/Metrolist/blob/main/LICENSE' },
 ]
 </script>
@@ -21,9 +21,15 @@ const links = [
       </div>
 
       <nav class="footer__links" aria-label="Footer navigation">
-        <a v-for="link in links" :key="link.label" :href="link.href" target="_blank" rel="noopener noreferrer">
+        <a
+          v-for="link in links"
+          :key="link.label"
+          :href="link.href"
+          :target="link.href.startsWith('http') ? '_blank' : undefined"
+          :rel="link.href.startsWith('http') ? 'noopener noreferrer' : undefined"
+        >
           {{ link.label }}
-          <span class="material-symbols-rounded" aria-hidden="true">arrow_outward</span>
+          <span v-if="link.href.startsWith('http')" class="material-symbols-rounded" aria-hidden="true">arrow_outward</span>
         </a>
       </nav>
 

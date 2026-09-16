@@ -3,6 +3,7 @@ import { computed, ref, useId } from 'vue'
 import {
   DOWNLOAD_PLATFORMS,
   findDownloadAsset,
+  getLatestRelease,
   type DownloadPlatform,
   type DownloadPlatformKey,
   type ReleaseAsset,
@@ -26,7 +27,6 @@ const releaseName = ref('')
 const isLoading = ref(false)
 const hasLoaded = ref(false)
 const loadFailed = ref(false)
-const copied = ref(false)
 const titleId = useId()
 
 function detectedPlatform(): DownloadPlatformKey {
@@ -48,12 +48,10 @@ const releasesUrl = 'https://github.com/MetrolistGroup/Metrolist/releases/latest
 function selectPlatform(platform: DownloadPlatform) {
   selectedKey.value = platform.key
   selectedArchitectureKey.value = platform.architectures[0]!.key
-  copied.value = false
 }
 
 function selectArchitecture(key: string) {
   selectedArchitectureKey.value = key
-  copied.value = false
 }
 
 async function loadLatestRelease() {
@@ -61,10 +59,7 @@ async function loadLatestRelease() {
   isLoading.value = true
 
   try {
-    const response = await fetch('https://api.github.com/repos/MetrolistGroup/Metrolist/releases/latest')
-    if (!response.ok) throw new Error(`GitHub returned ${response.status}`)
-
-    const release = await response.json() as { name?: string; tag_name?: string; assets?: ReleaseAsset[] }
+    const release = await getLatestRelease()
     assets.value = release.assets ?? []
     releaseName.value = release.name || release.tag_name || 'Latest release'
   } catch {
@@ -72,17 +67,6 @@ async function loadLatestRelease() {
   } finally {
     isLoading.value = false
     hasLoaded.value = true
-  }
-}
-
-async function copyCommand() {
-  if (!selectedArchitecture.value.command) return
-  try {
-    await navigator.clipboard.writeText(selectedArchitecture.value.command)
-    copied.value = true
-    window.setTimeout(() => { copied.value = false }, 1800)
-  } catch {
-    copied.value = false
   }
 }
 
@@ -170,16 +154,7 @@ function formatSize(bytes?: number) {
           </div>
 
           <div>
-            <template v-if="selectedArchitecture.command">
-              <div class="download-dialog__command-title">
-                <h3>Command</h3>
-                <button type="button" @click="copyCommand">
-                  <span class="material-symbols-rounded" aria-hidden="true">{{ copied ? 'check' : 'content_copy' }}</span>
-                  {{ copied ? 'Copied' : 'Copy' }}
-                </button>
-              </div>
-              <code>{{ selectedArchitecture.command }}</code>
-            </template>
+            <h3>Download</h3>
             <p class="download-dialog__status" aria-live="polite">
               <template v-if="isLoading">Finding the latest public build…</template>
               <template v-else-if="selectedAsset">{{ releaseName }}<template v-if="selectedAsset.size"> · {{ formatSize(selectedAsset.size) }}</template></template>
@@ -215,10 +190,29 @@ function formatSize(bytes?: number) {
   border-radius: var(--md-sys-shape-corner-extra-large-increased);
   background: var(--md-sys-color-surface-container);
   color: var(--md-sys-color-on-surface);
+  opacity: 0;
+  transform: translateY(12px) scale(0.98);
+  transition: opacity 220ms, transform 280ms var(--md-sys-motion-expressive), display 280ms allow-discrete, overlay 280ms allow-discrete;
+}
+
+.download-dialog[open] {
+  opacity: 1;
+  transform: none;
 }
 
 .download-dialog::backdrop {
   background: rgb(0 0 0 / 76%);
+  opacity: 0;
+  transition: opacity 220ms, display 280ms allow-discrete, overlay 280ms allow-discrete;
+}
+
+.download-dialog[open]::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  .download-dialog[open] { opacity: 0; transform: translateY(12px) scale(0.98); }
+  .download-dialog[open]::backdrop { opacity: 0; }
 }
 
 .download-dialog__header {
@@ -318,8 +312,7 @@ function formatSize(bytes?: number) {
   gap: 6px;
 }
 
-.download-dialog__architectures button,
-.download-dialog__command-title button {
+.download-dialog__architectures button {
   min-height: 38px;
   padding: 8px 14px;
   border: 0;
@@ -383,39 +376,6 @@ function formatSize(bytes?: number) {
   margin-top: 6px;
 }
 
-.download-dialog__command-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.download-dialog__command-title button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 34px;
-  padding-block: 6px;
-}
-
-.download-dialog__command-title .material-symbols-rounded {
-  font-size: 17px;
-}
-
-.download-dialog code {
-  display: block;
-  overflow-x: auto;
-  margin-top: 8px;
-  padding: 13px 14px;
-  border-radius: var(--md-sys-shape-corner-medium);
-  background: var(--md-sys-color-surface-container-lowest);
-  color: var(--md-sys-color-primary);
-  font-family: ui-monospace, monospace;
-  font-size: 0.76rem;
-  line-height: 1.5;
-  white-space: nowrap;
-}
-
 .download-dialog__status {
   min-height: 19px;
   margin-top: 9px;
@@ -436,6 +396,10 @@ function formatSize(bytes?: number) {
   margin-top: 18px;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .download-dialog, .download-dialog::backdrop { transition: none; }
+}
+
 @media (max-width: 760px) {
   .download-dialog__platforms {
     grid-template-columns: 1fr 1fr;
@@ -448,12 +412,31 @@ function formatSize(bytes?: number) {
 
 @media (max-width: 520px) {
   .download-dialog {
-    padding: 22px;
+    padding: 18px;
     border-radius: var(--md-sys-shape-corner-extra-large);
   }
 
-  .download-dialog__platforms {
-    grid-template-columns: 1fr;
+  .download-dialog__platforms button {
+    position: relative;
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 10px;
+    min-height: 64px;
+    padding: 10px;
+  }
+
+  .download-dialog__platforms button:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .download-dialog__platforms .material-symbols-rounded {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    font-size: 18px;
+  }
+
+  .download-dialog__selection {
+    padding: 16px;
   }
 
   .download-dialog__architectures {

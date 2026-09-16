@@ -113,6 +113,16 @@ img {
   transform: translateY(0);
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 :focus-visible {
   outline: 3px solid var(--md-sys-color-primary);
   outline-offset: 3px;
@@ -235,21 +245,7 @@ img {
   background: var(--md-sys-color-surface-container-highest);
 }
 
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 40px;
-  padding: 8px 14px;
-  border-radius: var(--md-sys-shape-corner-medium);
-  background: var(--md-sys-color-surface-container-low);
-  color: var(--md-sys-color-on-surface-variant);
-  font-size: 0.82rem;
-  font-weight: 650;
-}
-
 #desktop,
-#features,
 #platforms,
 .faq,
 .download,
@@ -276,7 +272,9 @@ img {
   *,
   *::before,
   *::after {
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
+    transition-duration: 0s !important;
   }
 }
