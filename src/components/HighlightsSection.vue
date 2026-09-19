@@ -32,10 +32,14 @@ const features = [
       <div class="features__grid">
         <article v-for="(feature, index) in features" :key="feature.label" class="features__card" :class="`features__card--${index + 1}`">
           <div class="features__top"><ShapeBackdrop :shape="feature.shape" :color="feature.iconBackground" class="features__icon"><span class="features__icon-glyph material-symbols-rounded" :style="{ color: feature.iconColor }" aria-hidden="true">{{ feature.icon }}</span></ShapeBackdrop><span class="features__label">{{ feature.label }}</span><button v-if="index === 1" type="button" class="lyrics-toggle" :aria-label="lyricsPaused ? 'Resume lyrics animation' : 'Pause lyrics animation'" :aria-pressed="lyricsPaused" @click="lyricsPaused = !lyricsPaused"><span aria-hidden="true">{{ lyricsPaused ? '▶' : 'Ⅱ' }}</span></button></div>
-          <div v-if="index === 0" class="features__wave" aria-hidden="true"><i v-for="bar in 25" :key="bar" :style="{ '--bar': `${18 + ((bar * 37) % 70)}%` }" /></div>
+          <div v-if="index === 0" class="features__ad-dodge" aria-hidden="true">
+            <span class="features__app-icon features__app-icon--youtube"><img src="/icons/youtube-music.png" alt="" /></span>
+            <span class="features__flying-ad">AD</span>
+            <span class="features__app-icon features__app-icon--metrolist"><img src="/logo.svg" alt="" /></span>
+          </div>
           <div v-if="index === 1" class="features__lyrics" :class="{ 'is-paused': lyricsPaused }" aria-hidden="true">
             <div v-for="(line, lineIndex) in lyrics" :key="line" class="lyrics-line" :style="{ '--line-delay': `${lineIndex === 0 ? 0 : (lineIndex - 3) * 3}s` }">
-              <span v-for="(word, wordIndex) in line.split(' ')" :key="wordIndex" class="lyrics-word" :style="{ '--word': wordIndex }">{{ word }}</span>
+              <span v-for="(word, wordIndex) in line.split(' ')" :key="wordIndex" class="lyrics-word" :style="{ '--word': wordIndex }"><span v-for="(character, characterIndex) in word" :key="characterIndex" class="lyrics-character" :style="{ '--character': characterIndex }">{{ character }}</span></span>
             </div>
           </div>
           <div class="features__copy"><h3>{{ feature.title }}</h3><p>{{ feature.body }}</p></div>
@@ -83,15 +87,22 @@ const features = [
 .features__card p { max-width: 46ch; color: var(--md-sys-color-on-surface-variant); font-size: 0.9rem; }
 .features__card--1 p { color: var(--md-sys-color-on-primary-container); }
 .features__card--6 .features__copy { max-width: 65%; }.features__card--6 p { max-width: 65ch; }
-.features__wave { display: flex; justify-content: center; align-items: center; gap: 5px; height: 90px; padding-inline: 10px; transform: rotate(-3deg); }
-.features__wave i { width: 9px; height: var(--bar); border-radius: 99px; background: var(--md-sys-color-primary); }
-.features__wave i:nth-child(3n) { background: var(--md-sys-color-on-primary-container); }
+.features__ad-dodge { position: relative; width: min(100%, 320px); height: 120px; margin-inline: auto; user-select: none; }
+.features__app-icon { position: absolute; bottom: 0; display: grid; width: 82px; height: 82px; place-items: center; border-radius: 24px; }
+.features__app-icon--metrolist { right: 22px; background: var(--md-sys-color-surface-container-lowest); }
+.features__app-icon--metrolist img { width: 74px; height: 74px; }
+.features__app-icon--youtube { left: 22px; animation: youtube-throw 3.2s var(--md-sys-motion-expressive) infinite; }
+.features__app-icon--youtube img { width: 82px; height: 82px; border-radius: 24px; }
+.features__flying-ad { position: absolute; bottom: 28px; left: 64px; display: grid; width: 58px; height: 36px; place-items: center; border-radius: 10px; background: #b3261e; color: white; font-size: 0.8rem; font-weight: 850; letter-spacing: 0.08em; animation: ad-toss 3.2s linear infinite; }
+@keyframes youtube-throw { 0%, 5%, 20%, 100% { transform: none; } 10% { transform: translate(-2px, 2px) rotate(-8deg); } 15% { transform: translate(3px, -2px) rotate(8deg); } }
+@keyframes ad-toss { 0%, 10% { opacity: 0; transform: translate(-8px, 18px) rotate(-18deg) scale(0.75); } 14% { opacity: 1; } 32% { opacity: 1; transform: translate(70px, -72px) rotate(-2deg) scale(0.95); } 48% { opacity: 1; transform: translate(105px, -72px) rotate(8deg) scale(1); } 78% { opacity: 1; transform: translate(185px, -72px) rotate(22deg) scale(0.92); } 88% { opacity: 1; transform: translate(240px, -72px) rotate(30deg) scale(0.82); } 96%, 100% { opacity: 0; transform: translate(270px, -10px) rotate(42deg) scale(0.65); } }
 .lyrics-toggle { display: grid; place-items: center; flex: 0 0 44px; height: 44px; margin-left: auto; border: 0; border-radius: 50%; background: #ffffff0c; color: var(--md-sys-color-on-secondary-container); cursor: pointer; font-size: 0.85rem; }
 .lyrics-toggle:hover { background: #ffffff18; }
 .features__lyrics { --lyrics-play-state: running; position: relative; height: 144px; flex: none; overflow: hidden; font-size: clamp(1rem, 7cqw, 2.1rem); font-weight: 760; letter-spacing: -0.04em; line-height: 1.2; mask-image: linear-gradient(transparent, #000 18% 82%, transparent); }
 .features__lyrics.is-paused { --lyrics-play-state: paused; }
 .lyrics-line { position: absolute; top: calc(50% - 0.85em); inset-inline: 4px; display: flex; flex-wrap: wrap; align-content: center; column-gap: 0.24em; height: 1.7em; transform-origin: left center; animation: lyrics-line 9s cubic-bezier(0.22, 1, 0.36, 1) infinite; animation-delay: var(--line-delay); animation-play-state: var(--lyrics-play-state); }
-.lyrics-word { display: inline-block; color: transparent; background: linear-gradient(90deg, #fff5d6 50%, #fff5d666 50%); background-size: 200% 100%; background-position: 100% 0; background-clip: text; animation: lyrics-word 9s linear infinite; animation-delay: calc(var(--line-delay) + var(--word) * 0.32s); animation-play-state: var(--lyrics-play-state); }
+.lyrics-word { display: inline-flex; background-position: 100% 0; animation: lyrics-word 9s linear infinite; animation-delay: calc(var(--line-delay) + var(--word) * 0.32s); animation-play-state: var(--lyrics-play-state); }
+.lyrics-character { display: inline-block; color: #fff5d666; transform-origin: center bottom; animation: lyrics-character 9s linear infinite; animation-delay: calc(var(--line-delay) + var(--word) * 0.32s + var(--character) * 0.045s); animation-play-state: var(--lyrics-play-state); }
 @keyframes lyrics-line {
   0%, 25%, 100% { transform: translateY(0) scale(1); opacity: 1; filter: blur(0); }
   33%, 58% { transform: translateY(-100%) scale(0.94); opacity: 0.5; filter: blur(1.5px); }
@@ -100,19 +111,27 @@ const features = [
   66%, 92% { transform: translateY(100%) scale(0.94); opacity: 0.5; filter: blur(1.5px); }
 }
 @keyframes lyrics-word {
-  0% { background-position: 100% 0; transform: translateY(0); text-shadow: none; }
-  5%, 24% { background-position: 0 0; transform: translateY(-0.035em); text-shadow: 0 0 18px #ffe79630; }
-  34%, 100% { background-position: 100% 0; transform: translateY(0); text-shadow: none; }
+  0% { background-position: 100% 0; }
+  5%, 24% { background-position: 0 0; }
+  34%, 100% { background-position: 100% 0; }
+}
+@keyframes lyrics-character {
+  0%, 100% { color: #fff5d666; transform: translateY(0) scale(1); text-shadow: none; }
+  3% { color: #fff5d6; transform: translateY(-0.055em) scale(1.08); text-shadow: 0 0 0.22em #fff5d699; }
+  8%, 24% { color: #fff5d6; transform: translateY(0) scale(1); text-shadow: 0 0 0.08em #fff5d633; }
+  34% { color: #fff5d666; transform: translateY(0) scale(1); text-shadow: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .features__card, .platforms__list button { transition: none; }
   .features__progress { animation: none; }
+  .features__app-icon { animation: none; }
+  .features__flying-ad { opacity: 1; transform: translate(120px, -72px) rotate(8deg); animation: none; }
   .lyrics-toggle { display: none; }
-  .lyrics-line, .lyrics-word { animation: none; }
+  .lyrics-line, .lyrics-word, .lyrics-character { animation: none; }
   .lyrics-line:not(:first-child) { visibility: hidden; }
-  .lyrics-word { color: var(--md-sys-color-on-secondary-container); background: none; }
+  .lyrics-character { color: var(--md-sys-color-on-secondary-container); }
 }
-@media (forced-colors: active) { .lyrics-word { color: CanvasText; background: none; } }
+@media (forced-colors: active) { .lyrics-character { color: CanvasText; } }
 .platforms { position: relative; overflow: hidden; isolation: isolate; background: var(--md-sys-color-surface); }
 .platforms::before { position: absolute; inset: 0; z-index: -1; background: url('/images/platform-pattern.svg') left top / 666px auto repeat; content: ''; pointer-events: none; }
 .platforms__layout { display: grid; grid-template-columns: minmax(280px, 0.7fr) minmax(0, 1.3fr); gap: clamp(56px, 9vw, 130px); align-items: start; }
