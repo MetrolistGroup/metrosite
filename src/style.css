@@ -8,7 +8,7 @@
 
 @font-face {
   font-family: 'Material Symbols Rounded';
-  src: url('/fonts/MaterialSymbolsRounded.ttf') format('truetype');
+  src: url('/fonts/MaterialSymbolsRounded.ttf?v=2') format('truetype');
   font-style: normal;
   font-weight: 400;
   font-display: block;
