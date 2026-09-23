@@ -21,6 +21,8 @@ function renderPage(meta: PageMeta, path: string, canonical = true) {
     ? html.replace(/<link rel="canonical" href="[^"]*" \/>/, `<link rel="canonical" href="${url}" />`)
     : html.replace(/\s*<link rel="canonical" href="[^"]*" \/>/, '')
 
+  if (path !== '/') html = html.replace(/\s*<link rel="discord:component-embed"[^>]*\/>/, '')
+
   if (!html.includes(`<title>${meta.title}</title>`) || !html.includes(`content="${meta.robots}"`)) {
     throw new Error(`Failed to generate metadata for ${path}`)
   }
@@ -32,6 +34,11 @@ await writeFile(new URL('faq.html', dist), renderPage(PAGE_META.faq, '/faq'))
 await writeFile(new URL('listen.html', dist), renderPage(PAGE_META.listen, '/listen'))
 await writeFile(new URL('privacy.html', dist), renderPage(PAGE_META.privacy, '/privacy'))
 await writeFile(new URL('404.html', dist), renderPage(PAGE_META.notFound, '/404', false))
+
+const discordEmbed = await readFile(new URL('discord-embed.json', dist))
+if (discordEmbed.byteLength > 3000 || JSON.parse(discordEmbed.toString()).component?.type !== 17) {
+  throw new Error('Invalid Discord link preview')
+}
 
 const jsonLd = source.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1]
 if (!jsonLd) throw new Error('Structured data script was not found')
