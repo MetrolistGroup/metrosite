@@ -1,34 +1,51 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { FAQ_ITEMS } from '../content/faq'
 
 const topItems = FAQ_ITEMS.slice(0, 5)
+const openItems = ref<number[]>([])
+
+function toggleItem(index: number) {
+  openItems.value = openItems.value.includes(index)
+    ? openItems.value.filter(item => item !== index)
+    : [...openItems.value, index]
+}
 </script>
 
 <template>
   <section id="faq" class="faq">
-    <div class="container">
-      <header class="faq__header">
-        <h2 class="faq__title">Quick answers.</h2>
-        <p class="faq__sub">Got questions? We've got you covered.</p>
+    <div class="container faq__layout">
+      <header>
+        <h2>Good questions, straight answers.</h2>
+        <RouterLink to="/faq" class="btn btn-tonal">
+          View the full FAQ
+          <span class="material-symbols-rounded" aria-hidden="true">arrow_outward</span>
+        </RouterLink>
       </header>
 
-      <div class="faq__card" role="region" aria-label="Frequently asked questions">
-        <details v-for="item in topItems" :key="item.question" class="faq__item">
-          <summary class="faq__q">
-            <span class="faq__q-text">{{ item.question }}</span>
-            <span class="faq__chev icon" aria-hidden="true">arrow_forward</span>
-          </summary>
-          <div class="faq__a">
-            <p>{{ item.answer }}</p>
+      <div class="faq__list">
+        <article v-for="(item, index) in topItems" :key="item.question" :class="{ 'is-open': openItems.includes(index) }">
+          <button
+            type="button"
+            :id="`home-faq-question-${index}`"
+            class="faq__question"
+            :aria-expanded="openItems.includes(index)"
+            :aria-controls="`home-faq-answer-${index}`"
+            @click="toggleItem(index)"
+          >
+            <strong>{{ item.question }}</strong>
+            <span class="faq__mark material-symbols-rounded" aria-hidden="true">add</span>
+          </button>
+          <div
+            :id="`home-faq-answer-${index}`"
+            class="faq__answer"
+            role="region"
+            :aria-labelledby="`home-faq-question-${index}`"
+            :aria-hidden="!openItems.includes(index)"
+          >
+            <div><p>{{ item.answer }}</p></div>
           </div>
-        </details>
-
-        <div class="faq__cta">
-          <RouterLink to="/faq" class="btn btn-tonal btn-lg">
-            Got more questions? View full FAQ
-            <span class="icon" aria-hidden="true" style="font-size: 1.125rem">arrow_forward</span>
-          </RouterLink>
-        </div>
+        </article>
       </div>
     </div>
   </section>
@@ -36,111 +53,138 @@ const topItems = FAQ_ITEMS.slice(0, 5)
 
 <style scoped>
 .faq {
-  padding: 80px 0;
+  padding: 108px 0;
+  background: var(--md-sys-color-surface-container-low);
 }
 
-.faq__header {
-  text-align: center;
-  margin-bottom: 28px;
+.faq__layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.65fr) minmax(0, 1.35fr);
+  gap: 24px;
 }
 
-.faq__title {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 900;
-  font-size: clamp(2rem, 4vw, 2.75rem);
-  letter-spacing: -0.025em;
-  color: var(--md-on-background);
-  margin-bottom: 10px;
+.faq header {
+  align-self: start;
+  padding: 36px;
+  border-radius: 44px 16px 44px 44px;
+  background: var(--md-sys-color-tertiary-container);
+  color: var(--md-sys-color-on-tertiary-container);
 }
 
-.faq__sub {
-  font-size: 1.0625rem;
-  color: var(--md-on-surface-variant);
-  max-width: 60ch;
-  margin: 0 auto;
+.faq h2 {
+  margin: 0 0 32px;
+  font-size: clamp(2.8rem, 5vw, 4.8rem);
+  font-weight: 760;
+  letter-spacing: -0.055em;
+  line-height: 0.96;
 }
 
-.faq__card {
-  max-width: 900px;
-  margin: 0 auto;
-  border-radius: var(--r-2xl);
-  background: var(--md-sc);
+.faq__list {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  border-radius: 16px 40px 40px 40px;
+  background: var(--md-sys-color-surface-container);
+}
+
+.faq__list article {
+  overflow: hidden;
+  border-radius: var(--md-sys-shape-corner-extra-large);
+  background: var(--md-sys-color-surface-container-high);
+}
+
+.faq__question {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 1fr 44px;
+  gap: 18px;
+  align-items: center;
+  min-height: 78px;
+  padding: 10px 12px 10px 24px;
+  border: 0;
+  background: transparent;
+  color: var(--md-sys-color-on-surface);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.faq__mark {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  transition: transform 320ms var(--md-sys-motion-expressive);
+}
+
+.faq__list article.is-open .faq__mark {
+  transform: rotate(45deg);
+}
+
+.faq__question strong {
+  font-size: 1rem;
+  font-weight: 680;
+}
+
+.faq__answer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 360ms var(--md-sys-motion-expressive);
+}
+
+.faq__answer > div {
   overflow: hidden;
 }
 
-.faq__item {
-  border-bottom: 1px solid var(--md-outline-variant);
+.faq__list article.is-open .faq__answer {
+  grid-template-rows: 1fr;
 }
 
-.faq__item:last-of-type {
-  border-bottom: none;
+.faq__answer p {
+  max-width: 680px;
+  padding: 0 76px 24px 24px;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 0.94rem;
+  line-height: 1.65;
 }
 
-.faq__q {
-  list-style: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 18px 20px;
-  color: var(--md-on-surface);
-  user-select: none;
-}
-
-.faq__q::-webkit-details-marker {
-  display: none;
-}
-
-.faq__q-text {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 900;
-  font-size: 1.0625rem;
-  letter-spacing: -0.01em;
-}
-
-.faq__chev {
-  pointer-events: none;
-  transform: rotate(0deg);
-  transition: transform var(--t-std), opacity var(--t-fast);
-  opacity: 0.7;
-}
-
-.faq__item[open] .faq__chev {
-  transform: rotate(90deg);
-  opacity: 1;
-}
-
-.faq__a {
-  padding: 0 20px 18px;
-  color: var(--md-on-surface-variant);
-}
-
-.faq__a p {
-  margin: 0;
-  line-height: 1.75;
-  font-size: 0.9375rem;
-  max-width: 76ch;
-}
-
-.faq__cta {
-  display: flex;
-  justify-content: center;
-  padding: 20px;
-  background: color-mix(in srgb, var(--md-sc) 75%, var(--md-secondary-container));
-}
-
-@media (min-width: 640px) {
-  .faq__q {
-    padding: 20px 28px;
+@media (max-width: 820px) {
+  .faq {
+    padding: 80px 0;
   }
 
-  .faq__a {
-    padding: 0 28px 22px;
+  .faq__layout {
+    grid-template-columns: 1fr;
   }
 
-  .faq__cta {
-    padding: 26px;
+  .faq header {
+    border-radius: 36px 14px 36px 36px;
+  }
+}
+
+@media (max-width: 520px) {
+  .faq header {
+    padding: 28px 24px;
+  }
+
+  .faq__list {
+    padding: 6px;
+  }
+
+  .faq__question {
+    grid-template-columns: 1fr 40px;
+    gap: 10px;
+    min-height: 72px;
+    padding: 8px 8px 8px 16px;
+  }
+
+  .faq__mark {
+    width: 40px;
+    height: 40px;
+  }
+
+  .faq__answer p {
+    padding: 0 58px 22px 16px;
   }
 }
 </style>

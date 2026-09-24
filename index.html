@@ -1,40 +1,52 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description"
-    content="Metrolist - ad-free, open-source YouTube Music client for Android with Material You design." />
-  <meta name="theme-color" content="#6C4BCC" />
-  <meta property="og:title" content="Metrolist - YouTube Music Client" />
-  <meta property="og:description"
-    content="Ad-free, open-source YouTube Music client for Android with Material You design." />
-  <meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Metrolist - YouTube Music Client" />
-  <meta name="twitter:description"
-    content="Ad-free, open-source YouTube Music client for Android with Material You design." />
-  <title>Metrolist - YouTube Music Client</title>
-
-  <!-- Preload LCP image to reduce LCP and prevent layout shift when hero image loads -->
-  <link rel="preload" as="image" href="/1.webp" fetchpriority="high" />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Nunito:wght@900&family=Nunito+Sans:wght@400;600&display=swap"
-    rel="stylesheet" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0&icon_namesandroid,arrow_back,arrow_forward,block,bolt,check,close,cloud_download,code,content_copy,crowdsource,download,groups,headphones,license,link_off,menu,music_note,open_in_new,palette,people&display=block"
-    rel="stylesheet" />
-</head>
-
-<body>
-  <a href="#main" class="skip-link">Skip to main content</a>
-  <div id="app"></div>
-  <script type="module" src="/src/main.ts"></script>
-</body>
-
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1a181c" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://metrolist.cc/" />
+    <meta name="description" content="Metrolist is an ad-free, open-source YouTube Music client for Android, iOS, Linux, macOS, and Windows, rebuilt with Kotlin Multiplatform." />
+    <meta property="og:title" content="Metrolist · Music for every screen" />
+    <meta property="og:description" content="An ad-free, open-source YouTube Music client for Android, iOS, Linux, macOS, and Windows." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Metrolist" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://metrolist.cc/" />
+    <meta property="og:image" content="https://metrolist.cc/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Metrolist running across desktop and mobile screens" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Metrolist · Music for every screen" />
+    <meta name="twitter:description" content="Open-source music on Android, iOS, Linux, macOS, and Windows." />
+    <meta name="twitter:image" content="https://metrolist.cc/og-image.png" />
+    <meta name="twitter:image:alt" content="Metrolist running across desktop and mobile screens" />
+    <link rel="discord:component-embed" type="application/json" href="https://metrolist.cc/discord-embed.json" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="stylesheet" href="/src/style.css" />
+    <link rel="preload" href="/fonts/GoogleSansFlex.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/MaterialSymbolsRounded.ttf?v=2" as="font" type="font/ttf" crossorigin />
+    <title>Metrolist · Music for every screen</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Metrolist",
+        "url": "https://metrolist.cc/",
+        "description": "An ad-free, open-source YouTube Music client with adaptive layouts for phones, foldables, tablets, desktops, and watches.",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "Android, iOS, Windows, macOS, Linux, Wear OS",
+        "isAccessibleForFree": true,
+        "license": "https://github.com/MetrolistGroup/Metrolist/blob/main/LICENSE",
+        "sameAs": "https://github.com/MetrolistGroup/Metrolist"
+      }
+    </script>
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>

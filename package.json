@@ -5,24 +5,24 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc -b && vite build",
+    "test": "bun test",
+    "test:browser": "bun run build && bun tests/browser.mjs",
+    "check": "bun test && bun run build",
+    "build": "vue-tsc -b && vite build && bun scripts/postbuild.ts",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@cloudflare/workers-types": "^4.20260403.1",
-    "vue": "^3.5.32",
-    "vue-router": "^4.6.4",
-    "wrangler": "^4.80.0"
+    "material-shapes-ts": "^0.3.0",
+    "vue": "^3.5.42",
+    "vue-router": "^4.6.4"
   },
   "devDependencies": {
-    "@types/node": "^24.12.2",
-    "@vitejs/plugin-vue": "^6.0.5",
+    "@types/node": "^24.13.4",
+    "@vitejs/plugin-vue": "^6.0.9",
     "@vue/tsconfig": "^0.8.1",
     "typescript": "~5.9.3",
-    "vite": "^8.0.3",
-    "vue-tsc": "^3.2.6"
-  },
-  "overrides": {
-    "vite": "^8.0.0-beta.13"
+    "vite": "^8.3.0",
+    "vue-tsc": "^3.3.11",
+    "wrangler": "^4.131.2"
   }
 }
