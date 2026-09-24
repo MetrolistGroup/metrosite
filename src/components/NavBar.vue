@@ -30,7 +30,7 @@ const currentAnchor = (hash: string) => route.path === '/' && route.hash === has
       </button>
     </div>
 
-    <nav v-if="isMenuOpen" id="mobile-navigation" class="navbar__drawer" aria-label="Mobile navigation">
+    <nav v-show="isMenuOpen" id="mobile-navigation" class="navbar__drawer" aria-label="Mobile navigation">
       <div class="container">
         <RouterLink :to="{ path: '/', hash: '#desktop' }" :aria-current="currentAnchor('#desktop')" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">devices</span>Showcase</RouterLink>
         <RouterLink :to="{ path: '/', hash: '#features' }" :aria-current="currentAnchor('#features')" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">tune</span>Features</RouterLink>

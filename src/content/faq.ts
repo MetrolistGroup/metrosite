@@ -18,7 +18,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     question: 'Is Metrolist safe to use?',
-    answer: 'Metrolist is open source under GPL-3.0, so its code is public and auditable. Using 3-rd party clients is technically against YouTube\'s Terms of Service, but there have been no reports of bans for using Metrolist in the entire history of the project.',
+    answer: 'Metrolist is open source under GPL-3.0, so its code is public and auditable. Using third-party clients is technically against YouTube\'s Terms of Service, but there have been no reports of bans for using Metrolist in the entire history of the project.',
   },
   {
     question: 'How do I update Metrolist?',
@@ -26,7 +26,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     question: "Why isn't Metrolist on the Play Store?",
-    answer: 'Google does not allow third-party YouTube clients on the Play Store. If you installed Metrolist from the Play Store, you have been using a 3-rd party client and should uninstall it, report the app, and install the official app.',
+    answer: 'Google does not allow third-party YouTube clients on the Play Store. Any Metrolist listing on the Play Store is an unofficial copy not published by this project. If you installed one, uninstall it, report the listing, and download the official app from this site.',
   },
   {
     question: 'Can I import my existing Spotify playlists?',

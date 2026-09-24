@@ -39,7 +39,7 @@ const features = [
           </div>
           <div v-if="index === 1" class="features__lyrics" :class="{ 'is-paused': lyricsPaused }" aria-hidden="true">
             <div v-for="(line, lineIndex) in lyrics" :key="line" class="lyrics-line" :style="{ '--line-delay': `${lineIndex === 0 ? 0 : (lineIndex - 3) * 3}s` }">
-              <span v-for="(word, wordIndex) in line.split(' ')" :key="wordIndex" class="lyrics-word" :style="{ '--word': wordIndex }"><span v-for="(character, characterIndex) in word" :key="characterIndex" class="lyrics-character" :style="{ '--character': characterIndex }">{{ character }}</span></span>
+              <span v-for="(word, wordIndex) in line.split(' ')" :key="wordIndex" class="lyrics-word" :style="{ '--word': wordIndex }">{{ word }}</span>
             </div>
           </div>
           <div class="features__copy"><h3>{{ feature.title }}</h3><p>{{ feature.body }}</p></div>
@@ -66,7 +66,7 @@ const features = [
 .features, .platforms { padding: 92px 0; }
 .features { background: linear-gradient(to bottom, var(--md-sys-color-surface), var(--md-sys-color-surface-container-low) 32px); }
 .features > .container { position: relative; }
-.features__progress { position: absolute; top: -99px; inset-inline: 0; height: 14px; background: var(--md-sys-color-primary); opacity: 0.6; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 14'%3E%3Cpath d='M0 7Q7 0 14 7T28 7' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E") repeat-x left center / 28px 14px; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 14'%3E%3Cpath d='M0 7Q7 0 14 7T28 7' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E") repeat-x left center / 28px 14px; animation: progress-wave 900ms linear infinite; }
+.features__progress { position: absolute; top: -99px; inset-inline: 0; height: 14px; background: var(--md-sys-color-primary); opacity: 0.6; -webkit-mask: url('/images/wave-mask.svg') repeat-x left center / 28px 14px; mask: url('/images/wave-mask.svg') repeat-x left center / 28px 14px; animation: progress-wave 900ms linear infinite; }
 @keyframes progress-wave { to { -webkit-mask-position: 28px center; mask-position: 28px center; } }
 .platforms h2 { font-size: clamp(2.7rem, 5vw, 4.7rem); font-weight: 760; letter-spacing: -0.055em; line-height: 1; }
 .platforms header > p:last-child { color: var(--md-sys-color-on-surface-variant); font-size: 1.05rem; }
@@ -98,28 +98,22 @@ const features = [
 @keyframes ad-toss { 0%, 10% { opacity: 0; transform: translate(-8px, 18px) rotate(-18deg) scale(0.75); } 14% { opacity: 1; } 32% { opacity: 1; transform: translate(70px, -72px) rotate(-2deg) scale(0.95); } 48% { opacity: 1; transform: translate(105px, -72px) rotate(8deg) scale(1); } 78% { opacity: 1; transform: translate(185px, -72px) rotate(22deg) scale(0.92); } 88% { opacity: 1; transform: translate(240px, -72px) rotate(30deg) scale(0.82); } 96%, 100% { opacity: 0; transform: translate(270px, -10px) rotate(42deg) scale(0.65); } }
 .lyrics-toggle { display: grid; place-items: center; flex: 0 0 44px; height: 44px; margin-left: auto; border: 0; border-radius: 50%; background: #ffffff0c; color: var(--md-sys-color-on-secondary-container); cursor: pointer; }
 .lyrics-toggle:hover { background: #ffffff18; }
-.features__lyrics { --lyrics-play-state: running; position: relative; height: 144px; flex: none; overflow: hidden; font-size: clamp(1rem, 7cqw, 2.1rem); font-weight: 760; letter-spacing: -0.04em; line-height: 1.2; mask-image: linear-gradient(transparent, #000 18% 82%, transparent); }
+.features__lyrics { --lyrics-play-state: running; position: relative; height: 144px; flex: none; overflow: hidden; font-size: clamp(1rem, 7cqw, 2.1rem); font-weight: 760; letter-spacing: -0.04em; line-height: 1.2; }
 .features__lyrics.is-paused { --lyrics-play-state: paused; }
 .lyrics-line { position: absolute; top: calc(50% - 0.85em); inset-inline: 4px; display: flex; flex-wrap: wrap; align-content: center; column-gap: 0.24em; height: 1.7em; transform-origin: left center; animation: lyrics-line 9s cubic-bezier(0.22, 1, 0.36, 1) infinite; animation-delay: var(--line-delay); animation-play-state: var(--lyrics-play-state); }
-.lyrics-word { display: inline-flex; background-position: 100% 0; animation: lyrics-word 9s linear infinite; animation-delay: calc(var(--line-delay) + var(--word) * 0.32s); animation-play-state: var(--lyrics-play-state); }
-.lyrics-character { display: inline-block; color: #fff5d666; transform-origin: center bottom; animation: lyrics-character 9s linear infinite; animation-delay: calc(var(--line-delay) + var(--word) * 0.32s + var(--character) * 0.045s); animation-play-state: var(--lyrics-play-state); }
+.lyrics-word { display: inline-block; color: #fff5d6; animation: lyrics-word 9s linear infinite; animation-delay: calc(var(--line-delay) + var(--word) * 0.32s); animation-play-state: var(--lyrics-play-state); }
 @keyframes lyrics-line {
-  0%, 25%, 100% { transform: translateY(0) scale(1); opacity: 1; filter: blur(0); }
-  33%, 58% { transform: translateY(-100%) scale(0.94); opacity: 0.5; filter: blur(1.5px); }
-  62% { transform: translateY(-110%) scale(0.94); opacity: 0; filter: blur(2px); }
-  63% { transform: translateY(110%) scale(0.94); opacity: 0; filter: blur(2px); }
-  66%, 92% { transform: translateY(100%) scale(0.94); opacity: 0.5; filter: blur(1.5px); }
+  0%, 25%, 100% { transform: translateY(0) scale(1); opacity: 1; }
+  33%, 58% { transform: translateY(-100%) scale(0.94); opacity: 0.5; }
+  62% { transform: translateY(-110%) scale(0.94); opacity: 0; }
+  63% { transform: translateY(110%) scale(0.94); opacity: 0; }
+  66%, 92% { transform: translateY(100%) scale(0.94); opacity: 0.5; }
 }
 @keyframes lyrics-word {
-  0% { background-position: 100% 0; }
-  5%, 24% { background-position: 0 0; }
-  34%, 100% { background-position: 100% 0; }
-}
-@keyframes lyrics-character {
-  0%, 100% { color: #fff5d666; transform: translateY(0) scale(1); text-shadow: none; }
-  3% { color: #fff5d6; transform: translateY(-0.055em) scale(1.08); text-shadow: 0 0 0.22em #fff5d699; }
-  8%, 24% { color: #fff5d6; transform: translateY(0) scale(1); text-shadow: 0 0 0.08em #fff5d633; }
-  34% { color: #fff5d666; transform: translateY(0) scale(1); text-shadow: none; }
+  0%, 100% { opacity: 0.4; transform: none; }
+  3% { opacity: 1; transform: translateY(-0.055em) scale(1.08); }
+  8%, 24% { opacity: 1; transform: none; }
+  34% { opacity: 0.4; }
 }
 @media (prefers-reduced-motion: reduce) {
   .features__card, .platforms__list button { transition: none; }
@@ -127,17 +121,17 @@ const features = [
   .features__app-icon { animation: none; }
   .features__flying-ad { opacity: 1; transform: translate(120px, -72px) rotate(8deg); animation: none; }
   .lyrics-toggle { display: none; }
-  .lyrics-line, .lyrics-word, .lyrics-character { animation: none; }
+  .lyrics-line, .lyrics-word { animation: none; }
   .lyrics-line:not(:first-child) { visibility: hidden; }
-  .lyrics-character { color: var(--md-sys-color-on-secondary-container); }
+  .lyrics-word { opacity: 1; color: var(--md-sys-color-on-secondary-container); }
 }
-@media (forced-colors: active) { .lyrics-character { color: CanvasText; } }
+@media (forced-colors: active) { .lyrics-word { color: CanvasText; } }
 .platforms { position: relative; overflow: hidden; isolation: isolate; background: var(--md-sys-color-surface); }
 .platforms::before { position: absolute; inset: 0; z-index: -1; background: url('/images/platform-pattern.svg') left top / 666px auto repeat; content: ''; pointer-events: none; }
 .platforms__layout { display: grid; grid-template-columns: minmax(280px, 0.7fr) minmax(0, 1.3fr); gap: clamp(56px, 9vw, 130px); align-items: start; }
 .platforms header > p:last-child { max-width: 520px; margin-top: 24px; }
 .platforms__list { display: grid; gap: 3px; border-radius: 16px; }
-.platforms__list button { display: grid; grid-template-columns: 54px minmax(120px, 1fr); gap: 16px; align-items: center; min-height: 82px; padding: 10px 12px; border: 0; border-radius: 4px; background: rgb(24 22 27 / 68%); color: var(--md-sys-color-on-surface); cursor: pointer; font: inherit; text-align: left; -webkit-backdrop-filter: blur(28px); backdrop-filter: blur(28px); transition: background 120ms, box-shadow 160ms var(--md-sys-motion-expressive); }
+.platforms__list button { display: grid; grid-template-columns: 54px minmax(120px, 1fr); gap: 16px; align-items: center; min-height: 82px; padding: 10px 12px; border: 0; border-radius: 4px; background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); cursor: pointer; font: inherit; text-align: left; transition: background 120ms, box-shadow 160ms var(--md-sys-motion-expressive); }
 .platforms__list button:first-child { border-radius: 16px 16px 4px 4px; }
 .platforms__list button:last-child { border-radius: 4px 4px 16px 16px; }
 .platforms__list button:hover, .platforms__list button:focus-visible { background: var(--md-sys-color-surface-container-high); box-shadow: 0 8px 20px #0004; }

@@ -98,7 +98,7 @@ onBeforeUnmount(() => { if (dialog.value?.open) restoreScroll() })
 .showcase__note .material-symbols-rounded { font-size: 18px; }
 .preview-dialog { position: fixed; inset: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 64px 20px; overflow: hidden; border: 0; background: transparent; color: var(--md-sys-color-on-surface); opacity: 0; transition: opacity 280ms, display 280ms allow-discrete, overlay 280ms allow-discrete; }
 .preview-dialog[open] { display: grid; place-items: center; opacity: 1; }
-.preview-dialog::backdrop { background: #050307c9; backdrop-filter: blur(8px); opacity: 0; transition: opacity 280ms, display 280ms allow-discrete, overlay 280ms allow-discrete; }
+.preview-dialog::backdrop { background: #050307dc; opacity: 0; transition: opacity 280ms, display 280ms allow-discrete, overlay 280ms allow-discrete; }
 .preview-dialog[open]::backdrop { opacity: 1; }
 .preview-dialog__close { position: absolute; z-index: 1; top: 12px; right: 12px; }
 .preview-dialog__screen { width: min(100%, calc((100dvh - 128px) * var(--preview-ratio))); aspect-ratio: var(--preview-ratio); overflow: hidden; border-radius: 4px; box-shadow: 0 24px 80px #0006; transform: scale(0.92); transition: transform 280ms var(--md-sys-motion-expressive); }

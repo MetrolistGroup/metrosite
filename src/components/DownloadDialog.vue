@@ -43,6 +43,9 @@ const selectedPlatform = computed(() => DOWNLOAD_PLATFORMS.find(({ key }) => key
 const selectedArchitectureKey = ref(selectedPlatform.value.architectures[0]!.key)
 const selectedArchitecture = computed(() => selectedPlatform.value.architectures.find(({ key }) => key === selectedArchitectureKey.value)!)
 const selectedAsset = computed(() => findDownloadAsset(selectedKey.value, selectedArchitectureKey.value, assets.value))
+const installInstructions = computed(() => selectedKey.value === 'windows' && selectedAsset.value?.name.toLowerCase().endsWith('.zip')
+  ? ['Download the portable ZIP.', 'Extract it to a folder.', 'Run Metrolist from the extracted folder.']
+  : selectedPlatform.value.instructions)
 const releasesUrl = 'https://github.com/MetrolistGroup/Metrolist/releases/latest'
 
 function selectPlatform(platform: DownloadPlatform) {
@@ -57,16 +60,17 @@ function selectArchitecture(key: string) {
 async function loadLatestRelease() {
   if (hasLoaded.value || isLoading.value) return
   isLoading.value = true
+  loadFailed.value = false
 
   try {
     const release = await getLatestRelease()
     assets.value = release.assets ?? []
     releaseName.value = release.name || release.tag_name || 'Latest release'
+    hasLoaded.value = true
   } catch {
     loadFailed.value = true
   } finally {
     isLoading.value = false
-    hasLoaded.value = true
   }
 }
 
@@ -146,7 +150,7 @@ function formatSize(bytes?: number) {
           <div>
             <h3>Install</h3>
             <ol>
-              <li v-for="instruction in selectedPlatform.instructions" :key="instruction">{{ instruction }}</li>
+              <li v-for="instruction in installInstructions" :key="instruction">{{ instruction }}</li>
             </ol>
           </div>
 
@@ -161,7 +165,7 @@ function formatSize(bytes?: number) {
             <div class="download-dialog__download-actions">
               <a :href="selectedAsset?.browser_download_url || releasesUrl" class="btn btn-filled" target="_blank" rel="noopener noreferrer">
                 <span class="material-symbols-rounded" aria-hidden="true">download</span>
-                {{ selectedAsset ? `Download ${selectedPlatform.package}` : 'Browse release files' }}
+                {{ selectedAsset?.name.toLowerCase().endsWith('.zip') ? 'Download portable ZIP' : selectedAsset ? `Download ${selectedPlatform.package}` : 'Browse release files' }}
               </a>
               <a v-if="selectedAsset" :href="releasesUrl" class="btn btn-tonal" target="_blank" rel="noopener noreferrer">All builds</a>
             </div>

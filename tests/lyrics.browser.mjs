@@ -33,7 +33,7 @@ try {
       await lyrics.evaluate((element, time) => element.getAnimations({ subtree: true }).forEach(animation => { animation.pause(); animation.currentTime = time }), time)
       const line = page.locator('.lyrics-line').nth(index % 3)
       assert.equal(await line.evaluate(element => getComputedStyle(element).opacity), '1', 'each line takes the active position, including after looping')
-      assert.equal(await line.evaluate(element => getComputedStyle(element).filter), 'blur(0px)', 'active line stays sharp')
+      assert.equal(await line.evaluate(element => getComputedStyle(element).filter), 'none', 'lyrics do not animate blur')
       assert.ok(await line.evaluate(element => {
         const bounds = element.getBoundingClientRect()
         return [...element.children].every(word => {
@@ -47,9 +47,9 @@ try {
     console.log(`PASS ${width}px: lyric progression, seamless loop and stable layout`)
   }
   await lyrics.evaluate(element => element.getAnimations({ subtree: true }).forEach(animation => { animation.currentTime = 600 }))
-  const fills = await page.locator('.lyrics-line').first().locator('.lyrics-word').evaluateAll(words => words.map(word => getComputedStyle(word).backgroundPositionX))
-  assert.notEqual(fills[0], fills[3], 'words highlight sequentially rather than all at once')
-  assert.ok(await page.locator('.lyrics-line').nth(1).evaluate(element => parseFloat(getComputedStyle(element).opacity) < 1 && getComputedStyle(element).filter !== 'blur(0px)'), 'inactive lines fade and blur')
+  const opacity = await page.locator('.lyrics-line').first().locator('.lyrics-word').evaluateAll(words => words.map(word => getComputedStyle(word).opacity))
+  assert.notEqual(opacity[0], opacity[3], 'words highlight sequentially rather than all at once')
+  assert.ok(await page.locator('.lyrics-line').nth(1).evaluate(element => parseFloat(getComputedStyle(element).opacity) < 1), 'inactive lines fade')
 
   await page.emulateMedia({ reducedMotion: 'reduce' })
   assert.ok(await lyrics.evaluate(element => [...element.querySelectorAll('.lyrics-line, .lyrics-word')].every(item => getComputedStyle(item).animationName === 'none')), 'reduced motion disables all lyric animation')
@@ -57,7 +57,7 @@ try {
   assert.equal(await page.locator('.lyrics-line').first().isVisible(), true)
   assert.equal(await page.locator('.lyrics-line').nth(1).isVisible(), false)
   assert.deepEqual(errors, [])
-  console.log('PASS word highlighting, inactive blur, keyboard pause/resume and reduced motion')
+  console.log('PASS word highlighting, inactive fade, keyboard pause/resume and reduced motion')
 } finally {
   await browser.close()
 }

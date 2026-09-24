@@ -7,21 +7,17 @@ const repoStats = ref({ stars: '—', version: 'Latest' })
 const compactNumber = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 })
 
 onMounted(async () => {
-  try {
-    const [repoResponse, release] = await Promise.all([
-      fetch('https://api.github.com/repos/MetrolistGroup/Metrolist'),
-      getLatestRelease(),
-    ])
-    if (!repoResponse.ok) return
-
-    const repo = await repoResponse.json() as { stargazers_count?: number }
-    repoStats.value = {
-      stars: compactNumber.format(repo.stargazers_count ?? 0),
-      version: release.tag_name ?? 'Latest',
-    }
-  } catch {
-    // Repository statistics are optional.
+  const [repoResult, releaseResult] = await Promise.allSettled([
+    fetch('https://api.github.com/repos/MetrolistGroup/Metrolist').then(response => {
+      if (!response.ok) throw new Error(`GitHub returned ${response.status}`)
+      return response.json() as Promise<{ stargazers_count?: number }>
+    }),
+    getLatestRelease(),
+  ])
+  if (repoResult.status === 'fulfilled' && repoResult.value.stargazers_count != null) {
+    repoStats.value.stars = compactNumber.format(repoResult.value.stargazers_count)
   }
+  if (releaseResult.status === 'fulfilled') repoStats.value.version = releaseResult.value.tag_name ?? 'Latest'
 })
 </script>
 
