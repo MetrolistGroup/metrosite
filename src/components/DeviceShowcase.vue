@@ -91,8 +91,7 @@ onBeforeUnmount(() => { if (dialog.value?.open) restoreScroll() })
 .preview-tile--wear .preview-tile__label { color: var(--md-sys-color-secondary); }
 .preview-tile__detail, .preview-tile__disclaimer { color: var(--md-sys-color-on-surface-variant); font-size: 0.75rem; }
 .preview-tile__disclaimer { margin-top: 10px; font-size: 0.68rem; }
-.preview-tile__screen { display: block; flex: none; width: 100%; aspect-ratio: var(--preview-ratio); margin-block: auto; padding: 0; overflow: hidden; border: 0; border-radius: 6px; background: #141217; cursor: zoom-in; box-shadow: 0 12px 32px #0003; transition: box-shadow 180ms; }
-.preview-tile__screen:hover { box-shadow: 0 16px 36px #0006; }
+.preview-tile__screen { display: block; flex: none; width: 100%; aspect-ratio: var(--preview-ratio); margin-block: auto; padding: 0; overflow: hidden; border: 0; border-radius: 6px; background: #141217; cursor: zoom-in; }
 .preview-tile--wear .preview-tile__screen { width: clamp(120px, 13vw, 170px); border-radius: 50%; }
 .showcase__note { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 20px; color: var(--md-sys-color-on-surface-variant); font-size: 0.75rem; }
 .showcase__note .material-symbols-rounded { font-size: 18px; }
@@ -101,7 +100,7 @@ onBeforeUnmount(() => { if (dialog.value?.open) restoreScroll() })
 .preview-dialog::backdrop { background: #050307dc; opacity: 0; transition: opacity 280ms, display 280ms allow-discrete, overlay 280ms allow-discrete; }
 .preview-dialog[open]::backdrop { opacity: 1; }
 .preview-dialog__close { position: absolute; z-index: 1; top: 12px; right: 12px; }
-.preview-dialog__screen { width: min(100%, calc((100dvh - 128px) * var(--preview-ratio))); aspect-ratio: var(--preview-ratio); overflow: hidden; border-radius: 4px; box-shadow: 0 24px 80px #0006; transform: scale(0.92); transition: transform 280ms var(--md-sys-motion-expressive); }
+.preview-dialog__screen { width: min(100%, calc((100dvh - 128px) * var(--preview-ratio))); aspect-ratio: var(--preview-ratio); overflow: hidden; border-radius: 4px; transform: scale(0.92); transition: transform 280ms var(--md-sys-motion-expressive); }
 .preview-dialog[open] .preview-dialog__screen { transform: scale(1); }
 .preview-dialog__screen--watch { max-width: 560px; border-radius: 50%; }
 @starting-style {

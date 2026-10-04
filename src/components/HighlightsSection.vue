@@ -7,6 +7,7 @@ import DeviceShowcase from './DeviceShowcase.vue'
 import DownloadDialog from './DownloadDialog.vue'
 
 const lyrics = ['Never gonna give you up', 'Never gonna let you down', 'Never gonna say goodbye']
+const playbackControls = [['Tempo', '1.10×'], ['Pitch', '+1 st'], ['Sleep timer', '30 min'], ['Skip silence', 'On'], ['Normalize', 'On']]
 const lyricsPaused = ref(false)
 const downloadDialog = ref<InstanceType<typeof DownloadDialog>>()
 function openDownload(platform: DownloadPlatformKey) {
@@ -34,6 +35,9 @@ function openDownload(platform: DownloadPlatformKey) {
               <span v-for="(word, wordIndex) in line.split(' ')" :key="wordIndex" class="lyrics-word" :style="{ '--word': wordIndex }">{{ word }}</span>
             </div>
           </div>
+          <ul v-if="index === 5" class="features__controls" aria-hidden="true">
+            <li v-for="[name, value] in playbackControls" :key="name">{{ name }}<strong>{{ value }}</strong></li>
+          </ul>
           <div class="features__copy"><h3>{{ feature.title }}</h3><p>{{ feature.body }}</p></div>
         </article>
       </div>
@@ -63,14 +67,17 @@ function openDownload(platform: DownloadPlatformKey) {
 .platforms h2 { font-size: clamp(2.7rem, 5vw, 4.7rem); font-weight: 760; letter-spacing: -0.055em; line-height: 1; }
 .platforms header > p:last-child { color: var(--md-sys-color-on-surface-variant); font-size: 1.05rem; }
 .features__grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
-.features__card { position: relative; isolation: isolate; display: flex; grid-column: span 2; flex-direction: column; justify-content: space-between; min-height: 250px; gap: 20px; padding: 28px; overflow: hidden; border-radius: 28px; background: var(--md-sys-color-surface-container); transition: box-shadow 160ms var(--md-sys-motion-expressive); }
-.features__card:hover { box-shadow: 0 16px 32px #0004; }
+.features__card { position: relative; isolation: isolate; display: flex; grid-column: span 2; flex-direction: column; justify-content: space-between; min-height: 250px; gap: 20px; padding: 28px; overflow: hidden; border-radius: 28px; background: var(--md-sys-color-surface-container); }
 .features__card--1, .features__card--2 { grid-column: span 3; min-height: 395px; }
 .features__card--1 { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); border-radius: 28px 72px 28px 28px; }
 .features__card--2 { container-type: inline-size; background: #302d21; border-radius: 28px 28px 72px 28px; }
 .features__card--3 { grid-column: span 2; }
 .features__card--3, .features__card--4, .features__card--5 { justify-content: flex-start; }
-.features__card--6 { grid-column: span 6; min-height: 180px; flex-direction: row; align-items: center; background: var(--md-sys-color-surface-container-high); }
+.features__card--6 { display: grid; grid-column: span 6; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 180px; align-items: center; column-gap: 40px; background: var(--md-sys-color-surface-container-high); }
+.features__card--6 .features__copy { grid-column: 2; grid-row: 1 / span 2; }
+.features__controls { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.features__controls li { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; background: var(--md-sys-color-surface-container-highest); font-size: 0.85rem; font-weight: 600; }
+.features__controls strong { color: var(--md-sys-color-primary); font-variant-numeric: tabular-nums; }
 .features__top { display: flex; align-items: center; gap: 10px; }
 .features__icon { flex: 0 0 48px; width: 48px; height: 48px; }
 .features__icon-glyph { display: grid; width: 48px; height: 48px; place-items: center; font-size: 26px; line-height: 1; }
@@ -78,7 +85,7 @@ function openDownload(platform: DownloadPlatformKey) {
 .features__card h3 { margin-bottom: 10px; max-width: 20ch; font-size: clamp(1.4rem, 2.3vw, 2rem); font-weight: 740; letter-spacing: -0.04em; line-height: 1.08; }
 .features__card p { max-width: 46ch; color: var(--md-sys-color-on-surface-variant); font-size: 0.9rem; }
 .features__card--1 p { color: var(--md-sys-color-on-primary-container); }
-.features__card--6 .features__copy { max-width: 65%; }.features__card--6 p { max-width: 65ch; }
+.features__card--6 .features__copy { max-width: none; }.features__card--6 p { max-width: 65ch; }
 .features__ad-dodge { position: relative; width: min(100%, 320px); height: 120px; margin-inline: auto; user-select: none; }
 .features__app-icon { position: absolute; bottom: 0; display: grid; width: 82px; height: 82px; place-items: center; border-radius: 24px; }
 .features__app-icon--metrolist { right: 22px; background: var(--md-sys-color-surface-container-lowest); }
@@ -108,7 +115,6 @@ function openDownload(platform: DownloadPlatformKey) {
   34% { opacity: 0.4; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .features__card, .platforms__list button { transition: none; }
   .features__progress { animation: none; }
   .features__app-icon { animation: none; }
   .features__flying-ad { opacity: 1; transform: translate(120px, -72px) rotate(8deg); animation: none; }
@@ -123,19 +129,19 @@ function openDownload(platform: DownloadPlatformKey) {
 .platforms__layout { display: grid; grid-template-columns: minmax(280px, 0.7fr) minmax(0, 1.3fr); gap: clamp(56px, 9vw, 130px); align-items: start; }
 .platforms header > p:last-child { max-width: 520px; margin-top: 24px; }
 .platforms__list { display: grid; gap: 3px; border-radius: 16px; }
-.platforms__list button { display: grid; grid-template-columns: 54px minmax(120px, 1fr); gap: 16px; align-items: center; min-height: 82px; padding: 10px 12px; border: 0; border-radius: 4px; background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); cursor: pointer; font: inherit; text-align: left; transition: background 120ms, box-shadow 160ms var(--md-sys-motion-expressive); }
+.platforms__list button { display: grid; grid-template-columns: 54px minmax(120px, 1fr); gap: 16px; align-items: center; min-height: 82px; padding: 10px 12px; border: 0; border-radius: 4px; background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); cursor: pointer; font: inherit; text-align: left; }
 .platforms__list button:first-child { border-radius: 16px 16px 4px 4px; }
 .platforms__list button:last-child { border-radius: 4px 4px 16px 16px; }
-.platforms__list button:hover, .platforms__list button:focus-visible { background: var(--md-sys-color-surface-container-high); box-shadow: 0 8px 20px #0004; }
+.platforms__list button:hover, .platforms__list button:focus-visible { background: var(--md-sys-color-surface-container-high); }
 .platforms__icon { display: grid; width: 52px; height: 52px; place-items: center; border-radius: 16px; background: var(--md-sys-color-surface-container-highest); }
 .platforms__icon img { width: 23px; height: 23px; object-fit: contain; }
 .platforms__name { display: flex; flex-direction: column; }.platforms__name strong { font-size: 1rem; font-weight: 720; }.platforms__name small { color: var(--md-sys-color-on-surface-variant); font-size: 0.8rem; }
 @media (max-width: 940px) {
   .features, .platforms { padding: 72px 0; }.features__progress { top: -79px; }.platforms__layout { grid-template-columns: 1fr; gap: 28px; }
-  .features__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }.features__card, .features__card--1, .features__card--2, .features__card--3, .features__card--6 { grid-column: auto; min-height: 280px; }.features__card--6 { flex-direction: column; align-items: start; }.features__card--6 .features__copy { max-width: none; }
+  .features__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }.features__card, .features__card--1, .features__card--2, .features__card--3, .features__card--6 { grid-column: auto; min-height: 280px; }.features__card--6 { grid-column: 1 / -1; grid-template-columns: 1fr; row-gap: 24px; }.features__card--6 .features__copy { grid-column: auto; grid-row: auto; }
 }
 @media (max-width: 600px) {
-  .features__grid { grid-template-columns: 1fr; }.features__card { padding: 24px; min-height: 250px; gap: 28px; }.features__card--1, .features__card--2 { min-height: 360px; }
+  .features__grid { grid-template-columns: 1fr; }.features__card { padding: 24px; min-height: 0; gap: 28px; }.features__card--1, .features__card--2 { min-height: 360px; }
   .platforms__list button { grid-template-columns: 52px 1fr; gap: 12px; }
 }
 </style>
