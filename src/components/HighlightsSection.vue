@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { ShapeBackdrop } from 'material-shapes-ts/vue'
 import { DOWNLOAD_PLATFORMS, type DownloadPlatformKey } from '../content/downloads'
+import { FEATURES as features } from '../content/features'
 import DeviceShowcase from './DeviceShowcase.vue'
 import DownloadDialog from './DownloadDialog.vue'
 
@@ -11,15 +12,6 @@ const downloadDialog = ref<InstanceType<typeof DownloadDialog>>()
 function openDownload(platform: DownloadPlatformKey) {
   downloadDialog.value?.open(platform)
 }
-
-const features = [
-  { icon: 'block', shape: 'Arch', iconBackground: 'var(--md-sys-color-primary)', iconColor: 'var(--md-sys-color-on-primary)', title: 'Just you and the music.', label: 'Ad-free listening', body: 'Stream songs and videos from YouTube Music with background playback and no interruptions.' },
-  { icon: 'lyrics', shape: 'Slanted', iconBackground: 'var(--md-sys-color-secondary-container)', iconColor: 'var(--md-sys-color-on-secondary-container)', title: 'Know every word.', label: 'Synchronized lyrics', body: 'Follow synchronized lyrics with word-by-word timing, translation, and romanization where available.' },
-  { icon: 'groups', shape: 'Sunny', iconBackground: 'var(--md-sys-color-tertiary-container)', iconColor: 'var(--md-sys-color-on-tertiary-container)', title: 'Good music. Better company.', label: 'Listen Together', body: 'Create a room, share queue suggestions, and keep playback synchronized with friends.' },
-  { icon: 'devices', shape: 'Ghostish', iconBackground: 'var(--md-sys-color-primary-container)', iconColor: 'var(--md-sys-color-on-primary-container)', title: 'Give your songs a bigger stage.', label: 'Cast wherever', body: 'Send playback to Chromecast, DLNA, and FCast devices directly from the player.' },
-  { icon: 'download_for_offline', shape: 'Cookie7Sided', iconBackground: 'var(--md-sys-color-secondary-container)', iconColor: 'var(--md-sys-color-on-secondary-container)', title: 'Go touch grass once in a while.', label: 'Ready offline', body: 'Download songs or cache them as you listen so your library stays available without a connection.' },
-  { icon: 'tune', shape: 'Pentagon', iconBackground: 'var(--md-sys-color-primary-container)', iconColor: 'var(--md-sys-color-on-primary-container)', title: 'Find your sweet spot.', label: 'Playback your way', body: 'Use skip silence, a sleep timer, audio normalization, tempo and pitch controls, and an equalizer.' },
-] as const
 </script>
 
 <template>

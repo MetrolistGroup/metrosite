@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto'
 import { readFile, writeFile } from 'node:fs/promises'
 import { FAQ_ITEMS } from '../src/content/faq'
+import { faqMarkdown, homeMarkdown, llmsTxt, privacyMarkdown } from './markdown'
 import { PAGE_META, SITE_URL, type PageMeta } from '../src/content/site'
 
 const dist = new URL('../dist/', import.meta.url)
@@ -27,7 +28,7 @@ const faqSchema = {
   })),
 }
 
-function renderPage(meta: PageMeta, path: string, canonical = true, schemas: object[] = []) {
+function renderPage(meta: PageMeta, path: string, canonical = true, schemas: object[] = [], markdown?: string) {
   const url = `${SITE_URL}${path}`
   let html = source
     .replace(/<title>[^<]*<\/title>/, `<title>${meta.title}</title>`)
@@ -44,6 +45,7 @@ function renderPage(meta: PageMeta, path: string, canonical = true, schemas: obj
     : html.replace(/\s*<link rel="canonical" href="[^"]*" \/>/, '')
 
   if (path !== '/') html = html.replace(/\s*<link rel="discord:component-embed"[^>]*\/>/, '')
+  if (markdown) html = html.replace('</head>', `<link rel="alternate" type="text/markdown" href="${markdown}" />\n  </head>`)
   for (const schema of schemas) {
     html = html.replace('</head>', `<script type="application/ld+json">${JSON.stringify(schema).replaceAll('<', '\\u003c')}</script>\n  </head>`)
   }
@@ -54,10 +56,14 @@ function renderPage(meta: PageMeta, path: string, canonical = true, schemas: obj
   return html
 }
 
-await writeFile(new URL('index.html', dist), renderPage(PAGE_META.home, '/'))
-await writeFile(new URL('faq.html', dist), renderPage(PAGE_META.faq, '/faq', true, [faqSchema, breadcrumbs('FAQ', '/faq')]))
+await writeFile(new URL('index.html', dist), renderPage(PAGE_META.home, '/', true, [], '/index.md'))
+await writeFile(new URL('faq.html', dist), renderPage(PAGE_META.faq, '/faq', true, [faqSchema, breadcrumbs('FAQ', '/faq')], '/faq.md'))
 await writeFile(new URL('listen.html', dist), renderPage(PAGE_META.listen, '/listen'))
-await writeFile(new URL('privacy.html', dist), renderPage(PAGE_META.privacy, '/privacy', true, [breadcrumbs('Privacy policy', '/privacy')]))
+await writeFile(new URL('privacy.html', dist), renderPage(PAGE_META.privacy, '/privacy', true, [breadcrumbs('Privacy policy', '/privacy')], '/privacy.md'))
+await writeFile(new URL('index.md', dist), homeMarkdown())
+await writeFile(new URL('faq.md', dist), faqMarkdown())
+await writeFile(new URL('privacy.md', dist), privacyMarkdown(await readFile(new URL('../src/views/PrivacyPage.vue', import.meta.url), 'utf8')))
+await writeFile(new URL('llms.txt', dist), llmsTxt())
 await writeFile(new URL('404.html', dist), renderPage(PAGE_META.notFound, '/404', false))
 
 const discordEmbed = await readFile(new URL('discord-embed.json', dist))
@@ -79,6 +85,12 @@ await writeFile(new URL('_headers', dist), `/assets/*
   Strict-Transport-Security: max-age=31536000
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
+
+/*.md
+  Content-Type: text/markdown; charset=utf-8
+
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
 
 /listen
   X-Robots-Tag: noindex, follow
