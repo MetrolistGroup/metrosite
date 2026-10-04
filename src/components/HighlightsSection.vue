@@ -33,7 +33,7 @@ const features = [
         <article v-for="(feature, index) in features" :key="feature.label" class="features__card" :class="`features__card--${index + 1}`">
           <div class="features__top"><ShapeBackdrop :shape="feature.shape" :color="feature.iconBackground" class="features__icon"><span class="features__icon-glyph material-symbols-rounded" :style="{ color: feature.iconColor }" aria-hidden="true">{{ feature.icon }}</span></ShapeBackdrop><span class="features__label">{{ feature.label }}</span><button v-if="index === 1" type="button" class="lyrics-toggle" :aria-label="lyricsPaused ? 'Resume lyrics animation' : 'Pause lyrics animation'" :aria-pressed="lyricsPaused" @click="lyricsPaused = !lyricsPaused"><span class="material-symbols-rounded" aria-hidden="true">{{ lyricsPaused ? 'play_arrow' : 'pause' }}</span></button></div>
           <div v-if="index === 0" class="features__ad-dodge" aria-hidden="true">
-            <span class="features__app-icon features__app-icon--youtube"><img src="/icons/youtube-music.png" alt="" /></span>
+            <span class="features__app-icon features__app-icon--youtube"><img src="/icons/youtube-music.webp" alt="" /></span>
             <span class="features__flying-ad">AD</span>
             <span class="features__app-icon features__app-icon--metrolist"><img src="/logo.svg" alt="" /></span>
           </div>

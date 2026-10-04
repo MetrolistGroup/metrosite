@@ -1,11 +1,33 @@
 import { createHash } from 'node:crypto'
 import { readFile, writeFile } from 'node:fs/promises'
+import { FAQ_ITEMS } from '../src/content/faq'
 import { PAGE_META, SITE_URL, type PageMeta } from '../src/content/site'
 
 const dist = new URL('../dist/', import.meta.url)
 const source = await readFile(new URL('index.html', dist), 'utf8')
 
-function renderPage(meta: PageMeta, path: string, canonical = true) {
+function breadcrumbs(name: string, path: string) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Metrolist', item: `${SITE_URL}/` },
+      { '@type': 'ListItem', position: 2, name, item: `${SITE_URL}${path}` },
+    ],
+  }
+}
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ_ITEMS.map(item => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer },
+  })),
+}
+
+function renderPage(meta: PageMeta, path: string, canonical = true, schemas: object[] = []) {
   const url = `${SITE_URL}${path}`
   let html = source
     .replace(/<title>[^<]*<\/title>/, `<title>${meta.title}</title>`)
@@ -22,6 +44,9 @@ function renderPage(meta: PageMeta, path: string, canonical = true) {
     : html.replace(/\s*<link rel="canonical" href="[^"]*" \/>/, '')
 
   if (path !== '/') html = html.replace(/\s*<link rel="discord:component-embed"[^>]*\/>/, '')
+  for (const schema of schemas) {
+    html = html.replace('</head>', `<script type="application/ld+json">${JSON.stringify(schema).replaceAll('<', '\\u003c')}</script>\n  </head>`)
+  }
 
   if (!html.includes(`<title>${meta.title}</title>`) || !html.includes(`content="${meta.robots}"`)) {
     throw new Error(`Failed to generate metadata for ${path}`)
@@ -30,9 +55,9 @@ function renderPage(meta: PageMeta, path: string, canonical = true) {
 }
 
 await writeFile(new URL('index.html', dist), renderPage(PAGE_META.home, '/'))
-await writeFile(new URL('faq.html', dist), renderPage(PAGE_META.faq, '/faq'))
+await writeFile(new URL('faq.html', dist), renderPage(PAGE_META.faq, '/faq', true, [faqSchema, breadcrumbs('FAQ', '/faq')]))
 await writeFile(new URL('listen.html', dist), renderPage(PAGE_META.listen, '/listen'))
-await writeFile(new URL('privacy.html', dist), renderPage(PAGE_META.privacy, '/privacy'))
+await writeFile(new URL('privacy.html', dist), renderPage(PAGE_META.privacy, '/privacy', true, [breadcrumbs('Privacy policy', '/privacy')]))
 await writeFile(new URL('404.html', dist), renderPage(PAGE_META.notFound, '/404', false))
 
 const discordEmbed = await readFile(new URL('discord-embed.json', dist))
