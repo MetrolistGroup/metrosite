@@ -8,7 +8,7 @@
     "test": "bun test",
     "test:browser": "bun run build && bun tests/browser.mjs",
     "check": "bun test && bun run build",
-    "build": "bun scripts/sponsors.ts && vue-tsc -b && vite build && bun scripts/postbuild.ts",
+    "build": "vue-tsc -b && vite build && bun scripts/postbuild.ts",
     "preview": "vite preview"
   },
   "dependencies": {
