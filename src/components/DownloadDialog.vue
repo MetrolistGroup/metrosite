@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useId } from 'vue'
+import { computed, onBeforeUnmount, ref, useId } from 'vue'
 import {
   DOWNLOAD_PLATFORMS,
   findDownloadAsset,
@@ -88,6 +88,19 @@ function closeOnBackdrop(event: MouseEvent) {
   if (event.target === dialog.value) dialog.value.close()
 }
 
+// Edit this list to change who can receive donations.
+const DEVELOPERS = ['mostafaalagamy', 'nyxiereal']
+const donateDeveloper = ref('')
+let donateTimer: ReturnType<typeof setTimeout>
+
+function showDonate() {
+  donateDeveloper.value = DEVELOPERS[Math.floor(Math.random() * DEVELOPERS.length)]!
+  clearTimeout(donateTimer)
+  donateTimer = setTimeout(() => { donateDeveloper.value = '' }, 12000)
+}
+
+onBeforeUnmount(() => clearTimeout(donateTimer))
+
 function formatSize(bytes?: number) {
   return bytes ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : ''
 }
@@ -163,12 +176,16 @@ function formatSize(bytes?: number) {
               <template v-else>No matching build was found in the latest release.</template>
             </p>
             <div class="download-dialog__download-actions">
-              <a :href="selectedAsset?.browser_download_url || releasesUrl" class="btn btn-filled" target="_blank" rel="noopener noreferrer">
+              <a :href="selectedAsset?.browser_download_url || releasesUrl" class="btn btn-filled" target="_blank" rel="noopener noreferrer" @click="showDonate">
                 <span class="material-symbols-rounded" aria-hidden="true">download</span>
                 {{ selectedAsset?.name.toLowerCase().endsWith('.zip') ? 'Download portable ZIP' : selectedAsset ? `Download ${selectedPlatform.package}` : 'Browse release files' }}
               </a>
               <a v-if="selectedAsset" :href="releasesUrl" class="btn btn-tonal" target="_blank" rel="noopener noreferrer">All builds</a>
             </div>
+            <p v-if="donateDeveloper" class="download-dialog__donate" role="status">
+              Enjoying Metrolist?
+              <a :href="`https://github.com/sponsors/${donateDeveloper}`" target="_blank" rel="noopener noreferrer">Donate to {{ donateDeveloper }}</a>
+            </p>
           </div>
         </div>
       </section>
@@ -389,6 +406,16 @@ function formatSize(bytes?: number) {
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 13px;
+}
+
+.download-dialog__donate {
+  margin-top: 14px;
+  font-size: 0.82rem;
+}
+
+.download-dialog__donate a {
+  color: var(--md-sys-color-primary);
+  font-weight: 700;
 }
 
 .download-dialog__footer {
