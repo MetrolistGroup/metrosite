@@ -92,6 +92,8 @@ function closeOnBackdrop(event: MouseEvent) {
 const DEVELOPERS = [
   { name: 'mostafaalagamy', url: 'https://www.buymeacoffee.com/mostafaalagamy' },
   { name: 'nyxiereal', url: 'https://github.com/sponsors/nyxiereal' },
+  { name: 'l6t9', url: 'https://github.com/sponsors/l6t9' },
+  { name: 'adrielGGmotion', url: 'https://github.com/sponsors/adrielGGmotion' },
 ]
 const donateDeveloper = ref<(typeof DEVELOPERS)[number]>()
 let donateTimer: ReturnType<typeof setTimeout>
