@@ -89,14 +89,17 @@ function closeOnBackdrop(event: MouseEvent) {
 }
 
 // Edit this list to change who can receive donations.
-const DEVELOPERS = ['mostafaalagamy', 'nyxiereal']
-const donateDeveloper = ref('')
+const DEVELOPERS = [
+  { name: 'mostafaalagamy', url: 'https://www.buymeacoffee.com/mostafaalagamy' },
+  { name: 'nyxiereal', url: 'https://github.com/sponsors/nyxiereal' },
+]
+const donateDeveloper = ref<(typeof DEVELOPERS)[number]>()
 let donateTimer: ReturnType<typeof setTimeout>
 
 function showDonate() {
-  donateDeveloper.value = DEVELOPERS[Math.floor(Math.random() * DEVELOPERS.length)]!
+  donateDeveloper.value = DEVELOPERS[Math.floor(Math.random() * DEVELOPERS.length)]
   clearTimeout(donateTimer)
-  donateTimer = setTimeout(() => { donateDeveloper.value = '' }, 12000)
+  donateTimer = setTimeout(() => { donateDeveloper.value = undefined }, 12000)
 }
 
 onBeforeUnmount(() => clearTimeout(donateTimer))
@@ -184,7 +187,7 @@ function formatSize(bytes?: number) {
             </div>
             <p v-if="donateDeveloper" class="download-dialog__donate" role="status">
               Enjoying Metrolist?
-              <a :href="`https://github.com/sponsors/${donateDeveloper}`" target="_blank" rel="noopener noreferrer">Donate to {{ donateDeveloper }}</a>
+              <a :href="donateDeveloper.url" target="_blank" rel="noopener noreferrer">Donate to {{ donateDeveloper.name }}</a>
             </p>
           </div>
         </div>
