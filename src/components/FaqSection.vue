@@ -16,7 +16,7 @@ function toggleItem(index: number) {
   <section id="faq" class="faq">
     <div class="container faq__layout">
       <header>
-        <h2>Good questions, straight answers.</h2>
+        <h2>Common questions</h2>
         <RouterLink to="/faq" class="btn btn-tonal">
           View the full FAQ
           <span class="material-symbols-rounded" aria-hidden="true">arrow_outward</span>
