@@ -61,7 +61,8 @@ const links = [
   align-items: center;
   gap: 12px;
   color: var(--md-sys-color-on-surface);
-  font-size: 1.2rem;
+  font: var(--md-sys-typescale-title-large);
+  letter-spacing: var(--md-sys-typescale-title-large-tracking);
   text-decoration: none;
 }
 
@@ -73,7 +74,8 @@ const links = [
 .footer__top > p {
   max-width: 430px;
   color: var(--md-sys-color-on-surface-variant);
-  font-size: 0.92rem;
+  font: var(--md-sys-typescale-body-medium);
+  letter-spacing: var(--md-sys-typescale-body-medium-tracking);
   text-align: right;
 }
 
@@ -93,8 +95,9 @@ const links = [
   border-radius: var(--md-sys-shape-corner-full);
   background: var(--md-sys-color-surface-container-high);
   color: var(--md-sys-color-on-surface-variant);
-  font-size: 0.86rem;
-  font-weight: 650;
+  font: var(--md-sys-typescale-label-large);
+  font-variation-settings: 'ROND' 100;
+  letter-spacing: var(--md-sys-typescale-label-large-tracking);
   text-decoration: none;
 }
 
@@ -113,7 +116,8 @@ const links = [
   gap: 30px 60px;
   padding-top: 28px;
   color: color-mix(in srgb, var(--md-sys-color-on-surface-variant) 72%, transparent);
-  font-size: 0.76rem;
+  font: var(--md-sys-typescale-body-small);
+  letter-spacing: var(--md-sys-typescale-body-small-tracking);
 }
 
 .footer__bottom p {

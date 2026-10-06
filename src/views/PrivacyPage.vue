@@ -91,22 +91,21 @@ import NavBar from '../components/NavBar.vue'
 
 .privacy-page h1 {
   margin-bottom: 20px;
-  font-size: clamp(2.5rem, 6vw, 3.75rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
+  font: var(--md-sys-typescale-display-small);
+  letter-spacing: var(--md-sys-typescale-display-small-tracking);
 }
 
 .privacy-page__intro {
   color: var(--md-sys-color-on-surface-variant);
-  font-size: 1.1rem;
-  line-height: 1.7;
+  font: var(--md-sys-typescale-body-large);
+  letter-spacing: var(--md-sys-typescale-body-large-tracking);
 }
 
 .privacy-page__date {
   margin-top: 24px;
   color: var(--md-sys-color-on-surface-variant);
-  font-size: 0.9rem;
+  font: var(--md-sys-typescale-body-medium);
+  letter-spacing: var(--md-sys-typescale-body-medium-tracking);
 }
 
 .privacy-page__document section {
@@ -119,20 +118,22 @@ import NavBar from '../components/NavBar.vue'
 
 .privacy-page__document h2 {
   margin-bottom: 18px;
-  font-size: clamp(1.75rem, 4vw, 2.5rem);
-  font-weight: 700;
-  letter-spacing: -0.04em;
+  font: var(--md-sys-typescale-headline-large);
+  letter-spacing: var(--md-sys-typescale-headline-large-tracking);
 }
 
 .privacy-page__document h3 {
   margin: 32px 0 10px;
-  font-size: 1.05rem;
+  font: var(--md-sys-typescale-title-large);
+  letter-spacing: var(--md-sys-typescale-title-large-tracking);
 }
 
 .privacy-page__document p,
 .privacy-page__document li {
   color: var(--md-sys-color-on-surface-variant);
-  line-height: 1.75;
+  font: var(--md-sys-typescale-body-large);
+  letter-spacing: var(--md-sys-typescale-body-large-tracking);
+  line-height: 1.7;
 }
 
 .privacy-page__document p + p {

@@ -119,8 +119,8 @@ async function copyCode() {
   align-items: center;
   gap: 10px;
   color: var(--md-sys-color-on-surface);
-  font-size: 1.08rem;
-  font-weight: 750;
+  font: var(--md-sys-typescale-title-large);
+  letter-spacing: var(--md-sys-typescale-title-large-tracking);
   text-decoration: none;
 }
 
@@ -150,10 +150,8 @@ async function copyCode() {
 
 .listen h1 {
   margin: 24px 0;
-  font-size: clamp(3.8rem, 8vw, 7rem);
-  font-weight: 760;
-  letter-spacing: -0.065em;
-  line-height: 0.9;
+  font: var(--md-sys-typescale-display-large);
+  letter-spacing: var(--md-sys-typescale-display-large-tracking);
 }
 
 .listen h1 span {
@@ -163,7 +161,8 @@ async function copyCode() {
 .listen__hero > div > p:last-child {
   max-width: 600px;
   color: var(--md-sys-color-on-surface-variant);
-  font-size: 1.06rem;
+  font: var(--md-sys-typescale-body-large);
+  letter-spacing: var(--md-sys-typescale-body-large-tracking);
 }
 
 .listen__hero-icon {
@@ -196,9 +195,9 @@ async function copyCode() {
 }
 
 .listen__room > div > span {
-  font-size: 0.76rem;
-  font-weight: 730;
-  letter-spacing: 0.08em;
+  font: var(--md-sys-typescale-label-small);
+  font-variation-settings: 'ROND' 100;
+  letter-spacing: var(--md-sys-typescale-label-small-tracking);
   text-transform: uppercase;
 }
 
@@ -226,7 +225,8 @@ async function copyCode() {
 
 .listen__empty h2 {
   margin-bottom: 4px;
-  font-size: 1.25rem;
+  font: var(--md-sys-typescale-title-large);
+  letter-spacing: var(--md-sys-typescale-title-large-tracking);
 }
 
 .listen__empty p {
@@ -275,22 +275,23 @@ async function copyCode() {
   padding: 7px 12px;
   border-radius: var(--md-sys-shape-corner-full);
   background: color-mix(in srgb, currentColor 10%, transparent);
-  font-size: 0.72rem;
-  font-weight: 720;
+  font: var(--md-sys-typescale-label-small);
+  font-variation-settings: 'ROND' 100;
+  letter-spacing: var(--md-sys-typescale-label-small-tracking);
   text-transform: uppercase;
 }
 
 .listen__guides h2 {
   margin: 34px 0 10px;
-  font-size: 1.6rem;
-  font-weight: 750;
-  letter-spacing: -0.03em;
+  font: var(--md-sys-typescale-headline-small);
+  letter-spacing: var(--md-sys-typescale-headline-small-tracking);
 }
 
 .listen__guides p,
 .listen__guides ol {
   color: color-mix(in srgb, currentColor 76%, transparent);
-  font-size: 0.92rem;
+  font: var(--md-sys-typescale-body-medium);
+  letter-spacing: var(--md-sys-typescale-body-medium-tracking);
 }
 
 .listen__guides p strong,

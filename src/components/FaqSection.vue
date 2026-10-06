@@ -73,10 +73,8 @@ function toggleItem(index: number) {
 
 .faq h2 {
   margin: 0 0 32px;
-  font-size: clamp(2.8rem, 5vw, 4.8rem);
-  font-weight: 760;
-  letter-spacing: -0.055em;
-  line-height: 0.96;
+  font: var(--md-sys-typescale-display-medium);
+  letter-spacing: var(--md-sys-typescale-display-medium-tracking);
 }
 
 .faq__list {
@@ -122,8 +120,8 @@ function toggleItem(index: number) {
 }
 
 .faq__question strong {
-  font-size: 1rem;
-  font-weight: 680;
+  font: var(--md-sys-typescale-title-medium);
+  letter-spacing: var(--md-sys-typescale-title-medium-tracking);
 }
 
 .faq__answer {
@@ -144,8 +142,8 @@ function toggleItem(index: number) {
   max-width: 680px;
   padding: 0 76px 24px 24px;
   color: var(--md-sys-color-on-surface-variant);
-  font-size: 0.94rem;
-  line-height: 1.65;
+  font: var(--md-sys-typescale-body-medium);
+  letter-spacing: var(--md-sys-typescale-body-medium-tracking);
 }
 
 @media (max-width: 820px) {

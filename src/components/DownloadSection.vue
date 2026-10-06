@@ -7,7 +7,7 @@ import DownloadDialog from './DownloadDialog.vue'
     <div class="container">
       <div class="download__panel">
         <div class="download__copy">
-          <h2 id="download-title">Put your library on a bigger screen.</h2>
+          <h2 id="download-title">Put your library on a <span>bigger screen.</span></h2>
           <p>Select Android, iOS, Linux, macOS, or Windows and get the right Metrolist build for your device.</p>
         </div>
         <div class="download__actions">
@@ -45,16 +45,15 @@ import DownloadDialog from './DownloadDialog.vue'
 
 .download h2 {
   margin: 0 0 20px;
-  font-size: clamp(3rem, 6vw, 5.8rem);
-  font-weight: 760;
-  letter-spacing: -0.06em;
-  line-height: 0.94;
+  font: var(--md-sys-typescale-display-medium);
+  letter-spacing: var(--md-sys-typescale-display-medium-tracking);
 }
 
 .download__copy > p {
   max-width: 560px;
   color: color-mix(in srgb, var(--md-sys-color-on-primary-container) 78%, transparent);
-  font-size: 1.04rem;
+  font: var(--md-sys-typescale-body-large);
+  letter-spacing: var(--md-sys-typescale-body-large-tracking);
 }
 
 .download__actions {

@@ -1,8 +1,9 @@
 @font-face {
   font-family: 'Google Sans Flex';
-  src: url('/fonts/GoogleSansFlex.woff2') format('woff2');
+  /* Variable subset: opsz 6-144, wght 400-850, ROND 0-100 (see public/fonts/OFL.txt). */
+  src: url('/fonts/GoogleSansFlex.woff2?v=2') format('woff2');
   font-style: normal;
-  font-weight: 400 700;
+  font-weight: 400 850;
   font-display: swap;
 }
 
@@ -63,6 +64,42 @@
   --md-motion-effects-slow: 300ms linear(0, 0.158, 0.413, 0.626, 0.774, 0.868, 0.925, 0.958, 0.977, 0.987, 0.993, 0.996, 1);
   /* Exits are shorter and accelerate away so they never block the next action. */
   --md-motion-exit: 160ms cubic-bezier(0.3, 0, 0.8, 0.15);
+  /* M3 Expressive type scale, fluid for the web. Optical size follows font
+     size automatically, so tracking stays light: big text tightens itself.
+     Baseline display weights stay light; emphasized words (h1/h2 > span)
+     jump to a heavy, fully rounded cut for contrast. */
+  --md-ref-typeface: 'Google Sans Flex', system-ui, sans-serif;
+  --md-sys-typescale-display-large: 500 clamp(3.25rem, 7vw, 6.75rem) / 0.94 var(--md-ref-typeface);
+  --md-sys-typescale-display-large-tracking: -0.035em;
+  --md-sys-typescale-display-medium: 500 clamp(2.6rem, 5.2vw, 5rem) / 0.98 var(--md-ref-typeface);
+  --md-sys-typescale-display-medium-tracking: -0.03em;
+  --md-sys-typescale-display-small: 500 clamp(2.1rem, 4.2vw, 3.5rem) / 1.02 var(--md-ref-typeface);
+  --md-sys-typescale-display-small-tracking: -0.025em;
+  --md-sys-typescale-headline-large: 560 clamp(1.75rem, 3vw, 2.5rem) / 1.1 var(--md-ref-typeface);
+  --md-sys-typescale-headline-large-tracking: -0.02em;
+  --md-sys-typescale-headline-medium: 600 clamp(1.4rem, 2.3vw, 2rem) / 1.12 var(--md-ref-typeface);
+  --md-sys-typescale-headline-medium-tracking: -0.015em;
+  --md-sys-typescale-headline-small: 600 1.5rem / 1.2 var(--md-ref-typeface);
+  --md-sys-typescale-headline-small-tracking: -0.01em;
+  --md-sys-typescale-title-large: 620 1.25rem / 1.3 var(--md-ref-typeface);
+  --md-sys-typescale-title-large-tracking: -0.005em;
+  --md-sys-typescale-title-medium: 620 1.0625rem / 1.4 var(--md-ref-typeface);
+  --md-sys-typescale-title-medium-tracking: 0;
+  --md-sys-typescale-title-small: 620 0.875rem / 1.35 var(--md-ref-typeface);
+  --md-sys-typescale-title-small-tracking: 0.005em;
+  --md-sys-typescale-body-large: 400 clamp(1.0625rem, 1.3vw, 1.1875rem) / 1.6 var(--md-ref-typeface);
+  --md-sys-typescale-body-large-tracking: 0;
+  --md-sys-typescale-body-medium: 400 0.9375rem / 1.6 var(--md-ref-typeface);
+  --md-sys-typescale-body-medium-tracking: 0.005em;
+  --md-sys-typescale-body-small: 400 0.75rem / 1.45 var(--md-ref-typeface);
+  --md-sys-typescale-body-small-tracking: 0.01em;
+  --md-sys-typescale-label-large: 600 0.875rem / 1.25 var(--md-ref-typeface);
+  --md-sys-typescale-label-large-tracking: 0.01em;
+  --md-sys-typescale-label-medium: 600 0.75rem / 1.33 var(--md-ref-typeface);
+  --md-sys-typescale-label-medium-tracking: 0.03em;
+  --md-sys-typescale-label-small: 650 0.6875rem / 1.45 var(--md-ref-typeface);
+  --md-sys-typescale-label-small-tracking: 0.08em;
+  --md-sys-typescale-emphasized-weight: 820;
   --md-sys-state-hover: 8%;
   --md-sys-state-focus: 10%;
   --md-sys-state-pressed: 10%;
@@ -87,9 +124,26 @@ body {
   overflow-x: hidden;
   background: var(--md-sys-color-background);
   color: var(--md-sys-color-on-background);
-  font-family: 'Google Sans Flex', system-ui, sans-serif;
-  font-size: 1rem;
-  line-height: 1.5;
+  font: 400 1rem / 1.5 var(--md-ref-typeface);
+  font-optical-sizing: auto;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p,
+li,
+dd {
+  text-wrap: pretty;
+}
+
+/* Emphasized words inside display headings: heavier and fully rounded. */
+:where(h1, h2) > span {
+  font-weight: var(--md-sys-typescale-emphasized-weight);
+  font-variation-settings: 'ROND' 100;
 }
 
 button,
@@ -117,7 +171,7 @@ img {
   border-radius: var(--md-sys-shape-corner-full);
   background: var(--md-sys-color-primary);
   color: var(--md-sys-color-on-primary);
-  font-weight: 700;
+  font: var(--md-sys-typescale-label-large);
   text-decoration: none;
   transform: translateY(-180%);
 }
@@ -174,9 +228,9 @@ img {
   border-radius: var(--md-sys-shape-corner-full);
   background: var(--md-sys-color-surface-container-high);
   color: var(--md-sys-color-primary);
-  font-size: 0.75rem;
-  font-weight: 720;
-  letter-spacing: 0.06em;
+  font: var(--md-sys-typescale-label-small);
+  font-variation-settings: 'ROND' 100;
+  letter-spacing: var(--md-sys-typescale-label-small-tracking);
   text-transform: uppercase;
 }
 
@@ -191,9 +245,9 @@ img {
   border-radius: 28px;
   color: inherit;
   cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 700;
-  line-height: 1;
+  font: var(--md-sys-typescale-label-large);
+  font-variation-settings: 'ROND' 100;
+  letter-spacing: var(--md-sys-typescale-label-large-tracking);
   text-decoration: none;
   white-space: nowrap;
 }
@@ -272,13 +326,13 @@ img {
 .btn-lg {
   min-height: 56px;
   padding: 14px 26px;
-  font-size: 1rem;
+  font: var(--md-sys-typescale-title-medium);
+  font-variation-settings: 'ROND' 100;
 }
 
 .btn-sm {
   min-height: 40px;
   padding: 9px 18px;
-  font-size: 0.86rem;
 }
 
 .icon-button {

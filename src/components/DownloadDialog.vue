@@ -255,15 +255,14 @@ function formatSize(bytes?: number) {
 .download-dialog__header p {
   margin-bottom: 6px;
   color: var(--md-sys-color-primary);
-  font-size: 0.78rem;
-  font-weight: 720;
+  font: var(--md-sys-typescale-label-medium);
+  font-variation-settings: 'ROND' 100;
+  letter-spacing: var(--md-sys-typescale-label-medium-tracking);
 }
 
 .download-dialog h2 {
-  font-size: clamp(2rem, 6vw, 3.25rem);
-  font-weight: 760;
-  letter-spacing: -0.045em;
-  line-height: 1;
+  font: var(--md-sys-typescale-display-small);
+  letter-spacing: var(--md-sys-typescale-display-small-tracking);
 }
 
 .download-dialog__platforms {
@@ -310,13 +309,15 @@ function formatSize(bytes?: number) {
 }
 
 .download-dialog__platforms strong {
-  font-size: 0.9rem;
+  font: var(--md-sys-typescale-title-small);
+  letter-spacing: var(--md-sys-typescale-title-small-tracking);
 }
 
 .download-dialog__platforms small {
   overflow: hidden;
   color: color-mix(in srgb, currentColor 72%, transparent);
-  font-size: 0.74rem;
+  font: var(--md-sys-typescale-body-small);
+  letter-spacing: var(--md-sys-typescale-body-small-tracking);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -334,8 +335,9 @@ function formatSize(bytes?: number) {
 
 .download-dialog__architectures > span {
   color: var(--md-sys-color-on-surface-variant);
-  font-size: 0.78rem;
-  font-weight: 700;
+  font: var(--md-sys-typescale-label-medium);
+  font-variation-settings: 'ROND' 100;
+  letter-spacing: var(--md-sys-typescale-label-medium-tracking);
 }
 
 .download-dialog__architectures > div {
@@ -352,9 +354,9 @@ function formatSize(bytes?: number) {
   background: var(--md-sys-color-surface-container-high);
   color: var(--md-sys-color-on-surface-variant);
   cursor: pointer;
-  font: inherit;
-  font-size: 0.78rem;
-  font-weight: 680;
+  font: var(--md-sys-typescale-label-large);
+  font-variation-settings: 'ROND' 100;
+  letter-spacing: var(--md-sys-typescale-label-large-tracking);
   transition: background var(--md-motion-effects-default), color var(--md-motion-effects-default), border-radius var(--md-motion-spatial-fast);
 }
 
@@ -390,12 +392,14 @@ function formatSize(bytes?: number) {
 }
 
 .download-dialog__selection strong {
-  font-size: 1.04rem;
+  font: var(--md-sys-typescale-title-medium);
+  letter-spacing: var(--md-sys-typescale-title-medium-tracking);
 }
 
 .download-dialog__selection header span {
   color: var(--md-sys-color-on-surface-variant);
-  font-size: 0.82rem;
+  font: var(--md-sys-typescale-body-small);
+  letter-spacing: var(--md-sys-typescale-body-small-tracking);
 }
 
 .download-dialog__install {
@@ -406,15 +410,15 @@ function formatSize(bytes?: number) {
 }
 
 .download-dialog__install h3 {
-  font-size: 0.82rem;
-  font-weight: 760;
+  font: var(--md-sys-typescale-title-small);
+  letter-spacing: var(--md-sys-typescale-title-small-tracking);
 }
 
 .download-dialog__install ol {
   margin: 12px 0 0 1.2rem;
   color: var(--md-sys-color-on-surface-variant);
-  font-size: 0.82rem;
-  line-height: 1.55;
+  font: var(--md-sys-typescale-body-medium);
+  letter-spacing: var(--md-sys-typescale-body-medium-tracking);
 }
 
 .download-dialog__install li + li {
@@ -425,7 +429,8 @@ function formatSize(bytes?: number) {
   min-height: 19px;
   margin-top: 9px;
   color: var(--md-sys-color-primary);
-  font-size: 0.76rem;
+  font: var(--md-sys-typescale-body-small);
+  letter-spacing: var(--md-sys-typescale-body-small-tracking);
 }
 
 .download-dialog__download-actions {
@@ -437,7 +442,8 @@ function formatSize(bytes?: number) {
 
 .download-dialog__donate {
   margin-top: 14px;
-  font-size: 0.82rem;
+  font: var(--md-sys-typescale-body-small);
+  letter-spacing: var(--md-sys-typescale-body-small-tracking);
 }
 
 .download-dialog__donate a {

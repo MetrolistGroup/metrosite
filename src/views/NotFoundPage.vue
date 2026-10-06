@@ -34,17 +34,16 @@ import NavBar from '../components/NavBar.vue'
 
 .not-found__panel > p {
   color: var(--md-sys-color-primary);
-  font-size: 0.85rem;
-  font-weight: 760;
-  letter-spacing: 0.12em;
+  font: var(--md-sys-typescale-label-large);
+  font-variation-settings: 'ROND' 100;
+  letter-spacing: var(--md-sys-typescale-label-large-tracking);
+  font-variant-numeric: tabular-nums;
 }
 
 .not-found h1 {
   max-width: 800px;
   margin: 20px 0 36px;
-  font-size: clamp(3rem, 8vw, 7rem);
-  font-weight: 760;
-  letter-spacing: -0.06em;
-  line-height: 0.94;
+  font: var(--md-sys-typescale-display-large);
+  letter-spacing: var(--md-sys-typescale-display-large-tracking);
 }
 </style>

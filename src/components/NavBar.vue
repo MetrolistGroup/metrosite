@@ -65,9 +65,8 @@ const currentAnchor = (hash: string) => route.path === '/' && route.hash === has
   gap: 12px;
   margin-right: auto;
   color: var(--md-sys-color-on-surface);
-  font-size: 1.1rem;
-  font-weight: 760;
-  letter-spacing: -0.025em;
+  font: var(--md-sys-typescale-title-large);
+  letter-spacing: var(--md-sys-typescale-title-large-tracking);
   text-decoration: none;
 }
 
@@ -86,8 +85,9 @@ const currentAnchor = (hash: string) => route.path === '/' && route.hash === has
   padding: 10px 14px;
   border-radius: var(--md-sys-shape-corner-full);
   color: var(--md-sys-color-on-surface-variant);
-  font-size: 0.86rem;
-  font-weight: 650;
+  font: var(--md-sys-typescale-label-large);
+  font-variation-settings: 'ROND' 100;
+  letter-spacing: var(--md-sys-typescale-label-large-tracking);
   text-decoration: none;
 }
 
@@ -133,7 +133,9 @@ const currentAnchor = (hash: string) => route.path === '/' && route.hash === has
   background: transparent;
   color: var(--md-sys-color-on-surface);
   cursor: pointer;
-  font-weight: 650;
+  font: var(--md-sys-typescale-title-small);
+  font-variation-settings: 'ROND' 100;
+  letter-spacing: var(--md-sys-typescale-title-small-tracking);
   text-align: left;
   text-decoration: none;
 }

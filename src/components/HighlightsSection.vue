@@ -46,7 +46,7 @@ function openDownload(platform: DownloadPlatformKey) {
 
   <section id="platforms" class="platforms">
     <div class="container platforms__layout">
-      <header><h2>One codebase.<br />Every place to press play.</h2><p>Kotlin Multiplatform keeps the foundation shared while each interface fits the screen around it.</p></header>
+      <header><h2>One codebase.<br /><span>Every place to press play.</span></h2><p>Kotlin Multiplatform keeps the foundation shared while each interface fits the screen around it.</p></header>
       <div class="platforms__list">
         <button v-for="platform in DOWNLOAD_PLATFORMS" :key="platform.name" type="button" aria-haspopup="dialog" @click="openDownload(platform.key)">
           <span class="platforms__icon"><img :src="`/icons/${platform.icon}.svg`" alt="" /></span>
@@ -64,8 +64,8 @@ function openDownload(platform: DownloadPlatformKey) {
 .features > .container { position: relative; }
 .features__progress { position: absolute; top: -99px; inset-inline: 0; height: 14px; background: var(--md-sys-color-primary); opacity: 0.6; -webkit-mask: url('/images/wave-mask.svg') repeat-x left center / 28px 14px; mask: url('/images/wave-mask.svg') repeat-x left center / 28px 14px; animation: progress-wave 900ms linear infinite; }
 @keyframes progress-wave { to { -webkit-mask-position: 28px center; mask-position: 28px center; } }
-.platforms h2 { font-size: clamp(2.7rem, 5vw, 4.7rem); font-weight: 760; letter-spacing: -0.055em; line-height: 1; }
-.platforms header > p:last-child { color: var(--md-sys-color-on-surface-variant); font-size: 1.05rem; }
+.platforms h2 { font: var(--md-sys-typescale-display-medium); letter-spacing: var(--md-sys-typescale-display-medium-tracking); }
+.platforms header > p:last-child { color: var(--md-sys-color-on-surface-variant); font: var(--md-sys-typescale-body-large); letter-spacing: var(--md-sys-typescale-body-large-tracking); }
 .features__grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
 .features__card { position: relative; isolation: isolate; display: flex; grid-column: span 2; flex-direction: column; justify-content: space-between; min-height: 250px; gap: 20px; padding: 28px; overflow: hidden; border-radius: 28px; background: var(--md-sys-color-surface-container); }
 .features__card--1, .features__card--2 { grid-column: span 3; min-height: 395px; }
@@ -76,14 +76,14 @@ function openDownload(platform: DownloadPlatformKey) {
 .features__card--6 { display: grid; grid-column: span 6; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 180px; align-items: center; column-gap: 40px; background: var(--md-sys-color-surface-container-high); }
 .features__card--6 .features__copy { grid-column: 2; grid-row: 1 / span 2; }
 .features__controls { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
-.features__controls li { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; background: var(--md-sys-color-surface-container-highest); font-size: 0.85rem; font-weight: 600; }
+.features__controls li { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; background: var(--md-sys-color-surface-container-highest); font: var(--md-sys-typescale-label-large); letter-spacing: var(--md-sys-typescale-label-large-tracking); }
 .features__controls strong { color: var(--md-sys-color-primary); font-variant-numeric: tabular-nums; }
 .features__top { display: flex; align-items: center; gap: 10px; }
 .features__icon { flex: 0 0 48px; width: 48px; height: 48px; }
 .features__icon-glyph { display: grid; width: 48px; height: 48px; place-items: center; font-size: 26px; line-height: 1; }
-.features__label { font-size: 1rem; font-weight: 650; }
-.features__card h3 { margin-bottom: 10px; max-width: 20ch; font-size: clamp(1.4rem, 2.3vw, 2rem); font-weight: 740; letter-spacing: -0.04em; line-height: 1.08; }
-.features__card p { max-width: 46ch; color: var(--md-sys-color-on-surface-variant); font-size: 0.9rem; }
+.features__label { font: var(--md-sys-typescale-title-medium); letter-spacing: var(--md-sys-typescale-title-medium-tracking); }
+.features__card h3 { margin-bottom: 10px; max-width: 20ch; font: var(--md-sys-typescale-headline-medium); letter-spacing: var(--md-sys-typescale-headline-medium-tracking); }
+.features__card p { max-width: 46ch; color: var(--md-sys-color-on-surface-variant); font: var(--md-sys-typescale-body-medium); letter-spacing: var(--md-sys-typescale-body-medium-tracking); }
 .features__card--1 p { color: var(--md-sys-color-on-primary-container); }
 .features__card--6 .features__copy { max-width: none; }.features__card--6 p { max-width: 65ch; }
 .features__ad-dodge { position: relative; width: min(100%, 320px); height: 120px; margin-inline: auto; user-select: none; }
@@ -97,7 +97,7 @@ function openDownload(platform: DownloadPlatformKey) {
 @keyframes ad-toss { 0%, 10% { opacity: 0; transform: translate(-8px, 18px) rotate(-18deg) scale(0.75); } 14% { opacity: 1; } 32% { opacity: 1; transform: translate(70px, -72px) rotate(-2deg) scale(0.95); } 48% { opacity: 1; transform: translate(105px, -72px) rotate(8deg) scale(1); } 78% { opacity: 1; transform: translate(185px, -72px) rotate(22deg) scale(0.92); } 88% { opacity: 1; transform: translate(240px, -72px) rotate(30deg) scale(0.82); } 96%, 100% { opacity: 0; transform: translate(270px, -10px) rotate(42deg) scale(0.65); } }
 .lyrics-toggle { display: grid; place-items: center; flex: 0 0 44px; height: 44px; margin-left: auto; border: 0; border-radius: 50%; background: #ffffff0c; color: var(--md-sys-color-on-secondary-container); cursor: pointer; }
 .lyrics-toggle:hover { background: #ffffff18; }
-.features__lyrics { --lyrics-play-state: running; position: relative; height: 144px; flex: none; overflow: hidden; font-size: clamp(1rem, 7cqw, 2.1rem); font-weight: 760; letter-spacing: -0.04em; line-height: 1.2; }
+.features__lyrics { --lyrics-play-state: running; position: relative; height: 144px; flex: none; overflow: hidden; font-size: clamp(1rem, 7cqw, 2.1rem); font-weight: 760; font-variation-settings: 'ROND' 100; letter-spacing: -0.02em; line-height: 1.2; }
 .features__lyrics.is-paused { --lyrics-play-state: paused; }
 .lyrics-line { position: absolute; top: calc(50% - 0.85em); inset-inline: 4px; display: flex; flex-wrap: wrap; align-content: center; column-gap: 0.24em; height: 1.7em; transform-origin: left center; animation: lyrics-line 9s cubic-bezier(0.22, 1, 0.36, 1) infinite; animation-delay: var(--line-delay); animation-play-state: var(--lyrics-play-state); }
 .lyrics-word { display: inline-block; color: #fff5d6; animation: lyrics-word 9s linear infinite; animation-delay: calc(var(--line-delay) + var(--word) * 0.32s); animation-play-state: var(--lyrics-play-state); }
@@ -135,7 +135,7 @@ function openDownload(platform: DownloadPlatformKey) {
 .platforms__list button:hover, .platforms__list button:focus-visible { background: var(--md-sys-color-surface-container-high); }
 .platforms__icon { display: grid; width: 52px; height: 52px; place-items: center; border-radius: 16px; background: var(--md-sys-color-surface-container-highest); }
 .platforms__icon img { width: 23px; height: 23px; object-fit: contain; }
-.platforms__name { display: flex; flex-direction: column; }.platforms__name strong { font-size: 1rem; font-weight: 720; }.platforms__name small { color: var(--md-sys-color-on-surface-variant); font-size: 0.8rem; }
+.platforms__name { display: flex; flex-direction: column; }.platforms__name strong { font: var(--md-sys-typescale-title-medium); letter-spacing: var(--md-sys-typescale-title-medium-tracking); }.platforms__name small { color: var(--md-sys-color-on-surface-variant); font: var(--md-sys-typescale-body-small); letter-spacing: var(--md-sys-typescale-body-small-tracking); }
 @media (max-width: 940px) {
   .features, .platforms { padding: 72px 0; }.features__progress { top: -79px; }.platforms__layout { grid-template-columns: 1fr; gap: 28px; }
   .features__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }.features__card, .features__card--1, .features__card--2, .features__card--3, .features__card--6 { grid-column: auto; min-height: 280px; }.features__card--6 { grid-column: 1 / -1; grid-template-columns: 1fr; row-gap: 24px; }.features__card--6 .features__copy { grid-column: auto; grid-row: auto; }

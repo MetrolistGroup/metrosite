@@ -78,10 +78,8 @@ onMounted(async () => {
 .hero h1 {
   max-width: 860px;
   margin: 0 0 26px;
-  font-size: clamp(3.6rem, 7.1vw, 7rem);
-  font-weight: 760;
-  letter-spacing: -0.06em;
-  line-height: 0.91;
+  font: var(--md-sys-typescale-display-large);
+  letter-spacing: var(--md-sys-typescale-display-large-tracking);
 }
 
 .hero h1 span {
@@ -91,8 +89,8 @@ onMounted(async () => {
 .hero__lede {
   max-width: 680px;
   color: var(--md-sys-color-on-surface-variant);
-  font-size: clamp(1.08rem, 1.7vw, 1.3rem);
-  line-height: 1.55;
+  font: var(--md-sys-typescale-body-large);
+  letter-spacing: var(--md-sys-typescale-body-large-tracking);
 }
 
 .hero__actions {
@@ -131,15 +129,14 @@ onMounted(async () => {
 .hero__signal strong {
   display: block;
   margin-bottom: 10px;
-  font-size: clamp(1.5rem, 2.4vw, 2.2rem);
-  font-weight: 760;
-  letter-spacing: -0.035em;
-  line-height: 1.05;
+  font: var(--md-sys-typescale-headline-medium);
+  letter-spacing: var(--md-sys-typescale-headline-medium-tracking);
 }
 
 .hero__signal p {
   color: color-mix(in srgb, var(--md-sys-color-on-secondary-container) 78%, transparent);
-  font-size: 0.94rem;
+  font: var(--md-sys-typescale-body-medium);
+  letter-spacing: var(--md-sys-typescale-body-medium-tracking);
 }
 
 .hero__stats {
@@ -155,13 +152,17 @@ onMounted(async () => {
 .hero__stats dt {
   margin-bottom: 3px;
   color: color-mix(in srgb, var(--md-sys-color-on-secondary-container) 70%, transparent);
-  font-size: 0.68rem;
+  font: var(--md-sys-typescale-label-small);
+  font-variation-settings: 'ROND' 100;
+  letter-spacing: var(--md-sys-typescale-label-small-tracking);
+  text-transform: uppercase;
 }
 
 .hero__stats dd {
   min-height: 20px;
-  font-size: 0.88rem;
-  font-weight: 760;
+  font: var(--md-sys-typescale-title-medium);
+  letter-spacing: var(--md-sys-typescale-title-medium-tracking);
+  font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 900px) {
@@ -186,8 +187,7 @@ onMounted(async () => {
   }
 
   .hero h1 {
-    font-size: clamp(3rem, 14vw, 5rem);
-    line-height: 1;
+    font-size: clamp(2.75rem, 12vw, 4.5rem);
   }
 
   .hero__signal {
