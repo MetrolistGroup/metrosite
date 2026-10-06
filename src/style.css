@@ -52,6 +52,20 @@
   --md-sys-shape-corner-full: 999px;
   --md-sys-motion-standard: cubic-bezier(0.2, 0, 0, 1);
   --md-sys-motion-expressive: cubic-bezier(0.05, 0.7, 0.1, 1);
+  /* M3 Expressive motion scheme springs (mass 1) sampled into linear().
+     Spatial: position, scale, rotation, shape; may overshoot.
+     Effects: opacity, color; critically damped, never overshoot. */
+  --md-motion-spatial-fast: 350ms linear(0, 0.072, 0.238, 0.44, 0.638, 0.806, 0.934, 1.021, 1.071, 1.092, 1.093, 1.081, 1.063, 1.044, 1.026, 1.012, 1.002, 0.995, 0.992, 0.991, 0.992, 0.993, 0.995, 0.997, 1);
+  --md-motion-spatial-default: 420ms linear(0, 0.048, 0.161, 0.301, 0.444, 0.576, 0.69, 0.784, 0.858, 0.913, 0.953, 0.98, 0.997, 1.008, 1.013, 1.015, 1.015, 1.013, 1.011, 1.009, 1.007, 1.005, 1.004, 1.003, 1);
+  --md-motion-spatial-slow: 570ms linear(0, 0.047, 0.157, 0.294, 0.435, 0.567, 0.681, 0.775, 0.85, 0.906, 0.947, 0.976, 0.995, 1.006, 1.012, 1.015, 1.015, 1.014, 1.012, 1.01, 1.008, 1.006, 1.004, 1.003, 1);
+  --md-motion-effects-fast: 140ms linear(0, 0.162, 0.421, 0.635, 0.782, 0.874, 0.929, 0.961, 0.979, 0.988, 0.994, 0.997, 1);
+  --md-motion-effects-default: 220ms linear(0, 0.167, 0.431, 0.645, 0.791, 0.881, 0.934, 0.964, 0.981, 0.99, 0.995, 0.997, 1);
+  --md-motion-effects-slow: 300ms linear(0, 0.158, 0.413, 0.626, 0.774, 0.868, 0.925, 0.958, 0.977, 0.987, 0.993, 0.996, 1);
+  /* Exits are shorter and accelerate away so they never block the next action. */
+  --md-motion-exit: 160ms cubic-bezier(0.3, 0, 0.8, 0.15);
+  --md-sys-state-hover: 8%;
+  --md-sys-state-focus: 10%;
+  --md-sys-state-pressed: 10%;
 }
 
 *,
@@ -174,7 +188,7 @@ img {
   min-height: 44px;
   padding: 10px 20px;
   border: 0;
-  border-radius: var(--md-sys-shape-corner-full);
+  border-radius: 28px;
   color: inherit;
   cursor: pointer;
   font-size: 0.9rem;
@@ -182,6 +196,58 @@ img {
   line-height: 1;
   text-decoration: none;
   white-space: nowrap;
+}
+
+/* State layer: an overlay tinted with the content color, so hover, focus,
+   and press read the same on every container color. Hover is instant;
+   only the press release eases out. */
+.btn,
+.icon-button {
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-radius var(--md-motion-spatial-fast);
+}
+
+.btn::after,
+.icon-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--md-motion-effects-fast);
+}
+
+.btn:hover::after,
+.icon-button:hover::after {
+  opacity: var(--md-sys-state-hover);
+  transition: none;
+}
+
+.btn:focus-visible::after,
+.icon-button:focus-visible::after {
+  opacity: var(--md-sys-state-focus);
+}
+
+.btn:active::after,
+.icon-button:active::after {
+  opacity: var(--md-sys-state-pressed);
+  transition: none;
+}
+
+/* Press morphs the pill toward a rounded square, then springs back. */
+.btn:active {
+  border-radius: 12px;
+}
+
+.btn-lg:active {
+  border-radius: 16px;
+}
+
+.icon-button:active {
+  border-radius: 16px;
 }
 
 .btn .material-symbols-rounded {
@@ -193,26 +259,14 @@ img {
   color: var(--md-sys-color-on-primary);
 }
 
-.btn-filled:hover {
-  background: #e3caff;
-}
-
 .btn-tonal {
   background: var(--md-sys-color-secondary-container);
   color: var(--md-sys-color-on-secondary-container);
 }
 
-.btn-tonal:hover {
-  background: #645300;
-}
-
 .btn-outlined {
   background: var(--md-sys-color-surface-container-high);
   color: var(--md-sys-color-primary);
-}
-
-.btn-outlined:hover {
-  background: var(--md-sys-color-surface-container-highest);
 }
 
 .btn-lg {
@@ -234,14 +288,10 @@ img {
   width: 48px;
   height: 48px;
   border: 0;
-  border-radius: var(--md-sys-shape-corner-full);
+  border-radius: 24px;
   background: var(--md-sys-color-surface-container-high);
   color: var(--md-sys-color-on-surface);
   cursor: pointer;
-}
-
-.icon-button:hover {
-  background: var(--md-sys-color-surface-container-highest);
 }
 
 #desktop,
@@ -264,7 +314,15 @@ img {
   }
 }
 
+/* Reduced motion drops movement, not feedback: spatial tokens become
+   instant while opacity and color fades stay. */
 @media (prefers-reduced-motion: reduce) {
+  :root {
+    --md-motion-spatial-fast: 0s linear;
+    --md-motion-spatial-default: 0s linear;
+    --md-motion-spatial-slow: 0s linear;
+  }
+
   html {
     scroll-behavior: auto;
   }
@@ -275,6 +333,5 @@ img {
     animation-duration: 0s !important;
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
-    transition-duration: 0s !important;
   }
 }

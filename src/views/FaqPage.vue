@@ -156,7 +156,7 @@ function toggleItem(index: number) {
 }
 
 .faq-page__mark {
-  transition: transform 320ms var(--md-sys-motion-expressive);
+  transition: transform var(--md-motion-spatial-fast);
 }
 
 .faq-page__list article.is-open .faq-page__mark {
@@ -171,7 +171,7 @@ function toggleItem(index: number) {
 .faq-page__answer {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 360ms var(--md-sys-motion-expressive);
+  transition: grid-template-rows var(--md-motion-spatial-default);
 }
 
 .faq-page__answer > div {

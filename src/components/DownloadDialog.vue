@@ -215,22 +215,24 @@ function formatSize(bytes?: number) {
   color: var(--md-sys-color-on-surface);
   opacity: 0;
   transform: translateY(12px) scale(0.98);
-  transition: opacity 220ms, transform 280ms var(--md-sys-motion-expressive), display 280ms allow-discrete, overlay 280ms allow-discrete;
+  transition: opacity var(--md-motion-exit), transform var(--md-motion-exit), display 160ms allow-discrete, overlay 160ms allow-discrete;
 }
 
 .download-dialog[open] {
   opacity: 1;
   transform: none;
+  transition: opacity var(--md-motion-effects-default), transform var(--md-motion-spatial-default), display 420ms allow-discrete, overlay 420ms allow-discrete;
 }
 
 .download-dialog::backdrop {
   background: rgb(0 0 0 / 76%);
   opacity: 0;
-  transition: opacity 220ms, display 280ms allow-discrete, overlay 280ms allow-discrete;
+  transition: opacity var(--md-motion-exit), display 160ms allow-discrete, overlay 160ms allow-discrete;
 }
 
 .download-dialog[open]::backdrop {
   opacity: 1;
+  transition: opacity var(--md-motion-effects-slow), display 300ms allow-discrete, overlay 300ms allow-discrete;
 }
 
 @starting-style {
@@ -279,9 +281,11 @@ function formatSize(bytes?: number) {
   color: var(--md-sys-color-on-surface);
   cursor: pointer;
   text-align: left;
+  transition: background var(--md-motion-effects-default), color var(--md-motion-effects-default), border-radius var(--md-motion-spatial-fast);
 }
 
 .download-dialog__platforms button[aria-pressed='true'] {
+  border-radius: var(--md-sys-shape-corner-extra-large);
   background: var(--md-sys-color-primary-container);
   color: var(--md-sys-color-on-primary-container);
 }
@@ -346,9 +350,22 @@ function formatSize(bytes?: number) {
   font: inherit;
   font-size: 0.78rem;
   font-weight: 680;
+  transition: background var(--md-motion-effects-default), color var(--md-motion-effects-default), border-radius var(--md-motion-spatial-fast);
+}
+
+.download-dialog__platforms button:hover:not([aria-pressed='true']),
+.download-dialog__architectures button:hover:not([aria-pressed='true']) {
+  background: var(--md-sys-color-surface-container-highest);
+  transition: none;
+}
+
+.download-dialog__platforms button:active,
+.download-dialog__architectures button:active {
+  border-radius: var(--md-sys-shape-corner-small);
 }
 
 .download-dialog__architectures button[aria-pressed='true'] {
+  border-radius: 19px;
   background: var(--md-sys-color-secondary-container);
   color: var(--md-sys-color-on-secondary-container);
 }
@@ -427,10 +444,6 @@ function formatSize(bytes?: number) {
   display: flex;
   justify-content: flex-end;
   margin-top: 18px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .download-dialog, .download-dialog::backdrop { transition: none; }
 }
 
 @media (max-width: 760px) {

@@ -30,6 +30,7 @@ const currentAnchor = (hash: string) => route.path === '/' && route.hash === has
       </button>
     </div>
 
+    <Transition name="drawer">
     <nav v-show="isMenuOpen" id="mobile-navigation" class="navbar__drawer" aria-label="Mobile navigation">
       <div class="container">
         <RouterLink :to="{ path: '/', hash: '#desktop' }" :aria-current="currentAnchor('#desktop')" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">devices</span>Showcase</RouterLink>
@@ -39,6 +40,7 @@ const currentAnchor = (hash: string) => route.path === '/' && route.hash === has
         <DownloadDialog label="Download" button-class="navbar__drawer-download" @open="isMenuOpen = false" />
       </div>
     </nav>
+    </Transition>
   </header>
 </template>
 
@@ -142,6 +144,20 @@ const currentAnchor = (hash: string) => route.path === '/' && route.hash === has
 .navbar__drawer :deep(.navbar__drawer-download:hover) {
   background: var(--md-sys-color-secondary-container);
   color: var(--md-sys-color-on-secondary-container);
+}
+
+.drawer-enter-active {
+  transition: opacity var(--md-motion-effects-default), transform var(--md-motion-spatial-default);
+}
+
+.drawer-leave-active {
+  transition: opacity var(--md-motion-exit), transform var(--md-motion-exit);
+}
+
+.drawer-enter-from,
+.drawer-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
 }
 
 @media (max-width: 800px) {

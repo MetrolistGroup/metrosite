@@ -101,7 +101,7 @@ try {
   assert.equal(await page.locator('.showcase__mosaic .screen-fade-enter-active').count(), 0, 'reduced motion skips screen fades')
   await page.getByRole('button', { name: 'Enlarge Android app preview' }).click()
   await page.waitForTimeout(50)
-  assert.equal(await page.locator('.preview-dialog').evaluate(element => element.getAnimations({ subtree: true }).length), 0)
+  assert.deepEqual(await page.locator('.preview-dialog').evaluate(element => element.getAnimations({ subtree: true }).map(animation => animation.transitionProperty).filter(property => property !== 'opacity')), [], 'reduced motion keeps only opacity fades')
   assert.match(await page.locator('.preview-dialog__screen img').getAttribute('src'), /folded-player/)
   await page.keyboard.press('Escape')
 

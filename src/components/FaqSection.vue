@@ -114,7 +114,7 @@ function toggleItem(index: number) {
   height: 44px;
   border-radius: var(--md-sys-shape-corner-full);
   background: color-mix(in srgb, currentColor 10%, transparent);
-  transition: transform 320ms var(--md-sys-motion-expressive);
+  transition: transform var(--md-motion-spatial-fast);
 }
 
 .faq__list article.is-open .faq__mark {
@@ -129,7 +129,7 @@ function toggleItem(index: number) {
 .faq__answer {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 360ms var(--md-sys-motion-expressive);
+  transition: grid-template-rows var(--md-motion-spatial-default);
 }
 
 .faq__answer > div {

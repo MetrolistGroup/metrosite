@@ -59,7 +59,7 @@ const platformName = computed(() => props.device === 'desktop' ? 'Desktop' : pro
 <style scoped>
 .screen { position: relative; width: 100%; height: 100%; overflow: hidden; container-type: inline-size; background: #141217; color: #f3ebf6; text-align: left; }
 .screen__capture { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
-.screen-fade-enter-active, .screen-fade-leave-active { transition: opacity 240ms var(--md-sys-motion-standard); }
+.screen-fade-enter-active, .screen-fade-leave-active { transition: opacity var(--md-motion-effects-slow); }
 .screen-fade-leave-active { position: absolute; inset: 0; }
 .screen-fade-enter-from, .screen-fade-leave-to { opacity: 0; }
 .screen__missing { display: flex; height: 100%; flex-direction: column; align-items: center; justify-content: center; gap: 4cqw; padding: 8cqw; background: radial-gradient(ellipse at 50% 20%, #53357155, transparent 70%); text-align: center; }
