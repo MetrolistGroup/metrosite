@@ -1,5 +1,8 @@
-import { createApp } from 'vue'
+import { createSSRApp } from 'vue'
 import App from './App.vue'
-import { router } from './router'
+import { createAppRouter } from './router'
 
-createApp(App).use(router).mount('#app')
+// Every route ships prerendered HTML; hydrate it once the route's chunk is loaded.
+const router = createAppRouter()
+const app = createSSRApp(App).use(router)
+router.isReady().then(() => app.mount('#app'))

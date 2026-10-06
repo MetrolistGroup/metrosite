@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import DownloadDialog from '../components/DownloadDialog.vue'
 
 const route = useRoute()
 const copied = ref(false)
-const code = computed(() => typeof route.query.code === 'string' ? route.query.code : '')
+// The page is prerendered without a query, so read the room code only after hydration.
+const hydrated = ref(false)
+onMounted(() => { hydrated.value = true })
+const code = computed(() => hydrated.value && typeof route.query.code === 'string' ? route.query.code : '')
 const openInAppUrl = computed(() => code.value ? `${window.location.origin}/listen?code=${encodeURIComponent(code.value)}` : '#')
 
 async function copyCode() {

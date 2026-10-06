@@ -8,8 +8,9 @@
     "test": "bun test",
     "test:browser": "bun run build && bun tests/browser.mjs",
     "check": "bun test && bun run build",
-    "build": "vue-tsc -b && vite build && bun scripts/postbuild.ts",
-    "preview": "vite preview"
+    "build": "vue-tsc -b && vite build --ssrManifest && vite build --ssr src/entry-server.ts --outDir dist-ssr && bun scripts/postbuild.ts",
+    "preview": "vite preview",
+    "indexnow": "bun scripts/indexnow.ts"
   },
   "dependencies": {
     "material-shapes-ts": "^0.3.0",

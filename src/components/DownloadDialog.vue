@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, useId } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, useId } from 'vue'
 import {
   DOWNLOAD_PLATFORMS,
   findDownloadAsset,
@@ -38,7 +38,8 @@ function detectedPlatform(): DownloadPlatformKey {
   return 'linux'
 }
 
-const selectedKey = ref<DownloadPlatformKey>(props.platform ?? detectedPlatform())
+// Prerendered HTML can't know the visitor's platform, so detect it after hydration.
+const selectedKey = ref<DownloadPlatformKey>(props.platform ?? 'android')
 const selectedPlatform = computed(() => DOWNLOAD_PLATFORMS.find(({ key }) => key === selectedKey.value)!)
 const selectedArchitectureKey = ref(selectedPlatform.value.architectures[0]!.key)
 const selectedArchitecture = computed(() => selectedPlatform.value.architectures.find(({ key }) => key === selectedArchitectureKey.value)!)
@@ -83,6 +84,10 @@ function open(platformKey?: DownloadPlatformKey) {
 }
 
 defineExpose({ open })
+
+onMounted(() => {
+  if (!props.platform) selectPlatform(DOWNLOAD_PLATFORMS.find(({ key }) => key === detectedPlatform())!)
+})
 
 function closeOnBackdrop(event: MouseEvent) {
   if (event.target === dialog.value) dialog.value.close()

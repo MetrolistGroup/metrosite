@@ -1,85 +1,207 @@
-import { createHash } from 'node:crypto'
-import { readFile, writeFile } from 'node:fs/promises'
-import { FAQ_ITEMS } from '../src/content/faq'
-import { faqMarkdown, homeMarkdown, llmsTxt, privacyMarkdown } from './markdown'
-import { PAGE_META, SITE_URL, type PageMeta } from '../src/content/site'
+import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { COMPARE_FAQ } from '../src/content/compare'
+import { DOWNLOAD_PLATFORMS, type DownloadPlatformKey } from '../src/content/downloads'
+import { FAQ_ITEMS, type FaqItem } from '../src/content/faq'
+import { PAGE_META, PLATFORM_PAGES, REPO_URL, SITE_URL, type PageMeta } from '../src/content/site'
+import { compareMarkdown, faqMarkdown, homeMarkdown, llmsTxt, platformMarkdown, privacyMarkdown } from './markdown'
 
 const dist = new URL('../dist/', import.meta.url)
 const source = await readFile(new URL('index.html', dist), 'utf8')
+const ssrManifest: Record<string, string[]> = JSON.parse(await readFile(new URL('.vite/ssr-manifest.json', dist), 'utf8'))
+const { render } = await import(new URL('../dist-ssr/entry-server.js', import.meta.url).href) as typeof import('../src/entry-server')
+const assets = await readdir(new URL('assets/', dist))
+const assetUrl = (stem: string) => {
+  const file = assets.find(name => name.startsWith(`${stem}-`) && !name.startsWith(`${stem}-thumb`))
+  if (!file) throw new Error(`Screenshot ${stem} was not found`)
+  return `${SITE_URL}/assets/${file}`
+}
 
-function breadcrumbs(name: string, path: string) {
+const SCREENSHOTS = {
+  desktop: assetUrl('desktop-player'),
+  desktopHome: assetUrl('desktop-home'),
+  android: assetUrl('pixel-10-pro-fold-folded-player-dark'),
+  ios: assetUrl('iphone-17-player-dark'),
+}
+const PLATFORM_SCREENSHOT: Record<DownloadPlatformKey, string> = {
+  android: SCREENSHOTS.android,
+  ios: SCREENSHOTS.ios,
+  linux: SCREENSHOTS.desktop,
+  macos: SCREENSHOTS.desktop,
+  windows: SCREENSHOTS.desktop,
+}
+
+// Latest version for structured data; the build still succeeds offline.
+const release = await fetch('https://api.github.com/repos/MetrolistGroup/Metrolist/releases/latest', { signal: AbortSignal.timeout(5000) })
+  .then(response => response.ok ? response.json() as Promise<{ tag_name?: string, published_at?: string }> : undefined)
+  .catch(() => undefined)
+
+const ORGANIZATION = {
+  '@type': 'Organization',
+  '@id': `${SITE_URL}/#organization`,
+  name: 'Metrolist',
+  url: `${SITE_URL}/`,
+  logo: `${SITE_URL}/logo.svg`,
+  sameAs: ['https://github.com/MetrolistGroup', REPO_URL, 'https://hosted.weblate.org/projects/Metrolist/'],
+}
+
+function app(operatingSystem: string, screenshot: string | string[], downloadUrl = `${REPO_URL}/releases/latest`) {
   return {
     '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Metrolist', item: `${SITE_URL}/` },
-      { '@type': 'ListItem', position: 2, name, item: `${SITE_URL}${path}` },
-    ],
+    '@type': 'SoftwareApplication',
+    name: 'Metrolist',
+    alternateName: 'Metrolist Music',
+    url: `${SITE_URL}/`,
+    description: PAGE_META.home.description,
+    applicationCategory: 'MultimediaApplication',
+    applicationSubCategory: 'Music player',
+    operatingSystem,
+    downloadUrl,
+    installUrl: downloadUrl,
+    screenshot,
+    image: `${SITE_URL}/og-image.png`,
+    ...(release?.tag_name && { softwareVersion: release.tag_name.replace(/^v/, '') }),
+    ...(release?.published_at && { dateModified: release.published_at }),
+    isAccessibleForFree: true,
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    license: `${REPO_URL}/blob/main/LICENSE`,
+    codeRepository: REPO_URL,
+    featureList: 'Ad-free YouTube Music playback, background playback, offline downloads, synchronized lyrics, Listen Together rooms, Chromecast, DLNA, and FCast casting, equalizer, tempo and pitch controls',
+    author: { '@type': 'Person', name: 'Mo Agamy', url: 'https://github.com/mostafaalagamy' },
+    publisher: { '@id': `${SITE_URL}/#organization` },
+    sameAs: REPO_URL,
   }
 }
 
-const faqSchema = {
+const faq = (items: FaqItem[]) => ({
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: FAQ_ITEMS.map(item => ({
-    '@type': 'Question',
-    name: item.question,
-    acceptedAnswer: { '@type': 'Answer', text: item.answer },
-  })),
+  mainEntity: items.map(item => ({ '@type': 'Question', name: item.question, acceptedAnswer: { '@type': 'Answer', text: item.answer } })),
+})
+
+const breadcrumbs = (name: string, path: string) => ({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Metrolist', item: `${SITE_URL}/` },
+    { '@type': 'ListItem', position: 2, name, item: `${SITE_URL}${path}` },
+  ],
+})
+
+type Page = {
+  path: string
+  file: string
+  meta: PageMeta
+  canonical?: boolean
+  schemas?: object[]
+  markdown?: [file: string, content: string]
+  /** Screenshots listed in the image sitemap. */
+  images?: string[]
 }
 
-function renderPage(meta: PageMeta, path: string, canonical = true, schemas: object[] = [], markdown?: string) {
-  const url = `${SITE_URL}${path}`
-  let html = source
-    .replace(/<title>[^<]*<\/title>/, `<title>${meta.title}</title>`)
-    .replace(/<meta name="robots" content="[^"]*" \/>/, `<meta name="robots" content="${meta.robots}" />`)
-    .replace(/<meta name="description" content="[^"]*" \/>/, `<meta name="description" content="${meta.description}" />`)
-    .replace(/<meta property="og:title" content="[^"]*" \/>/, `<meta property="og:title" content="${meta.title}" />`)
-    .replace(/<meta property="og:description" content="[^"]*" \/>/, `<meta property="og:description" content="${meta.description}" />`)
-    .replace(/<meta property="og:url" content="[^"]*" \/>/, `<meta property="og:url" content="${url}" />`)
-    .replace(/<meta name="twitter:title" content="[^"]*" \/>/, `<meta name="twitter:title" content="${meta.title}" />`)
-    .replace(/<meta name="twitter:description" content="[^"]*" \/>/, `<meta name="twitter:description" content="${meta.description}" />`)
+const pages: Page[] = [
+  {
+    path: '/',
+    file: 'index.html',
+    meta: PAGE_META.home,
+    markdown: ['index.md', homeMarkdown()],
+    images: [SCREENSHOTS.desktopHome, SCREENSHOTS.desktop, SCREENSHOTS.android, SCREENSHOTS.ios],
+    schemas: [
+      { '@context': 'https://schema.org', '@type': 'WebSite', '@id': `${SITE_URL}/#website`, name: 'Metrolist', alternateName: ['Metrolist Music', 'metrolist.cc'], url: `${SITE_URL}/`, publisher: { '@id': `${SITE_URL}/#organization` } },
+      { '@context': 'https://schema.org', ...ORGANIZATION },
+      app('Android, iOS, Windows, macOS, Linux', Object.values(SCREENSHOTS)),
+    ],
+  },
+  { path: '/faq', file: 'faq.html', meta: PAGE_META.faq, schemas: [faq(FAQ_ITEMS), breadcrumbs('FAQ', '/faq')], markdown: ['faq.md', faqMarkdown()] },
+  { path: '/compare', file: 'compare.html', meta: PAGE_META.compare, schemas: [faq(COMPARE_FAQ), breadcrumbs('Metrolist vs YouTube Music', '/compare')], markdown: ['compare.md', compareMarkdown()] },
+  { path: '/privacy', file: 'privacy.html', meta: PAGE_META.privacy, schemas: [breadcrumbs('Privacy policy', '/privacy')], markdown: ['privacy.md', privacyMarkdown(await readFile(new URL('../src/views/PrivacyPage.vue', import.meta.url), 'utf8'))] },
+  ...DOWNLOAD_PLATFORMS.map(({ key, name }): Page => ({
+    path: `/download/${key}`,
+    file: `download/${key}.html`,
+    meta: PLATFORM_PAGES[key].meta,
+    markdown: [`download/${key}.md`, platformMarkdown(key)],
+    images: [PLATFORM_SCREENSHOT[key]],
+    schemas: [app(PLATFORM_PAGES[key].operatingSystem, PLATFORM_SCREENSHOT[key]), faq(PLATFORM_PAGES[key].faq), breadcrumbs(`Metrolist for ${name}`, `/download/${key}`)],
+  })),
+  { path: '/listen', file: 'listen.html', meta: PAGE_META.listen },
+  { path: '/404', file: '404.html', meta: PAGE_META.notFound, canonical: false },
+]
 
-  html = canonical
-    ? html.replace(/<link rel="canonical" href="[^"]*" \/>/, `<link rel="canonical" href="${url}" />`)
-    : html.replace(/\s*<link rel="canonical" href="[^"]*" \/>/, '')
+const escapeHtml = (text: string) => text.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;')
+
+// Stylesheets and chunks the prerendered route needs, so it paints styled before hydration.
+function preloadLinks(modules: Set<string>) {
+  const files = new Set([...modules].flatMap(id => ssrManifest[id] ?? []).filter(file => !source.includes(file)))
+  return [...files].map(file => file.endsWith('.css')
+    ? `<link rel="stylesheet" href="${file}" />`
+    : file.endsWith('.js') ? `<link rel="modulepreload" crossorigin href="${file}" />` : '').filter(Boolean).join('\n    ')
+}
+
+async function renderPage(page: Page) {
+  const { meta, path } = page
+  const url = `${SITE_URL}${path}`
+  const title = escapeHtml(meta.title)
+  const description = escapeHtml(meta.description)
+  let html = source
+    .replace(/<title>[^<]*<\/title>/, `<title>${title}</title>`)
+    .replace(/<meta name="robots" content="[^"]*" \/>/, `<meta name="robots" content="${meta.robots}" />`)
+    .replace(/<meta name="description" content="[^"]*" \/>/, `<meta name="description" content="${description}" />`)
+    .replace(/<meta property="og:title" content="[^"]*" \/>/, `<meta property="og:title" content="${title}" />`)
+    .replace(/<meta property="og:description" content="[^"]*" \/>/, `<meta property="og:description" content="${description}" />`)
+    .replace(/<meta property="og:url" content="[^"]*" \/>/, `<meta property="og:url" content="${url}" />`)
+    .replace(/<meta name="twitter:title" content="[^"]*" \/>/, `<meta name="twitter:title" content="${title}" />`)
+    .replace(/<meta name="twitter:description" content="[^"]*" \/>/, `<meta name="twitter:description" content="${description}" />`)
+
+  html = page.canonical === false
+    ? html.replace(/\s*<link rel="canonical" href="[^"]*" \/>/, '')
+    : html.replace(/<link rel="canonical" href="[^"]*" \/>/, `<link rel="canonical" href="${url}" />`)
 
   if (path !== '/') html = html.replace(/\s*<link rel="discord:component-embed"[^>]*\/>/, '')
-  if (markdown) html = html.replace('</head>', `<link rel="alternate" type="text/markdown" href="${markdown}" />\n  </head>`)
-  for (const schema of schemas) {
-    html = html.replace('</head>', `<script type="application/ld+json">${JSON.stringify(schema).replaceAll('<', '\\u003c')}</script>\n  </head>`)
+  if (page.markdown) html = html.replace('</head>', `  <link rel="alternate" type="text/markdown" href="/${page.markdown[0]}" />\n  </head>`)
+  for (const schema of page.schemas ?? []) {
+    html = html.replace('</head>', `  <script type="application/ld+json">${JSON.stringify(schema).replaceAll('<', '\\u003c')}</script>\n  </head>`)
   }
 
-  if (!html.includes(`<title>${meta.title}</title>`) || !html.includes(`content="${meta.robots}"`)) {
-    throw new Error(`Failed to generate metadata for ${path}`)
+  const rendered = await render(path === '/404' ? '/__not-found' : path)
+  html = html
+    .replace('</head>', `  ${preloadLinks(rendered.modules)}\n  </head>`)
+    // Vue hydrates body teleports starting from the body's first child.
+    .replace('<body>', `<body>${rendered.teleports.body ?? ''}`)
+    .replace('<div id="app"></div>', `<div id="app">${rendered.html}</div>`)
+
+  if (!html.includes(`<title>${title}</title>`) || !html.includes(`content="${meta.robots}"`) || !html.includes('<h1')) {
+    throw new Error(`Failed to prerender ${path}`)
   }
-  return html
+  const target = new URL(page.file, dist)
+  await mkdir(new URL('.', target), { recursive: true })
+  await writeFile(target, html)
+  if (page.markdown) await writeFile(new URL(page.markdown[0], dist), page.markdown[1])
 }
 
-await writeFile(new URL('index.html', dist), renderPage(PAGE_META.home, '/', true, [], '/index.md'))
-await writeFile(new URL('faq.html', dist), renderPage(PAGE_META.faq, '/faq', true, [faqSchema, breadcrumbs('FAQ', '/faq')], '/faq.md'))
-await writeFile(new URL('listen.html', dist), renderPage(PAGE_META.listen, '/listen'))
-await writeFile(new URL('privacy.html', dist), renderPage(PAGE_META.privacy, '/privacy', true, [breadcrumbs('Privacy policy', '/privacy')], '/privacy.md'))
-await writeFile(new URL('index.md', dist), homeMarkdown())
-await writeFile(new URL('faq.md', dist), faqMarkdown())
-await writeFile(new URL('privacy.md', dist), privacyMarkdown(await readFile(new URL('../src/views/PrivacyPage.vue', import.meta.url), 'utf8')))
+for (const page of pages) await renderPage(page)
+
+const indexable = pages.filter(page => page.meta.robots.startsWith('index'))
+await writeFile(new URL('sitemap.xml', dist), `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+${indexable.map(page => `  <url>
+    <loc>${SITE_URL}${page.path}</loc>${(page.images ?? []).map(image => `
+    <image:image><image:loc>${image}</image:loc></image:image>`).join('')}
+  </url>`).join('\n')}
+</urlset>
+`)
 await writeFile(new URL('llms.txt', dist), llmsTxt())
-await writeFile(new URL('404.html', dist), renderPage(PAGE_META.notFound, '/404', false))
+await rm(new URL('.vite/', dist), { recursive: true })
 
 const discordEmbed = await readFile(new URL('discord-embed.json', dist))
 if (discordEmbed.byteLength > 3000 || JSON.parse(discordEmbed.toString()).component?.type !== 17) {
   throw new Error('Invalid Discord link preview')
 }
 
-const jsonLd = source.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1]
-if (!jsonLd) throw new Error('Structured data script was not found')
-const scriptHash = createHash('sha256').update(jsonLd).digest('base64')
-
+// JSON-LD blocks are data, not script, so script-src needs no inline hashes.
 await writeFile(new URL('_headers', dist), `/assets/*
   Cache-Control: public, max-age=31536000, immutable
 
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-${scriptHash}'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self' https://api.github.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self' https://api.github.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
   Permissions-Policy: camera=(), geolocation=(), microphone=()
   Referrer-Policy: strict-origin-when-cross-origin
   Strict-Transport-Security: max-age=31536000
@@ -88,6 +210,7 @@ await writeFile(new URL('_headers', dist), `/assets/*
 
 /*.md
   Content-Type: text/markdown; charset=utf-8
+  X-Robots-Tag: noindex
 
 /llms.txt
   Content-Type: text/plain; charset=utf-8
@@ -95,4 +218,3 @@ await writeFile(new URL('_headers', dist), `/assets/*
 /listen
   X-Robots-Tag: noindex, follow
 `)
-

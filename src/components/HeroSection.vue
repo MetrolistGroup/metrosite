@@ -26,7 +26,7 @@ onMounted(async () => {
     <div class="container">
       <div class="hero__layout">
         <div class="hero__copy">
-          <h1 id="hero-title">Metrolist brings your music to <span>every screen.</span></h1>
+          <h1 id="hero-title">Metrolist brings YouTube Music to <span>every screen.</span></h1>
           <p class="hero__lede">
             An open-source YouTube Music client for Android, iOS, Linux, macOS, and Windows, with ad-free playback and a layout that fits each platform.
           </p>
