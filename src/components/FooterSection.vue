@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { DOWNLOAD_PLATFORMS } from '../content/downloads'
-import { PLATFORM_PAGES } from '../content/site'
-
 const links = [
   { label: 'Source', href: 'https://github.com/MetrolistGroup/Metrolist' },
   { label: 'Releases', href: 'https://github.com/MetrolistGroup/Metrolist/releases' },
@@ -22,12 +19,6 @@ const links = [
         </RouterLink>
         <p>Open-source music for Android, iOS, and desktop, built with Kotlin Multiplatform.</p>
       </div>
-
-      <nav class="footer__links" aria-label="Downloads and guides">
-        <RouterLink v-for="platform in DOWNLOAD_PLATFORMS" :key="platform.key" :to="`/download/${platform.key}`">{{ PLATFORM_PAGES[platform.key].linkLabel }}</RouterLink>
-        <RouterLink to="/compare">Metrolist vs YouTube Music</RouterLink>
-        <RouterLink to="/faq">FAQ</RouterLink>
-      </nav>
 
       <nav class="footer__links" aria-label="Footer navigation">
         <a
@@ -91,10 +82,6 @@ const links = [
   flex-wrap: wrap;
   gap: 8px;
   padding: 24px 0;
-}
-
-.footer__links + .footer__links {
-  padding-top: 0;
 }
 
 .footer__links a {

@@ -48,11 +48,10 @@ function openDownload(platform: DownloadPlatformKey) {
     <div class="container platforms__layout">
       <header><h2>One codebase.<br />Every place to press play.</h2><p>Kotlin Multiplatform keeps the foundation shared while each interface fits the screen around it.</p></header>
       <div class="platforms__list">
-        <!-- Real links keep each platform page crawlable; a plain click opens the download dialog instead. -->
-        <a v-for="platform in DOWNLOAD_PLATFORMS" :key="platform.name" :href="`/download/${platform.key}`" aria-haspopup="dialog" @click.exact.prevent="openDownload(platform.key)">
+        <button v-for="platform in DOWNLOAD_PLATFORMS" :key="platform.name" type="button" aria-haspopup="dialog" @click="openDownload(platform.key)">
           <span class="platforms__icon"><img :src="`/icons/${platform.icon}.svg`" alt="" /></span>
-          <span class="platforms__name"><strong>Metrolist for {{ platform.name }}</strong><small>{{ platform.detail }}</small></span>
-        </a>
+          <span class="platforms__name"><strong>{{ platform.name }}</strong><small>{{ platform.detail }}</small></span>
+        </button>
       </div>
       <DownloadDialog ref="downloadDialog" :show-trigger="false" />
     </div>
@@ -130,10 +129,10 @@ function openDownload(platform: DownloadPlatformKey) {
 .platforms__layout { display: grid; grid-template-columns: minmax(280px, 0.7fr) minmax(0, 1.3fr); gap: clamp(56px, 9vw, 130px); align-items: start; }
 .platforms header > p:last-child { max-width: 520px; margin-top: 24px; }
 .platforms__list { display: grid; gap: 3px; border-radius: 16px; }
-.platforms__list a { display: grid; grid-template-columns: 54px minmax(120px, 1fr); gap: 16px; align-items: center; min-height: 82px; padding: 10px 12px; border: 0; border-radius: 4px; background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); cursor: pointer; font: inherit; text-align: left; text-decoration: none; }
-.platforms__list a:first-child { border-radius: 16px 16px 4px 4px; }
-.platforms__list a:last-child { border-radius: 4px 4px 16px 16px; }
-.platforms__list a:hover, .platforms__list a:focus-visible { background: var(--md-sys-color-surface-container-high); }
+.platforms__list button { display: grid; grid-template-columns: 54px minmax(120px, 1fr); gap: 16px; align-items: center; min-height: 82px; padding: 10px 12px; border: 0; border-radius: 4px; background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); cursor: pointer; font: inherit; text-align: left; }
+.platforms__list button:first-child { border-radius: 16px 16px 4px 4px; }
+.platforms__list button:last-child { border-radius: 4px 4px 16px 16px; }
+.platforms__list button:hover, .platforms__list button:focus-visible { background: var(--md-sys-color-surface-container-high); }
 .platforms__icon { display: grid; width: 52px; height: 52px; place-items: center; border-radius: 16px; background: var(--md-sys-color-surface-container-highest); }
 .platforms__icon img { width: 23px; height: 23px; object-fit: contain; }
 .platforms__name { display: flex; flex-direction: column; }.platforms__name strong { font-size: 1rem; font-weight: 720; }.platforms__name small { color: var(--md-sys-color-on-surface-variant); font-size: 0.8rem; }
@@ -143,6 +142,6 @@ function openDownload(platform: DownloadPlatformKey) {
 }
 @media (max-width: 600px) {
   .features__grid { grid-template-columns: 1fr; }.features__card { padding: 24px; min-height: 0; gap: 28px; }.features__card--1, .features__card--2 { min-height: 360px; }
-  .platforms__list a { grid-template-columns: 52px 1fr; gap: 12px; }
+  .platforms__list button { grid-template-columns: 52px 1fr; gap: 12px; }
 }
 </style>

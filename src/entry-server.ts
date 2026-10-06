@@ -1,9 +1,7 @@
 import { createSSRApp } from 'vue'
 import { renderToString, type SSRContext } from 'vue/server-renderer'
 import App from './App.vue'
-import { createAppRouter, ROUTES } from './router'
-
-export { ROUTES }
+import { createAppRouter } from './router'
 
 export async function render(url: string) {
   const router = createAppRouter()

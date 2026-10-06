@@ -1,8 +1,7 @@
-import { COMPARE_FAQ, COMPARE_ROWS } from '../src/content/compare'
-import { DOWNLOAD_PLATFORMS, type DownloadPlatformKey } from '../src/content/downloads'
+import { DOWNLOAD_PLATFORMS } from '../src/content/downloads'
 import { FAQ_ITEMS } from '../src/content/faq'
 import { FEATURES } from '../src/content/features'
-import { PAGE_META, PLATFORM_PAGES, REPO_URL as REPO, SITE_URL } from '../src/content/site'
+import { PAGE_META, REPO_URL as REPO, SITE_URL } from '../src/content/site'
 
 // ponytail: regex conversion covers the simple markup legal pages use (headings, paragraphs, lists, links, bold); swap for a real parser if templates get nested.
 export function htmlToMarkdown(html: string) {
@@ -51,48 +50,6 @@ ${FAQ_ITEMS.map(({ question, answer }) => `## ${question}\n\n${answer}`).join('\
 `
 }
 
-export function platformMarkdown(key: DownloadPlatformKey) {
-  const platform = DOWNLOAD_PLATFORMS.find(item => item.key === key)!
-  const page = PLATFORM_PAGES[key]
-  return `# ${page.heading}
-
-> ${page.meta.description}
-
-${page.lede}
-
-## Requirements
-
-${page.requirements.map(item => `- ${item}`).join('\n')}
-
-## Install Metrolist on ${platform.name}
-
-${platform.instructions.map((step, index) => `${index + 1}. ${step}`).join('\n')}
-
-Download: ${REPO}/releases/latest
-
-## Features
-
-${FEATURES.map(feature => `- **${feature.label}:** ${feature.body}`).join('\n')}
-
-## Questions
-
-${page.faq.map(({ question, answer }) => `### ${question}\n\n${answer}`).join('\n\n')}
-`
-}
-
-export function compareMarkdown() {
-  return `# Metrolist vs the YouTube Music app
-
-> ${PAGE_META.compare.description}
-
-| Feature | Metrolist | YouTube Music | YouTube Music Premium |
-| --- | --- | --- | --- |
-${COMPARE_ROWS.map(row => `| ${row.feature} | ${row.metrolist} | ${row.free} | ${row.premium} |`).join('\n')}
-
-${COMPARE_FAQ.map(({ question, answer }) => `## ${question}\n\n${answer}`).join('\n\n')}
-`
-}
-
 export function privacyMarkdown(vueSource: string) {
   const template = vueSource.match(/<header class="privacy-page__header">([\s\S]*?)<\/article>/)?.[1]
   if (!template) throw new Error('Privacy policy content was not found')
@@ -110,8 +67,6 @@ Metrolist is free and open source (GPL-3.0). It is not affiliated with YouTube o
 
 - [Overview](${SITE_URL}/index.md): features, supported platforms, and install steps
 - [FAQ](${SITE_URL}/faq.md): platforms, migration, accounts, safety, updates, and imports
-- [Metrolist vs YouTube Music](${SITE_URL}/compare.md): feature comparison with the official app and Premium
-${DOWNLOAD_PLATFORMS.map(({ key, name }) => `- [Metrolist for ${name}](${SITE_URL}/download/${key}.md): requirements, install steps, and ${name} questions`).join('\n')}
 - [Privacy policy](${SITE_URL}/privacy.md): app data, optional Sentry diagnostics, and website hosting
 
 ## Project

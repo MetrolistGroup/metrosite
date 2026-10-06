@@ -14,9 +14,6 @@ try {
   const expected = [
     ['', 'Metrolist · Ad-free YouTube Music client for every device', index, 'Metrolist brings YouTube Music to every screen.'],
     ['faq', 'Metrolist FAQ · Install, sign in, update, and import playlists', index, 'Answers before the first track.'],
-    ['compare', 'Metrolist vs YouTube Music app · Free ad-free alternative', index, 'Metrolist vs the YouTube Music app.'],
-    ['download/linux', 'YouTube Music app for Linux · Metrolist AppImage', index, 'A real YouTube Music desktop app for Linux.'],
-    ['download/android', 'Metrolist for Android · Ad-free YouTube Music APK', index, 'The ad-free YouTube Music app for Android.'],
     ['listen?code=ABC123', 'Listen Together · Metrolist', 'noindex, follow', 'Join the same room.'],
   ]
   for (const [route, title, robots, heading] of expected) {
@@ -39,12 +36,12 @@ try {
   assert.match(await page.locator('h1').innerText(), /isn’t in the queue/)
 
   const sitemap = await (await fetch(new URL('sitemap.xml', base))).text()
-  for (const path of ['/', '/faq', '/compare', '/privacy', '/download/android', '/download/ios', '/download/linux', '/download/macos', '/download/windows']) {
+  for (const path of ['/', '/faq', '/privacy']) {
     assert.match(sitemap, new RegExp(`<loc>https://metrolist.cc${path}</loc>`), `sitemap lists ${path}`)
   }
   assert.doesNotMatch(sitemap, /listen/, 'sitemap omits noindex pages')
-  const schemas = [...(await (await fetch(new URL('download/windows', base))).text()).matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map(match => JSON.parse(match[1])['@type'])
-  assert.deepEqual(schemas.sort(), ['BreadcrumbList', 'FAQPage', 'SoftwareApplication'])
+  const schemas = [...(await (await fetch(new URL('', base))).text()).matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map(match => JSON.parse(match[1])['@type'])
+  assert.deepEqual(schemas.sort(), ['Organization', 'SoftwareApplication', 'WebSite'])
   console.log('PASS prerendered routes, metadata, structured data, sitemap, indexing rules and not-found view')
 } finally {
   await browser.close()

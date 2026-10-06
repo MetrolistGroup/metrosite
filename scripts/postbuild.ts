@@ -1,9 +1,7 @@
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
-import { COMPARE_FAQ } from '../src/content/compare'
-import { DOWNLOAD_PLATFORMS, type DownloadPlatformKey } from '../src/content/downloads'
 import { FAQ_ITEMS, type FaqItem } from '../src/content/faq'
-import { PAGE_META, PLATFORM_PAGES, REPO_URL, SITE_URL, type PageMeta } from '../src/content/site'
-import { compareMarkdown, faqMarkdown, homeMarkdown, llmsTxt, platformMarkdown, privacyMarkdown } from './markdown'
+import { PAGE_META, REPO_URL, SITE_URL, type PageMeta } from '../src/content/site'
+import { faqMarkdown, homeMarkdown, llmsTxt, privacyMarkdown } from './markdown'
 
 const dist = new URL('../dist/', import.meta.url)
 const source = await readFile(new URL('index.html', dist), 'utf8')
@@ -21,13 +19,6 @@ const SCREENSHOTS = {
   desktopHome: assetUrl('desktop-home'),
   android: assetUrl('pixel-10-pro-fold-folded-player-dark'),
   ios: assetUrl('iphone-17-player-dark'),
-}
-const PLATFORM_SCREENSHOT: Record<DownloadPlatformKey, string> = {
-  android: SCREENSHOTS.android,
-  ios: SCREENSHOTS.ios,
-  linux: SCREENSHOTS.desktop,
-  macos: SCREENSHOTS.desktop,
-  windows: SCREENSHOTS.desktop,
 }
 
 // Latest version for structured data; the build still succeeds offline.
@@ -112,16 +103,7 @@ const pages: Page[] = [
     ],
   },
   { path: '/faq', file: 'faq.html', meta: PAGE_META.faq, schemas: [faq(FAQ_ITEMS), breadcrumbs('FAQ', '/faq')], markdown: ['faq.md', faqMarkdown()] },
-  { path: '/compare', file: 'compare.html', meta: PAGE_META.compare, schemas: [faq(COMPARE_FAQ), breadcrumbs('Metrolist vs YouTube Music', '/compare')], markdown: ['compare.md', compareMarkdown()] },
   { path: '/privacy', file: 'privacy.html', meta: PAGE_META.privacy, schemas: [breadcrumbs('Privacy policy', '/privacy')], markdown: ['privacy.md', privacyMarkdown(await readFile(new URL('../src/views/PrivacyPage.vue', import.meta.url), 'utf8'))] },
-  ...DOWNLOAD_PLATFORMS.map(({ key, name }): Page => ({
-    path: `/download/${key}`,
-    file: `download/${key}.html`,
-    meta: PLATFORM_PAGES[key].meta,
-    markdown: [`download/${key}.md`, platformMarkdown(key)],
-    images: [PLATFORM_SCREENSHOT[key]],
-    schemas: [app(PLATFORM_PAGES[key].operatingSystem, PLATFORM_SCREENSHOT[key]), faq(PLATFORM_PAGES[key].faq), breadcrumbs(`Metrolist for ${name}`, `/download/${key}`)],
-  })),
   { path: '/listen', file: 'listen.html', meta: PAGE_META.listen },
   { path: '/404', file: '404.html', meta: PAGE_META.notFound, canonical: false },
 ]
