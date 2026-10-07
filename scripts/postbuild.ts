@@ -83,6 +83,8 @@ type Page = {
   file: string
   meta: PageMeta
   canonical?: boolean
+  /** Discord component embed file, linked from the page head. */
+  embed?: string
   schemas?: object[]
   markdown?: [file: string, content: string]
   /** Screenshots listed in the image sitemap. */
@@ -94,6 +96,7 @@ const pages: Page[] = [
     path: '/',
     file: 'index.html',
     meta: PAGE_META.home,
+    embed: 'discord-embed.json',
     markdown: ['index.md', homeMarkdown()],
     images: [SCREENSHOTS.desktopHome, SCREENSHOTS.desktop, SCREENSHOTS.android, SCREENSHOTS.ios],
     schemas: [
@@ -102,8 +105,8 @@ const pages: Page[] = [
       app('Android, iOS, Windows, macOS, Linux', Object.values(SCREENSHOTS)),
     ],
   },
-  { path: '/faq', file: 'faq.html', meta: PAGE_META.faq, schemas: [faq(FAQ_ITEMS), breadcrumbs('FAQ', '/faq')], markdown: ['faq.md', faqMarkdown()] },
-  { path: '/privacy', file: 'privacy.html', meta: PAGE_META.privacy, schemas: [breadcrumbs('Privacy policy', '/privacy')], markdown: ['privacy.md', privacyMarkdown(await readFile(new URL('../src/views/PrivacyPage.vue', import.meta.url), 'utf8'))] },
+  { path: '/faq', file: 'faq.html', meta: PAGE_META.faq, embed: 'discord-embed-faq.json', schemas: [faq(FAQ_ITEMS), breadcrumbs('FAQ', '/faq')], markdown: ['faq.md', faqMarkdown()] },
+  { path: '/privacy', file: 'privacy.html', meta: PAGE_META.privacy, embed: 'discord-embed-privacy.json', schemas: [breadcrumbs('Privacy policy', '/privacy')], markdown: ['privacy.md', privacyMarkdown(await readFile(new URL('../src/views/PrivacyPage.vue', import.meta.url), 'utf8'))] },
   { path: '/listen', file: 'listen.html', meta: PAGE_META.listen },
   { path: '/404', file: '404.html', meta: PAGE_META.notFound, canonical: false },
 ]
@@ -137,7 +140,8 @@ async function renderPage(page: Page) {
     ? html.replace(/\s*<link rel="canonical" href="[^"]*" \/>/, '')
     : html.replace(/<link rel="canonical" href="[^"]*" \/>/, `<link rel="canonical" href="${url}" />`)
 
-  if (path !== '/') html = html.replace(/\s*<link rel="discord:component-embed"[^>]*\/>/, '')
+  html = html.replace(/\s*<link rel="discord:component-embed"[^>]*\/>/, '')
+  if (page.embed) html = html.replace('</head>', `  <link rel="discord:component-embed" type="application/json" href="${SITE_URL}/${page.embed}" />\n  </head>`)
   if (page.markdown) html = html.replace('</head>', `  <link rel="alternate" type="text/markdown" href="/${page.markdown[0]}" />\n  </head>`)
   for (const schema of page.schemas ?? []) {
     html = html.replace('</head>', `  <script type="application/ld+json">${JSON.stringify(schema).replaceAll('<', '\\u003c')}</script>\n  </head>`)
@@ -173,9 +177,34 @@ ${indexable.map(page => `  <url>
 await writeFile(new URL('llms.txt', dist), llmsTxt())
 await rm(new URL('.vite/', dist), { recursive: true })
 
-const discordEmbed = await readFile(new URL('discord-embed.json', dist))
-if (discordEmbed.byteLength > 3000 || JSON.parse(discordEmbed.toString()).component?.type !== 17) {
-  throw new Error('Invalid Discord link preview')
+// Discord component embeds (3,000-byte limit); the og:* tags remain the fallback.
+const button = (label: string, url: string) => ({ type: 2, style: 5, label, url })
+const embed = (path: string, heading: string, body: string, buttons: ReturnType<typeof button>[], image?: string) => ({
+  component: {
+    type: 17,
+    accent_color: 14268927,
+    components: [
+      {
+        type: 9,
+        components: [{ type: 10, content: `## [${heading}](${SITE_URL}${path})\n${body}` }],
+        accessory: button('Open', `${SITE_URL}${path}`),
+      },
+      ...(image ? [{ type: 12, items: [{ media: { url: image }, description: 'Metrolist running across desktop and mobile screens' }] }] : []),
+      { type: 14, divider: true, spacing: 1 },
+      { type: 1, components: buttons },
+    ],
+  },
+})
+const download = button('Download', `${REPO_URL}/releases/latest`)
+const embeds = {
+  'discord-embed.json': embed('/', 'Metrolist', `Music without the noise · Fully multiplatform\n${PAGE_META.home.description}`, [download, button('Source', REPO_URL), button('FAQ', `${SITE_URL}/faq`)], `${SITE_URL}/og-image.png`),
+  'discord-embed-faq.json': embed('/faq', 'Metrolist FAQ', PAGE_META.faq.description, [download, button('Home', `${SITE_URL}/`)]),
+  'discord-embed-privacy.json': embed('/privacy', 'Metrolist privacy policy', PAGE_META.privacy.description, [button('Home', `${SITE_URL}/`), button('Source', REPO_URL)]),
+}
+for (const [file, payload] of Object.entries(embeds)) {
+  const json = JSON.stringify(payload)
+  if (Buffer.byteLength(json) > 3000) throw new Error(`Discord embed ${file} exceeds 3,000 bytes`)
+  await writeFile(new URL(file, dist), json)
 }
 
 // JSON-LD blocks are data, not script, so script-src needs no inline hashes.
