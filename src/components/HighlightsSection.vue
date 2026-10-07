@@ -25,11 +25,6 @@ function openDownload(platform: DownloadPlatformKey) {
       <div class="features__grid">
         <article v-for="(feature, index) in features" :key="feature.label" class="features__card" :class="`features__card--${index + 1}`">
           <div class="features__top"><ShapeBackdrop :shape="feature.shape" :color="feature.iconBackground" class="features__icon"><span class="features__icon-glyph material-symbols-rounded" :style="{ color: feature.iconColor }" aria-hidden="true">{{ feature.icon }}</span></ShapeBackdrop><span class="features__label">{{ feature.label }}</span><button v-if="index === 1" type="button" class="lyrics-toggle" :aria-label="lyricsPaused ? 'Resume lyrics animation' : 'Pause lyrics animation'" :aria-pressed="lyricsPaused" @click="lyricsPaused = !lyricsPaused"><span class="material-symbols-rounded" aria-hidden="true">{{ lyricsPaused ? 'play_arrow' : 'pause' }}</span></button></div>
-          <div v-if="index === 0" class="features__ad-dodge" aria-hidden="true">
-            <span class="features__app-icon features__app-icon--youtube"><img src="/icons/youtube-music.webp" alt="" /></span>
-            <span class="features__flying-ad">AD</span>
-            <span class="features__app-icon features__app-icon--metrolist"><img src="/logo.svg" alt="" /></span>
-          </div>
           <div v-if="index === 1" class="features__lyrics" :class="{ 'is-paused': lyricsPaused }" aria-hidden="true">
             <div v-for="(line, lineIndex) in lyrics" :key="line" class="lyrics-line" :style="{ '--line-delay': `${lineIndex === 0 ? 0 : (lineIndex - 3) * 3}s` }">
               <span v-for="(word, wordIndex) in line.split(' ')" :key="wordIndex" class="lyrics-word" :style="{ '--word': wordIndex }">{{ word }}</span>
@@ -86,15 +81,6 @@ function openDownload(platform: DownloadPlatformKey) {
 .features__card p { max-width: 46ch; color: var(--md-sys-color-on-surface-variant); font: var(--md-sys-typescale-body-medium); letter-spacing: var(--md-sys-typescale-body-medium-tracking); }
 .features__card--1 p { color: var(--md-sys-color-on-primary-container); }
 .features__card--6 .features__copy { max-width: none; }.features__card--6 p { max-width: 65ch; }
-.features__ad-dodge { position: relative; width: min(100%, 320px); height: 120px; margin-inline: auto; user-select: none; }
-.features__app-icon { position: absolute; bottom: 0; display: grid; width: 82px; height: 82px; place-items: center; border-radius: 24px; }
-.features__app-icon--metrolist { right: 22px; background: var(--md-sys-color-surface-container-lowest); }
-.features__app-icon--metrolist img { width: 74px; height: 74px; }
-.features__app-icon--youtube { left: 22px; animation: youtube-throw 3.2s var(--md-sys-motion-expressive) infinite; }
-.features__app-icon--youtube img { width: 82px; height: 82px; border-radius: 24px; }
-.features__flying-ad { position: absolute; bottom: 28px; left: 64px; display: grid; width: 58px; height: 36px; place-items: center; border-radius: 10px; background: #b3261e; color: white; font-size: 0.8rem; font-weight: 850; letter-spacing: 0.08em; animation: ad-toss 3.2s linear infinite; }
-@keyframes youtube-throw { 0%, 5%, 20%, 100% { transform: none; } 10% { transform: translate(-2px, 2px) rotate(-8deg); } 15% { transform: translate(3px, -2px) rotate(8deg); } }
-@keyframes ad-toss { 0%, 10% { opacity: 0; transform: translate(-8px, 18px) rotate(-18deg) scale(0.75); } 14% { opacity: 1; } 32% { opacity: 1; transform: translate(70px, -72px) rotate(-2deg) scale(0.95); } 48% { opacity: 1; transform: translate(105px, -72px) rotate(8deg) scale(1); } 78% { opacity: 1; transform: translate(185px, -72px) rotate(22deg) scale(0.92); } 88% { opacity: 1; transform: translate(240px, -72px) rotate(30deg) scale(0.82); } 96%, 100% { opacity: 0; transform: translate(270px, -10px) rotate(42deg) scale(0.65); } }
 .lyrics-toggle { display: grid; place-items: center; flex: 0 0 44px; height: 44px; margin-left: auto; border: 0; border-radius: 50%; background: #ffffff0c; color: var(--md-sys-color-on-secondary-container); cursor: pointer; }
 .lyrics-toggle:hover { background: #ffffff18; }
 .features__lyrics { --lyrics-play-state: running; position: relative; height: 144px; flex: none; overflow: hidden; font-size: clamp(1rem, 7cqw, 2.1rem); font-weight: 760; font-variation-settings: 'ROND' 100; letter-spacing: -0.02em; line-height: 1.2; }
@@ -116,8 +102,6 @@ function openDownload(platform: DownloadPlatformKey) {
 }
 @media (prefers-reduced-motion: reduce) {
   .features__progress { animation: none; }
-  .features__app-icon { animation: none; }
-  .features__flying-ad { opacity: 1; transform: translate(120px, -72px) rotate(8deg); animation: none; }
   .lyrics-toggle { display: none; }
   .lyrics-line, .lyrics-word { animation: none; }
   .lyrics-line:not(:first-child) { visibility: hidden; }
