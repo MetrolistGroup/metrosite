@@ -196,8 +196,29 @@ const embed = (path: string, heading: string, body: string, buttons: ReturnType<
   },
 })
 const download = button('Download', `${REPO_URL}/releases/latest`)
+const text = (content: string) => ({ type: 10, content })
+const gallery = [
+  [SCREENSHOTS.desktopHome, 'Metrolist home on desktop'],
+  [SCREENSHOTS.desktop, 'Metrolist player on desktop'],
+  [SCREENSHOTS.android, 'Metrolist player on Android'],
+]
+const home = {
+  component: {
+    type: 17,
+    accent_color: 14268927,
+    components: [
+      { type: 9, components: [text(`## [Metrolist](${SITE_URL}/)\nMusic without the noise · Fully multiplatform`)], accessory: button('Open', `${SITE_URL}/`) },
+      { type: 12, items: gallery.map(([url, description]) => ({ media: { url }, description })) },
+      text('*Home and player on desktop and Android*'),
+      { type: 14, divider: true, spacing: 1 },
+      { type: 1, components: [button('Download', `${REPO_URL}/releases/latest`), button('Source', REPO_URL), button('FAQ', `${SITE_URL}/faq`), button('Privacy', `${SITE_URL}/privacy`)] },
+      { type: 14, divider: true, spacing: 1 },
+      { type: 9, components: [text('### Ad-free YouTube Music\nBackground play, synced lyrics, offline downloads, and casting on Android, Linux, macOS, and Windows.')], accessory: { type: 11, media: { url: `${SITE_URL}/icons/youtube-music.webp` }, description: 'YouTube Music' } },
+    ],
+  },
+}
 const embeds = {
-  'discord-embed.json': embed('/', 'Metrolist', `Music without the noise · Fully multiplatform\n${PAGE_META.home.description}`, [download, button('Source', REPO_URL), button('FAQ', `${SITE_URL}/faq`)], `${SITE_URL}/og-image.png`),
+  'discord-embed.json': home,
   'discord-embed-faq.json': embed('/faq', 'Metrolist FAQ', PAGE_META.faq.description, [download, button('Home', `${SITE_URL}/`)]),
   'discord-embed-privacy.json': embed('/privacy', 'Metrolist privacy policy', PAGE_META.privacy.description, [button('Home', `${SITE_URL}/`), button('Source', REPO_URL)]),
 }
