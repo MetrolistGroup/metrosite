@@ -1,89 +1,110 @@
-/* ======================================================
-   Metrolist - Material 3 Expressive Design System
-   Seed colour: #6C4BCC  (Vivid Violet)
-   Generated with the M3 Theme Builder tonal palette tool
-====================================================== */
+@font-face {
+  font-family: 'Google Sans Flex';
+  /* Variable subset: opsz 6-144, wght 400-850, ROND 0-100 (see public/fonts/OFL.txt). */
+  src: url('/fonts/GoogleSansFlex.woff2?v=2') format('woff2');
+  font-style: normal;
+  font-weight: 400 850;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Material Symbols Rounded';
+  src: url('/fonts/MaterialSymbolsRounded.ttf?v=2') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+}
 
 :root {
   color-scheme: dark;
-
-  /* -- Primary -- */
-  --md-primary: #D0BCFF;
-  --md-on-primary: #371E55;
-  --md-primary-container: #4F2C6F;
-  --md-on-primary-container: #EEDCFF;
-
-  /* -- Secondary -- */
-  --md-secondary: #CCC7E0;
-  --md-on-secondary: #302E47;
-  --md-secondary-container: #49435E;
-  --md-on-secondary-container: #E8DEFF;
-
-  /* -- Tertiary (warm rose - music energy) -- */
-  --md-tertiary: #FFB3D9;
-  --md-on-tertiary: #5E0A35;
-  --md-tertiary-container: #85184E;
-  --md-on-tertiary-container: #FFD9E5;
-
-  /* -- Surfaces -- */
-  --md-background: #1C1B1F;
-  --md-on-background: #E7E0EC;
-  --md-surface: #1C1B1F;
-  --md-on-surface: #E7E0EC;
-  --md-surface-variant: #49454F;
-  --md-on-surface-variant: #CAC4D0;
-  --md-outline: #938F99;
-  --md-outline-variant: #49454F;
-
-  /* -- Surface containers (low → high = brighter → darker) -- */
-  --md-sc-lowest: #0F0E12;
-  --md-sc-low: #2B2930;
-  --md-sc: #362F38;
-  --md-sc-high: #413A41;
-  --md-sc-highest: #4B464B;
-
-  /* -- Shapes - M3 Expressive favours generous rounding -- */
-  --r-xs: 4px;
-  --r-sm: 8px;
-  --r-md: 12px;
-  --r-lg: 16px;
-  --r-xl: 28px;
-  /* "Extra Large" - default card shape in M3 Exp */
-  --r-2xl: 32px;
-  --r-full: 9999px;
-
-  /* -- Elevation shadows (tinted purple for dark mode) -- */
-  --el-1: 0 1px 2px rgba(0, 0, 0, .3), 0 1px 3px 1px rgba(0, 0, 0, .15);
-  --el-2: 0 1px 2px rgba(0, 0, 0, .3), 0 2px 6px 2px rgba(0, 0, 0, .15);
-  --el-3: 0 4px 8px 3px rgba(0, 0, 0, .3), 0 1px 3px rgba(0, 0, 0, .15);
-
-  /* -- Motion -- */
-  --t-fast: 150ms cubic-bezier(0.2, 0, 0, 1);
-  --t-std: 250ms cubic-bezier(0.2, 0, 0, 1);
-  --t-slow: 400ms cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-color-background: #121113;
+  --md-sys-color-on-background: #ebe4eb;
+  --md-sys-color-surface: #121113;
+  --md-sys-color-surface-dim: #0e0d0f;
+  --md-sys-color-surface-container-lowest: #0b0a0c;
+  --md-sys-color-surface-container-low: #1a181c;
+  --md-sys-color-surface-container: #211e23;
+  --md-sys-color-surface-container-high: #2b272d;
+  --md-sys-color-surface-container-highest: #37323a;
+  --md-sys-color-on-surface: #ebe4eb;
+  --md-sys-color-on-surface-variant: #cec4cf;
+  --md-sys-color-primary: #d9b9ff;
+  --md-sys-color-on-primary: #3b1f55;
+  --md-sys-color-primary-container: #533571;
+  --md-sys-color-on-primary-container: #efddff;
+  --md-sys-color-secondary: #e9c661;
+  --md-sys-color-on-secondary: #3d3000;
+  --md-sys-color-secondary-container: #544500;
+  --md-sys-color-on-secondary-container: #ffe796;
+  --md-sys-color-tertiary: #ffb59d;
+  --md-sys-color-on-tertiary: #572012;
+  --md-sys-color-tertiary-container: #743424;
+  --md-sys-color-on-tertiary-container: #ffdbd0;
+  --md-sys-color-outline: #9a919c;
+  --md-sys-color-outline-variant: #4d464f;
+  --md-sys-color-error: #ffb4ab;
+  --md-sys-shape-corner-extra-small: 4px;
+  --md-sys-shape-corner-small: 8px;
+  --md-sys-shape-corner-medium: 12px;
+  --md-sys-shape-corner-large: 16px;
+  --md-sys-shape-corner-large-increased: 20px;
+  --md-sys-shape-corner-extra-large: 28px;
+  --md-sys-shape-corner-extra-large-increased: 36px;
+  --md-sys-shape-corner-full: 999px;
+  --md-sys-motion-standard: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-expressive: cubic-bezier(0.05, 0.7, 0.1, 1);
+  /* M3 Expressive motion scheme springs (mass 1) sampled into linear().
+     Spatial: position, scale, rotation, shape; may overshoot.
+     Effects: opacity, color; critically damped, never overshoot. */
+  --md-motion-spatial-fast: 350ms linear(0, 0.072, 0.238, 0.44, 0.638, 0.806, 0.934, 1.021, 1.071, 1.092, 1.093, 1.081, 1.063, 1.044, 1.026, 1.012, 1.002, 0.995, 0.992, 0.991, 0.992, 0.993, 0.995, 0.997, 1);
+  --md-motion-spatial-default: 420ms linear(0, 0.048, 0.161, 0.301, 0.444, 0.576, 0.69, 0.784, 0.858, 0.913, 0.953, 0.98, 0.997, 1.008, 1.013, 1.015, 1.015, 1.013, 1.011, 1.009, 1.007, 1.005, 1.004, 1.003, 1);
+  --md-motion-spatial-slow: 570ms linear(0, 0.047, 0.157, 0.294, 0.435, 0.567, 0.681, 0.775, 0.85, 0.906, 0.947, 0.976, 0.995, 1.006, 1.012, 1.015, 1.015, 1.014, 1.012, 1.01, 1.008, 1.006, 1.004, 1.003, 1);
+  --md-motion-effects-fast: 140ms linear(0, 0.162, 0.421, 0.635, 0.782, 0.874, 0.929, 0.961, 0.979, 0.988, 0.994, 0.997, 1);
+  --md-motion-effects-default: 220ms linear(0, 0.167, 0.431, 0.645, 0.791, 0.881, 0.934, 0.964, 0.981, 0.99, 0.995, 0.997, 1);
+  --md-motion-effects-slow: 300ms linear(0, 0.158, 0.413, 0.626, 0.774, 0.868, 0.925, 0.958, 0.977, 0.987, 0.993, 0.996, 1);
+  /* Exits are shorter and accelerate away so they never block the next action. */
+  --md-motion-exit: 160ms cubic-bezier(0.3, 0, 0.8, 0.15);
+  /* M3 Expressive type scale, fluid for the web. Optical size follows font
+     size automatically, so tracking stays light: big text tightens itself.
+     Baseline display weights stay light; emphasized words (h1/h2 > span)
+     jump to a heavy, fully rounded cut for contrast. */
+  --md-ref-typeface: 'Google Sans Flex', system-ui, sans-serif;
+  --md-sys-typescale-display-large: 500 clamp(3.25rem, 7vw, 6.75rem) / 0.94 var(--md-ref-typeface);
+  --md-sys-typescale-display-large-tracking: -0.035em;
+  --md-sys-typescale-display-medium: 500 clamp(2.6rem, 5.2vw, 5rem) / 0.98 var(--md-ref-typeface);
+  --md-sys-typescale-display-medium-tracking: -0.03em;
+  --md-sys-typescale-display-small: 500 clamp(2.1rem, 4.2vw, 3.5rem) / 1.02 var(--md-ref-typeface);
+  --md-sys-typescale-display-small-tracking: -0.025em;
+  --md-sys-typescale-headline-large: 560 clamp(1.75rem, 3vw, 2.5rem) / 1.1 var(--md-ref-typeface);
+  --md-sys-typescale-headline-large-tracking: -0.02em;
+  --md-sys-typescale-headline-medium: 600 clamp(1.4rem, 2.3vw, 2rem) / 1.12 var(--md-ref-typeface);
+  --md-sys-typescale-headline-medium-tracking: -0.015em;
+  --md-sys-typescale-headline-small: 600 1.5rem / 1.2 var(--md-ref-typeface);
+  --md-sys-typescale-headline-small-tracking: -0.01em;
+  --md-sys-typescale-title-large: 620 1.25rem / 1.3 var(--md-ref-typeface);
+  --md-sys-typescale-title-large-tracking: -0.005em;
+  --md-sys-typescale-title-medium: 620 1.0625rem / 1.4 var(--md-ref-typeface);
+  --md-sys-typescale-title-medium-tracking: 0;
+  --md-sys-typescale-title-small: 620 0.875rem / 1.35 var(--md-ref-typeface);
+  --md-sys-typescale-title-small-tracking: 0.005em;
+  --md-sys-typescale-body-large: 400 clamp(1.0625rem, 1.3vw, 1.1875rem) / 1.6 var(--md-ref-typeface);
+  --md-sys-typescale-body-large-tracking: 0;
+  --md-sys-typescale-body-medium: 400 0.9375rem / 1.6 var(--md-ref-typeface);
+  --md-sys-typescale-body-medium-tracking: 0.005em;
+  --md-sys-typescale-body-small: 400 0.75rem / 1.45 var(--md-ref-typeface);
+  --md-sys-typescale-body-small-tracking: 0.01em;
+  --md-sys-typescale-label-large: 600 0.875rem / 1.25 var(--md-ref-typeface);
+  --md-sys-typescale-label-large-tracking: 0.01em;
+  --md-sys-typescale-label-medium: 600 0.75rem / 1.33 var(--md-ref-typeface);
+  --md-sys-typescale-label-medium-tracking: 0.03em;
+  --md-sys-typescale-label-small: 650 0.6875rem / 1.45 var(--md-ref-typeface);
+  --md-sys-typescale-label-small-tracking: 0.08em;
+  --md-sys-typescale-emphasized-weight: 820;
+  --md-sys-state-hover: 8%;
+  --md-sys-state-focus: 10%;
+  --md-sys-state-pressed: 10%;
 }
 
-/* -- Skip link (a11y) */
-.skip-link {
-  position: absolute;
-  top: -100px;
-  left: 24px;
-  padding: 10px 16px;
-  background: var(--md-primary);
-  color: var(--md-on-primary);
-  font-weight: 600;
-  border-radius: var(--r-sm);
-  z-index: 1000;
-  transition: top var(--t-fast);
-}
-
-.skip-link:focus {
-  top: 24px;
-  outline: 2px solid var(--md-on-primary);
-  outline-offset: 2px;
-}
-
-/* -- Reset */
 *,
 *::before,
 *::after {
@@ -93,128 +114,278 @@
 }
 
 html {
+  scrollbar-gutter: stable;
   scroll-behavior: smooth;
+  scroll-padding-top: 96px;
 }
 
 body {
-  font-family: 'Nunito Sans', sans-serif;
-  font-size: 1rem;
-  line-height: 1.6;
-  background: var(--md-background);
-  color: var(--md-on-background);
+  min-width: 320px;
   overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-background);
+  font: 400 1rem / 1.5 var(--md-ref-typeface);
+  font-optical-sizing: auto;
 }
 
 h1,
 h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: 'Nunito', sans-serif;
+h3 {
+  text-wrap: balance;
 }
 
-/* -- Material Symbols helper */
-.icon {
-  font-family: 'Material Symbols Rounded';
-  font-weight: normal;
-  font-style: normal;
-  font-size: 1.5rem;
-  line-height: 1;
+p,
+li,
+dd {
+  text-wrap: pretty;
+}
+
+/* Emphasized words inside display headings: heavier and fully rounded. */
+:where(h1, h2) > span {
+  font-weight: var(--md-sys-typescale-emphasized-weight);
+  font-variation-settings: 'ROND' 100;
+}
+
+button,
+a {
+  font: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+::selection {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+}
+
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 1000;
+  padding: 12px 18px;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  font: var(--md-sys-typescale-label-large);
+  text-decoration: none;
+  transform: translateY(-180%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 3px;
+}
+
+.container {
+  width: min(100% - 40px, 1240px);
+  margin-inline: auto;
+}
+
+.material-symbols-rounded {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  font-family: 'Material Symbols Rounded';
+  font-size: 24px;
+  font-style: normal;
+  font-weight: normal;
+  font-feature-settings: 'liga';
+  letter-spacing: normal;
+  line-height: 1;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
   user-select: none;
-  pointer-events: none;
-  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-/* -- Layout */
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 24px;
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-primary);
+  font: var(--md-sys-typescale-label-small);
+  font-variation-settings: 'ROND' 100;
+  letter-spacing: var(--md-sys-typescale-label-small-tracking);
+  text-transform: uppercase;
 }
 
-/* Below-the-fold sections: skip rendering until near viewport (faster LCP, less CLS) */
-#highlights,
-.faq,
-.download,
-.footer {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 400px;
-}
-
-/* -- M3 Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 24px;
-  border: none;
-  border-radius: var(--r-full);
-  font-family: 'Nunito Sans', sans-serif;
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  text-decoration: none;
+  gap: 9px;
+  min-height: 44px;
+  padding: 10px 20px;
+  border: 0;
+  border-radius: 28px;
+  color: inherit;
   cursor: pointer;
-  transition:
-    box-shadow var(--t-std),
-    background-color var(--t-std),
-    transform var(--t-fast);
+  font: var(--md-sys-typescale-label-large);
+  font-variation-settings: 'ROND' 100;
+  letter-spacing: var(--md-sys-typescale-label-large-tracking);
+  text-decoration: none;
   white-space: nowrap;
+}
+
+/* State layer: an overlay tinted with the content color, so hover, focus,
+   and press read the same on every container color. Hover is instant;
+   only the press release eases out. */
+.btn,
+.icon-button {
+  position: relative;
   -webkit-tap-highlight-color: transparent;
+  transition: border-radius var(--md-motion-spatial-fast);
 }
 
+.btn::after,
+.icon-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--md-motion-effects-fast);
+}
+
+.btn:hover::after,
+.icon-button:hover::after {
+  opacity: var(--md-sys-state-hover);
+  transition: none;
+}
+
+.btn:focus-visible::after,
+.icon-button:focus-visible::after {
+  opacity: var(--md-sys-state-focus);
+}
+
+.btn:active::after,
+.icon-button:active::after {
+  opacity: var(--md-sys-state-pressed);
+  transition: none;
+}
+
+/* Press morphs the pill toward a rounded square, then springs back. */
 .btn:active {
-  transform: scale(0.96);
+  border-radius: 12px;
 }
 
-/* Filled */
+.btn-lg:active {
+  border-radius: 16px;
+}
+
+.icon-button:active {
+  border-radius: 16px;
+}
+
+.btn .material-symbols-rounded {
+  font-size: 20px;
+}
+
 .btn-filled {
-  background: var(--md-primary);
-  color: var(--md-on-primary);
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
 }
 
-.btn-filled:hover {
-  box-shadow: var(--el-2);
-  background: color-mix(in srgb, var(--md-primary) 92%, white);
-}
-
-/* Tonal */
 .btn-tonal {
-  background: var(--md-secondary-container);
-  color: var(--md-on-secondary-container);
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
 }
 
-.btn-tonal:hover {
-  box-shadow: var(--el-1);
-  background: color-mix(in srgb, var(--md-secondary-container) 88%, var(--md-secondary));
-}
-
-/* Outlined */
 .btn-outlined {
-  background: transparent;
-  color: var(--md-primary);
-  border: 1.5px solid var(--md-outline-variant);
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-primary);
 }
 
-.btn-outlined:hover {
-  background: color-mix(in srgb, var(--md-primary) 8%, transparent);
-  border-color: var(--md-outline);
-}
-
-/* Large variant */
 .btn-lg {
-  padding: 14px 28px;
-  font-size: 1rem;
+  min-height: 56px;
+  padding: 14px 26px;
+  font: var(--md-sys-typescale-title-medium);
+  font-variation-settings: 'ROND' 100;
 }
 
-/* Small variant */
 .btn-sm {
-  padding: 8px 18px;
-  font-size: 0.875rem;
+  min-height: 40px;
+  padding: 9px 18px;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 24px;
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+  cursor: pointer;
+}
+
+#desktop,
+#features,
+#platforms,
+.faq,
+.download,
+.footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 700px;
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: min(100% - 28px, 1240px);
+  }
+
+  .btn-lg {
+    padding-inline: 22px;
+  }
+}
+
+/* Reduced motion drops movement, not feedback: spatial tokens become
+   instant while opacity and color fades stay. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --md-motion-spatial-fast: 0s linear;
+    --md-motion-spatial-default: 0s linear;
+    --md-motion-spatial-slow: 0s linear;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
 }
