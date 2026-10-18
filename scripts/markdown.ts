@@ -1,7 +1,7 @@
 import { DOWNLOAD_PLATFORMS } from '../src/content/downloads'
 import { FAQ_ITEMS } from '../src/content/faq'
 import { FEATURES } from '../src/content/features'
-import { PAGE_META, REPO_URL as REPO, SITE_URL } from '../src/content/site'
+import { HOSTING_NOTICE, PAGE_META, REPO_URL as REPO, SITE_URL } from '../src/content/site'
 
 // ponytail: regex conversion covers the simple markup legal pages use (headings, paragraphs, lists, links, bold); swap for a real parser if templates get nested.
 export function htmlToMarkdown(html: string) {
@@ -63,11 +63,14 @@ export function llmsTxt() {
 
 Metrolist is free and open source (GPL-3.0). It is not affiliated with YouTube or Google, and it is not published on the Play Store; official builds come only from GitHub Releases.
 
+${HOSTING_NOTICE}
+
 ## Pages
 
 - [Overview](${SITE_URL}/index.md): features, supported platforms, and install steps
 - [FAQ](${SITE_URL}/faq.md): platforms, migration, accounts, safety, updates, and imports
 - [Privacy policy](${SITE_URL}/privacy.md): app data, optional Sentry diagnostics, and website hosting
+- [Everything in one file](${SITE_URL}/llms-full.txt): all of the above pages
 
 ## Project
 

@@ -1,3 +1,5 @@
+import { HOSTING_NOTICE } from './site'
+
 export type FaqItem = {
   question: string
   answer: string
@@ -19,6 +21,10 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     question: 'Is Metrolist safe to use?',
     answer: 'Metrolist is open source under GPL-3.0, and anyone can inspect its code. Third-party clients technically violate YouTube\'s Terms of Service. No bans for using Metrolist have been reported since the project began.',
+  },
+  {
+    question: 'Does Metrolist host or pirate music?',
+    answer: `No. ${HOSTING_NOTICE}`,
   },
   {
     question: 'How do I update Metrolist?',

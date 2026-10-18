@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { HOSTING_NOTICE } from '../content/site'
+
 const links = [
   { label: 'Source', href: 'https://github.com/MetrolistGroup/Metrolist' },
   { label: 'Releases', href: 'https://github.com/MetrolistGroup/Metrolist/releases' },
@@ -34,6 +36,7 @@ const links = [
       </nav>
 
       <div class="footer__bottom">
+        <p>{{ HOSTING_NOTICE }}</p>
         <p>Metrolist is an educational open-source project and is not affiliated with Google LLC. YouTube and YouTube Music are trademarks of Google LLC.</p>
         <p>Metrolist by <a href="https://github.com/mostafaalagamy" target="_blank" rel="noopener noreferrer">Mo Agamy</a> and contributors. Site by <a href="https://nyx.meowery.eu" target="_blank" rel="noopener noreferrer">Nyx</a>.</p>
       </div>

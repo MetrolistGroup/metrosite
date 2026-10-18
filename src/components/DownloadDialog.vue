@@ -8,6 +8,7 @@ import {
   type DownloadPlatformKey,
   type ReleaseAsset,
 } from '../content/downloads'
+import { HOSTING_NOTICE } from '../content/site'
 
 const props = withDefaults(defineProps<{
   label?: string
@@ -28,6 +29,8 @@ const isLoading = ref(false)
 const hasLoaded = ref(false)
 const loadFailed = ref(false)
 const titleId = useId()
+const noticeId = useId()
+const notice = ref<HTMLElement>()
 
 function detectedPlatform(): DownloadPlatformKey {
   const agent = navigator.userAgent.toLowerCase()
@@ -109,6 +112,11 @@ function showDonate() {
   donateTimer = setTimeout(() => { donateDeveloper.value = undefined }, 12000)
 }
 
+function onDownload() {
+  showDonate()
+  notice.value?.showPopover()
+}
+
 onBeforeUnmount(() => clearTimeout(donateTimer))
 
 function formatSize(bytes?: number) {
@@ -186,11 +194,15 @@ function formatSize(bytes?: number) {
               <template v-else>No matching build was found in the latest release.</template>
             </p>
             <div class="download-dialog__download-actions">
-              <a :href="selectedAsset?.browser_download_url || releasesUrl" class="btn btn-filled" target="_blank" rel="noopener noreferrer" @click="showDonate">
+              <a :href="selectedAsset?.browser_download_url || releasesUrl" class="btn btn-filled" target="_blank" rel="noopener noreferrer" @click="onDownload">
                 <span class="material-symbols-rounded" aria-hidden="true">download</span>
                 {{ selectedAsset?.name.toLowerCase().endsWith('.zip') ? 'Download portable ZIP' : selectedAsset ? `Download ${selectedPlatform.package}` : 'Browse release files' }}
               </a>
               <a v-if="selectedAsset" :href="releasesUrl" class="btn btn-tonal" target="_blank" rel="noopener noreferrer">All builds</a>
+            </div>
+            <div :id="noticeId" ref="notice" popover class="download-dialog__notice" role="note">
+              <p><strong>Heads up.</strong> {{ HOSTING_NOTICE }}</p>
+              <button type="button" class="btn btn-tonal" :popovertarget="noticeId" popovertargetaction="hide">Got it</button>
             </div>
             <p v-if="donateDeveloper" class="download-dialog__donate" role="status">
               Enjoying Metrolist?
@@ -438,6 +450,37 @@ function formatSize(bytes?: number) {
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 13px;
+}
+
+.download-dialog__download-actions > .btn-filled {
+  anchor-name: --download-button;
+}
+
+.download-dialog__notice {
+  width: min(360px, calc(100vw - 32px));
+  margin: auto;
+  padding: 16px;
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-large);
+  background: var(--md-sys-color-tertiary-container);
+  color: var(--md-sys-color-on-tertiary-container);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 30%);
+  font: var(--md-sys-typescale-body-medium);
+  letter-spacing: var(--md-sys-typescale-body-medium-tracking);
+}
+
+/* Without anchor positioning the popover stays centred on screen. */
+@supports (position-area: top) {
+  .download-dialog__notice {
+    position-anchor: --download-button;
+    position-area: top span-right;
+    position-try-fallbacks: flip-block;
+    margin: 0 0 8px;
+  }
+}
+
+.download-dialog__notice .btn {
+  margin-top: 12px;
 }
 
 .download-dialog__donate {

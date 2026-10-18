@@ -175,6 +175,8 @@ ${indexable.map(page => `  <url>
 </urlset>
 `)
 await writeFile(new URL('llms.txt', dist), llmsTxt())
+// One-fetch copy of every page for agents that read llms-full.txt.
+await writeFile(new URL('llms-full.txt', dist), pages.flatMap(page => page.markdown ? [page.markdown[1].trim()] : []).join('\n\n---\n\n') + '\n')
 await rm(new URL('.vite/', dist), { recursive: true })
 
 // Discord component embeds (3,000-byte limit); the og:* tags remain the fallback.
@@ -244,7 +246,7 @@ await writeFile(new URL('_headers', dist), `/assets/*
   Content-Type: text/markdown; charset=utf-8
   X-Robots-Tag: noindex
 
-/llms.txt
+/llms*.txt
   Content-Type: text/plain; charset=utf-8
 
 /listen

@@ -1,6 +1,9 @@
 export const SITE_URL = 'https://metrolist.cc'
 export const REPO_URL = 'https://github.com/MetrolistGroup/Metrolist'
 
+// Shown in the footer, FAQ, and llms.txt; written for takedown reviewers as much as users.
+export const HOSTING_NOTICE = 'Metrolist does not host, upload, or distribute any music, videos, or other media. It is a client that plays content directly from YouTube Music, the same way the official website does. It does not bypass DRM, and Premium-only features such as premium audio quality require your own YouTube Music Premium subscription.'
+
 // Large image previews and full snippets let search results show screenshots and complete answers.
 const INDEX = 'index, follow, max-image-preview:large, max-snippet:-1'
 
