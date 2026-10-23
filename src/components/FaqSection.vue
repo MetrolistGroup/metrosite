@@ -1,15 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { FAQ_ITEMS } from '../content/faq'
 
 const topItems = FAQ_ITEMS.slice(0, 5)
-const openItems = ref<number[]>([])
-
-function toggleItem(index: number) {
-  openItems.value = openItems.value.includes(index)
-    ? openItems.value.filter(item => item !== index)
-    : [...openItems.value, index]
-}
 </script>
 
 <template>
@@ -24,28 +16,15 @@ function toggleItem(index: number) {
       </header>
 
       <div class="faq__list">
-        <article v-for="(item, index) in topItems" :key="item.question" :class="{ 'is-open': openItems.includes(index) }">
-          <button
-            type="button"
-            :id="`home-faq-question-${index}`"
-            class="faq__question"
-            :aria-expanded="openItems.includes(index)"
-            :aria-controls="`home-faq-answer-${index}`"
-            @click="toggleItem(index)"
-          >
-            <strong>{{ item.question }}</strong>
-            <span class="faq__mark material-symbols-rounded" aria-hidden="true">add</span>
-          </button>
-          <div
-            :id="`home-faq-answer-${index}`"
-            class="faq__answer"
-            role="region"
-            :aria-labelledby="`home-faq-question-${index}`"
-            :aria-hidden="!openItems.includes(index)"
-          >
-            <div><p>{{ item.answer }}</p></div>
-          </div>
-        </article>
+        <details v-for="item in topItems" :key="item.question">
+          <summary class="faq__question">
+            <h3>
+              {{ item.question }}
+              <span class="faq__mark material-symbols-rounded" aria-hidden="true">add</span>
+            </h3>
+          </summary>
+          <div class="faq__answer"><p>{{ item.answer }}</p></div>
+        </details>
       </div>
     </div>
   </section>
@@ -85,26 +64,36 @@ function toggleItem(index: number) {
   background: var(--md-sys-color-surface-container);
 }
 
-.faq__list article {
+.faq__list details {
   overflow: hidden;
   border-radius: var(--md-sys-shape-corner-extra-large);
   background: var(--md-sys-color-surface-container-high);
 }
 
 .faq__question {
+  display: block;
+  border-radius: inherit;
+  color: var(--md-sys-color-on-surface);
+  cursor: pointer;
+}
+
+.faq__question::-webkit-details-marker {
+  display: none;
+}
+
+.faq__question:focus-visible {
+  outline-offset: -6px;
+}
+
+.faq__question h3 {
   display: grid;
-  width: 100%;
   grid-template-columns: 1fr 44px;
   gap: 18px;
   align-items: center;
   min-height: 78px;
   padding: 10px 12px 10px 24px;
-  border: 0;
-  background: transparent;
-  color: var(--md-sys-color-on-surface);
-  cursor: pointer;
-  font: inherit;
-  text-align: left;
+  font: var(--md-sys-typescale-title-medium);
+  letter-spacing: var(--md-sys-typescale-title-medium-tracking);
 }
 
 .faq__mark {
@@ -115,27 +104,8 @@ function toggleItem(index: number) {
   transition: transform var(--md-motion-spatial-fast);
 }
 
-.faq__list article.is-open .faq__mark {
+.faq__list details[open] .faq__mark {
   transform: rotate(45deg);
-}
-
-.faq__question strong {
-  font: var(--md-sys-typescale-title-medium);
-  letter-spacing: var(--md-sys-typescale-title-medium-tracking);
-}
-
-.faq__answer {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows var(--md-motion-spatial-default);
-}
-
-.faq__answer > div {
-  overflow: hidden;
-}
-
-.faq__list article.is-open .faq__answer {
-  grid-template-rows: 1fr;
 }
 
 .faq__answer p {
@@ -169,7 +139,7 @@ function toggleItem(index: number) {
     padding: 6px;
   }
 
-  .faq__question {
+  .faq__question h3 {
     grid-template-columns: 1fr 40px;
     gap: 10px;
     min-height: 72px;

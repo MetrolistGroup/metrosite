@@ -3,9 +3,13 @@ import { FAQ_ITEMS } from '../src/content/faq'
 import { FEATURES } from '../src/content/features'
 import { HOSTING_NOTICE, PAGE_META, REPO_URL as REPO, SITE_URL } from '../src/content/site'
 
-// ponytail: regex conversion covers the simple markup legal pages use (headings, paragraphs, lists, links, bold); swap for a real parser if templates get nested.
+// shortcut: conversion covers simple legal markup (headings, paragraphs, lists, links, bold); use a parser if templates get nested.
 export function htmlToMarkdown(html: string) {
   return html
+    // Escape literal text before adding Markdown syntax; leave entities for the reader to decode once.
+    .split(/(<[^>]+>|&(?:#\d+|#x[\da-f]+|[a-z][a-z\d]+);)/gi)
+    .map((part, index) => index % 2 ? part : part.replace(/[\\`*_[\]{}()#+.!|>~-]/g, '\\$&'))
+    .join('')
     .replace(/\s*(<\/?(?:ul|li|section|article|header)\b)/g, '$1')
     .replace(/<a [^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g, '[$2]($1)')
     .replace(/<\/?strong>/g, '**')
@@ -13,7 +17,6 @@ export function htmlToMarkdown(html: string) {
     .replace(/<li>([\s\S]*?)<\/li>/g, '\n- $1')
     .replace(/<p[^>]*>([\s\S]*?)<\/p>/g, '\n\n$1\n\n')
     .replace(/<[^>]+>/g, '')
-    .replace(/&amp;/g, '&')
     .replace(/[ \t]+/g, ' ')
     .replace(/ *\n */g, '\n')
     .replace(/\n{3,}/g, '\n\n')

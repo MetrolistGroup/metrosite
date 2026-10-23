@@ -21,11 +21,6 @@ const SCREENSHOTS = {
   ios: assetUrl('iphone-17-player-dark'),
 }
 
-// Latest version for structured data; the build still succeeds offline.
-const release = await fetch('https://api.github.com/repos/MetrolistGroup/Metrolist/releases/latest', { signal: AbortSignal.timeout(5000) })
-  .then(response => response.ok ? response.json() as Promise<{ tag_name?: string, published_at?: string }> : undefined)
-  .catch(() => undefined)
-
 const ORGANIZATION = {
   '@type': 'Organization',
   '@id': `${SITE_URL}/#organization`,
@@ -35,7 +30,7 @@ const ORGANIZATION = {
   sameAs: ['https://github.com/MetrolistGroup', REPO_URL, 'https://hosted.weblate.org/projects/Metrolist/'],
 }
 
-function app(operatingSystem: string, screenshot: string | string[], downloadUrl = `${REPO_URL}/releases/latest`) {
+function app(operatingSystem: string, screenshot: string | string[]) {
   return {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -46,16 +41,12 @@ function app(operatingSystem: string, screenshot: string | string[], downloadUrl
     applicationCategory: 'MultimediaApplication',
     applicationSubCategory: 'Music player',
     operatingSystem,
-    downloadUrl,
-    installUrl: downloadUrl,
+    installUrl: `${REPO_URL}/releases/latest`,
     screenshot,
     image: `${SITE_URL}/og-image.png`,
-    ...(release?.tag_name && { softwareVersion: release.tag_name.replace(/^v/, '') }),
-    ...(release?.published_at && { dateModified: release.published_at }),
     isAccessibleForFree: true,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     license: `${REPO_URL}/blob/main/LICENSE`,
-    codeRepository: REPO_URL,
     featureList: 'Ad-free YouTube Music playback, background playback, offline downloads, synchronized lyrics, Listen Together rooms, Chromecast, DLNA, and FCast casting, equalizer, tempo and pitch controls',
     author: { '@type': 'Person', name: 'Mo Agamy', url: 'https://github.com/mostafaalagamy' },
     publisher: { '@id': `${SITE_URL}/#organization` },
@@ -121,38 +112,45 @@ function preloadLinks(modules: Set<string>) {
     : file.endsWith('.js') ? `<link rel="modulepreload" crossorigin href="${file}" />` : '').filter(Boolean).join('\n    ')
 }
 
+function replaceRequired(html: string, pattern: RegExp, replacement: string) {
+  if (!pattern.test(html)) throw new Error(`Required HTML placeholder was not found: ${pattern}`)
+  return html.replace(pattern, () => replacement)
+}
+
 async function renderPage(page: Page) {
   const { meta, path } = page
   const url = `${SITE_URL}${path}`
   const title = escapeHtml(meta.title)
   const description = escapeHtml(meta.description)
-  let html = source
-    .replace(/<title>[^<]*<\/title>/, `<title>${title}</title>`)
-    .replace(/<meta name="robots" content="[^"]*" \/>/, `<meta name="robots" content="${meta.robots}" />`)
-    .replace(/<meta name="description" content="[^"]*" \/>/, `<meta name="description" content="${description}" />`)
-    .replace(/<meta property="og:title" content="[^"]*" \/>/, `<meta property="og:title" content="${title}" />`)
-    .replace(/<meta property="og:description" content="[^"]*" \/>/, `<meta property="og:description" content="${description}" />`)
-    .replace(/<meta property="og:url" content="[^"]*" \/>/, `<meta property="og:url" content="${url}" />`)
-    .replace(/<meta name="twitter:title" content="[^"]*" \/>/, `<meta name="twitter:title" content="${title}" />`)
-    .replace(/<meta name="twitter:description" content="[^"]*" \/>/, `<meta name="twitter:description" content="${description}" />`)
+  let html = replaceRequired(source, /<title>[^<]*<\/title>/, `<title>${title}</title>`)
+  for (const [attribute, name, value] of [
+    ['name', 'robots', escapeHtml(meta.robots)],
+    ['name', 'description', description],
+    ['property', 'og:title', title],
+    ['property', 'og:description', description],
+    ['property', 'og:url', escapeHtml(url)],
+    ['name', 'twitter:title', title],
+    ['name', 'twitter:description', description],
+  ]) {
+    html = replaceRequired(html, new RegExp(`<meta ${attribute}="${name}" content="[^"]*"\\s*/?>`), `<meta ${attribute}="${name}" content="${value}" />`)
+  }
 
-  html = page.canonical === false
-    ? html.replace(/\s*<link rel="canonical" href="[^"]*" \/>/, '')
-    : html.replace(/<link rel="canonical" href="[^"]*" \/>/, `<link rel="canonical" href="${url}" />`)
+  html = replaceRequired(html, /<link rel="canonical" href="[^"]*"\s*\/?>/,
+    page.canonical === false ? '' : `<link rel="canonical" href="${escapeHtml(url)}" />`)
 
-  html = html.replace(/\s*<link rel="discord:component-embed"[^>]*\/>/, '')
-  if (page.embed) html = html.replace('</head>', `  <link rel="discord:component-embed" type="application/json" href="${SITE_URL}/${page.embed}" />\n  </head>`)
-  if (page.markdown) html = html.replace('</head>', `  <link rel="alternate" type="text/markdown" href="/${page.markdown[0]}" />\n  </head>`)
+  html = html.replace(/\s*<link rel="discord:component-embed"[^>]*>/, '')
+  if (page.embed) html = html.replace('</head>', () => `  <link rel="discord:component-embed" type="application/json" href="${SITE_URL}/${page.embed}" />\n  </head>`)
+  if (page.markdown) html = html.replace('</head>', () => `  <link rel="alternate" type="text/markdown" href="/${page.markdown[0]}" />\n  </head>`)
   for (const schema of page.schemas ?? []) {
-    html = html.replace('</head>', `  <script type="application/ld+json">${JSON.stringify(schema).replaceAll('<', '\\u003c')}</script>\n  </head>`)
+    html = html.replace('</head>', () => `  <script type="application/ld+json">${JSON.stringify(schema).replaceAll('<', '\\u003c')}</script>\n  </head>`)
   }
 
   const rendered = await render(path === '/404' ? '/__not-found' : path)
   html = html
-    .replace('</head>', `  ${preloadLinks(rendered.modules)}\n  </head>`)
+    .replace('</head>', () => `  ${preloadLinks(rendered.modules)}\n  </head>`)
     // Vue hydrates body teleports starting from the body's first child.
-    .replace('<body>', `<body>${rendered.teleports.body ?? ''}`)
-    .replace('<div id="app"></div>', `<div id="app">${rendered.html}</div>`)
+    .replace('<body>', () => `<body>${rendered.teleports.body ?? ''}`)
+    .replace('<div id="app"></div>', () => `<div id="app">${rendered.html}</div>`)
 
   if (!html.includes(`<title>${title}</title>`) || !html.includes(`content="${meta.robots}"`) || !html.includes('<h1')) {
     throw new Error(`Failed to prerender ${path}`)
@@ -215,7 +213,7 @@ const home = {
       { type: 14, divider: true, spacing: 1 },
       { type: 1, components: [button('Download', `${REPO_URL}/releases/latest`), button('Source', REPO_URL), button('FAQ', `${SITE_URL}/faq`), button('Privacy', `${SITE_URL}/privacy`)] },
       { type: 14, divider: true, spacing: 1 },
-      { type: 9, components: [text('### Ad-free YouTube Music\nBackground play, synced lyrics, offline downloads, and casting on Android, Linux, macOS, and Windows.')], accessory: { type: 11, media: { url: `${SITE_URL}/icons/youtube-music.webp` }, description: 'YouTube Music' } },
+      { type: 9, components: [text(`### Ad-free YouTube Music\n${PAGE_META.home.description}`)], accessory: { type: 11, media: { url: `${SITE_URL}/icons/youtube-music.webp` }, description: 'YouTube Music' } },
     ],
   },
 }
@@ -231,10 +229,7 @@ for (const [file, payload] of Object.entries(embeds)) {
 }
 
 // JSON-LD blocks are data, not script, so script-src needs no inline hashes.
-await writeFile(new URL('_headers', dist), `/assets/*
-  Cache-Control: public, max-age=31536000, immutable
-
-/*
+await writeFile(new URL('_headers', dist), `/*
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self' https://api.github.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
   Permissions-Policy: camera=(), geolocation=(), microphone=()
   Referrer-Policy: strict-origin-when-cross-origin
@@ -243,7 +238,6 @@ await writeFile(new URL('_headers', dist), `/assets/*
   X-Frame-Options: DENY
 
 /*.md
-  Content-Type: text/markdown; charset=utf-8
   X-Robots-Tag: noindex
 
 /llms*.txt

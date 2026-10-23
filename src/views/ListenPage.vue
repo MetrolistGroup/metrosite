@@ -1,32 +1,41 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import DownloadDialog from '../components/DownloadDialog.vue'
+import { copyRoomCode, listenAppUrl, roomCodeFromQuery } from '../content/listen'
 
 const route = useRoute()
-const copied = ref(false)
+const copyStatus = ref('')
+const copying = ref(false)
+let feedbackTimer: ReturnType<typeof setTimeout> | undefined
 // The page is prerendered without a query, so read the room code only after hydration.
 const hydrated = ref(false)
 onMounted(() => { hydrated.value = true })
-const code = computed(() => hydrated.value && typeof route.query.code === 'string' ? route.query.code : '')
-const openInAppUrl = computed(() => code.value ? `${window.location.origin}/listen?code=${encodeURIComponent(code.value)}` : '#')
+const code = computed(() => hydrated.value ? roomCodeFromQuery(route.query.code) : '')
+const invalidCode = computed(() => hydrated.value && route.query.code !== undefined && !code.value)
+const openInAppUrl = computed(() => code.value ? listenAppUrl(code.value, navigator.userAgent, navigator.maxTouchPoints) : '')
+const androidLink = computed(() => openInAppUrl.value.startsWith('https:'))
+
+function clearFeedback() {
+  clearTimeout(feedbackTimer)
+  copyStatus.value = ''
+}
+watch(code, clearFeedback)
+onUnmounted(() => {
+  hydrated.value = false
+  clearFeedback()
+})
 
 async function copyCode() {
-  if (!code.value) return
-
-  try {
-    await navigator.clipboard.writeText(code.value)
-  } catch {
-    const input = document.createElement('input')
-    input.value = code.value
-    document.body.appendChild(input)
-    input.select()
-    document.execCommand('copy')
-    input.remove()
-  }
-
-  copied.value = true
-  window.setTimeout(() => { copied.value = false }, 2000)
+  if (!code.value || copying.value) return
+  const room = code.value
+  clearFeedback()
+  copying.value = true
+  const success = await copyRoomCode(room)
+  copying.value = false
+  if (!hydrated.value || code.value !== room) return
+  copyStatus.value = success ? 'success' : 'error'
+  if (success) feedbackTimer = setTimeout(clearFeedback, 2000)
 }
 </script>
 
@@ -58,31 +67,36 @@ async function copyCode() {
           <span id="room-code-title">Room code</span>
           <strong>{{ code }}</strong>
         </div>
-        <button type="button" class="btn btn-tonal btn-lg" @click="copyCode">
-          <span class="material-symbols-rounded" aria-hidden="true">{{ copied ? 'check' : 'content_copy' }}</span>
-          {{ copied ? 'Copied' : 'Copy code' }}
+        <button type="button" class="btn btn-tonal btn-lg" :aria-disabled="copying" @click="copyCode">
+          <span class="material-symbols-rounded" aria-hidden="true">{{ copyStatus === 'success' ? 'check' : 'content_copy' }}</span>
+          {{ copying ? 'Copying…' : copyStatus === 'success' ? 'Copied' : 'Copy code' }}
         </button>
       </section>
 
       <section v-else class="listen__empty">
         <span class="material-symbols-rounded" aria-hidden="true">link_off</span>
-        <div><h2>No room code found</h2><p>Use a Listen Together link shared from Metrolist.</p></div>
+        <div><h2>{{ invalidCode ? 'Invalid room code' : 'No room code found' }}</h2><p>Use a Listen Together link shared from Metrolist. Room codes contain six or eight letters and numbers.</p></div>
       </section>
+      <p class="listen__feedback" role="status" aria-atomic="true">{{ copyStatus === 'success' ? 'Room code copied.' : copyStatus === 'error' ? 'Could not copy the room code. Select the code above and copy it manually.' : '' }}</p>
 
       <div class="listen__guides">
         <article>
           <div class="listen__guide-top"><span class="material-symbols-rounded" aria-hidden="true">open_in_new</span><small>Step 1</small></div>
-          <h2>Open in Metrolist</h2>
-          <p>Set Metrolist as the default app for links from <strong>metrolist.cc</strong>.</p>
+          <h2>Join in Metrolist</h2>
+          <p>Copy the room code, then open Metrolist on your device.</p>
           <ol>
-            <li>Choose Open in Metrolist below.</li>
-            <li>Select Metrolist, then choose Always.</li>
-            <li>If asked, allow supported links in your system app settings.</li>
+            <li>Open Listen Together in the app.</li>
+            <li>Choose Join room and paste or type the code.</li>
+            <li>If the code is not accepted, ask the host for a new invitation and check that your app versions are compatible.</li>
           </ol>
-          <a v-if="code" :href="openInAppUrl" class="btn btn-filled btn-lg">
-            <span class="material-symbols-rounded" aria-hidden="true">open_in_new</span>
-            Open in Metrolist
-          </a>
+          <template v-if="openInAppUrl">
+            <p v-if="androidLink">On Android, you can also try the invitation link. Allow Metrolist to open supported links from <strong>metrolist.cc</strong> in system app settings. If this page reopens or the room does not appear, join manually above.</p>
+            <p v-else>On iPhone or iPad with Metrolist installed, try opening this room directly. If it does not open, join manually above.</p>
+            <a :href="openInAppUrl" class="btn btn-filled btn-lg">
+              <span class="material-symbols-rounded" aria-hidden="true">open_in_new</span>
+              {{ androidLink ? 'Try Android app link' : 'Open in Metrolist' }}
+            </a>
+          </template>
         </article>
 
         <article>
@@ -189,6 +203,8 @@ async function copyCode() {
 }
 
 .listen__room > div {
+  min-width: 0;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -202,10 +218,20 @@ async function copyCode() {
 }
 
 .listen__room strong {
+  overflow-wrap: anywhere;
+  user-select: text;
   font-family: ui-monospace, monospace;
   font-size: clamp(2.2rem, 7vw, 4.2rem);
   letter-spacing: 0.12em;
   line-height: 1;
+}
+
+.listen__room > button {
+  flex-shrink: 0;
+}
+
+.listen__feedback {
+  margin-top: 12px;
 }
 
 .listen__empty {
@@ -308,7 +334,7 @@ async function copyCode() {
 }
 
 .listen__guides .btn {
-  margin-top: auto;
+  margin-top: 24px;
 }
 
 @media (max-width: 760px) {

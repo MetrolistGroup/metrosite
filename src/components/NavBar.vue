@@ -1,16 +1,32 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import DownloadDialog from './DownloadDialog.vue'
 
 const isMenuOpen = ref(false)
 const menuButton = ref<HTMLButtonElement>()
+const header = ref<HTMLElement>()
+const mounted = ref(false)
 const route = useRoute()
-const currentAnchor = (hash: string) => route.path === '/' && route.hash === hash ? 'location' : 'false'
+const currentAnchor = (hash: string) => mounted.value && route.path === '/' && route.hash === hash ? 'location' : 'false'
+
+function closeOutside(target: EventTarget | null) {
+  if (!(target instanceof Node) || !header.value?.contains(target)) isMenuOpen.value = false
+}
+
+function onPointerDown(event: PointerEvent) {
+  closeOutside(event.target)
+}
+
+onMounted(() => {
+  mounted.value = true
+  document.addEventListener('pointerdown', onPointerDown, true)
+})
+onBeforeUnmount(() => document.removeEventListener('pointerdown', onPointerDown, true))
 </script>
 
 <template>
-  <header class="navbar" @keydown.esc="isMenuOpen = false; menuButton?.focus()">
+  <header ref="header" class="navbar" @focusout="closeOutside($event.relatedTarget)" @keydown.esc="isMenuOpen = false; menuButton?.focus()">
     <div class="container navbar__inner">
       <RouterLink to="/" class="navbar__brand" aria-label="Metrolist home" @click="isMenuOpen = false">
         <img class="navbar__brand-mark" src="/logo.svg" alt="" width="58" height="58" />
@@ -37,7 +53,7 @@ const currentAnchor = (hash: string) => route.path === '/' && route.hash === has
         <RouterLink :to="{ path: '/', hash: '#features' }" :aria-current="currentAnchor('#features')" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">tune</span>Features</RouterLink>
         <RouterLink :to="{ path: '/', hash: '#platforms' }" :aria-current="currentAnchor('#platforms')" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">devices</span>Platforms</RouterLink>
         <RouterLink to="/faq" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">help</span>FAQ</RouterLink>
-        <DownloadDialog label="Download" button-class="navbar__drawer-download" @open="isMenuOpen = false" />
+        <DownloadDialog label="Download" button-class="navbar__drawer-download" @open="isMenuOpen = false" @close="menuButton?.focus()" />
       </div>
     </nav>
     </Transition>
@@ -111,6 +127,8 @@ const currentAnchor = (hash: string) => route.path === '/' && route.hash === has
   top: 100%;
   inset-inline: 0;
   display: none;
+  max-height: calc(100dvh - 100%);
+  overflow-y: auto;
   padding: 6px 0 18px;
   border-radius: 0 0 var(--md-sys-shape-corner-extra-large) var(--md-sys-shape-corner-extra-large);
   background: var(--md-sys-color-surface-container-low);
@@ -153,7 +171,7 @@ const currentAnchor = (hash: string) => route.path === '/' && route.hash === has
 }
 
 .drawer-leave-active {
-  transition: opacity var(--md-motion-exit), transform var(--md-motion-exit);
+  transition: opacity var(--md-motion-exit), transform var(--md-motion-spatial-exit, var(--md-motion-exit));
 }
 
 .drawer-enter-from,

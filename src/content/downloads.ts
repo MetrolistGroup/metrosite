@@ -28,19 +28,43 @@ export type LatestRelease = {
   assets?: ReleaseAsset[]
 }
 
+const RELEASE_TIMEOUT_MS = 10_000
+const RELEASE_CACHE_MS = 60_000
 let latestReleaseRequest: Promise<LatestRelease> | undefined
+let lastSuccessfulRelease: LatestRelease | undefined
+let latestReleaseExpiresAt = Infinity
 
 export function getLatestRelease() {
-  if (!latestReleaseRequest) {
-    latestReleaseRequest = fetch('https://api.github.com/repos/MetrolistGroup/Metrolist/releases/latest')
-      .then(response => {
-        if (!response.ok) throw new Error(`GitHub returned ${response.status}`)
-        return response.json() as Promise<LatestRelease>
+  if (!latestReleaseRequest || Date.now() >= latestReleaseExpiresAt) {
+    latestReleaseExpiresAt = Infinity
+    const controller = new AbortController()
+    let timeout: ReturnType<typeof setTimeout>
+    const deadline = new Promise<never>((_, reject) => {
+      timeout = setTimeout(() => {
+        reject(new Error('GitHub release request timed out'))
+        controller.abort()
+      }, RELEASE_TIMEOUT_MS)
+    })
+    const request = async () => {
+      const response = await fetch('https://api.github.com/repos/MetrolistGroup/Metrolist/releases/latest', {
+        signal: controller.signal,
+      })
+      if (!response.ok) throw new Error(`GitHub returned ${response.status}`)
+      return response.json() as Promise<LatestRelease>
+    }
+    // Keep the deadline active through body parsing, not just response headers.
+    latestReleaseRequest = Promise.race([request(), deadline])
+      .then(release => {
+        lastSuccessfulRelease = release
+        latestReleaseExpiresAt = Date.now() + RELEASE_CACHE_MS
+        return release
       })
       .catch(error => {
         latestReleaseRequest = undefined
+        if (lastSuccessfulRelease !== undefined) return lastSuccessfulRelease
         throw error
       })
+      .finally(() => clearTimeout(timeout))
   }
   return latestReleaseRequest
 }
@@ -50,7 +74,7 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
     key: 'android',
     icon: 'android',
     name: 'Android',
-    detail: 'Android 6 and newer',
+    detail: 'Android 9 and newer',
     package: 'APK',
     instructions: [
       'Download the APK for your device.',
@@ -73,7 +97,7 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
     package: 'IPA',
     instructions: [
       'Download the unsigned IPA.',
-      'Open it in AltStore, SideStore, TrollStore, or Sideloadly.',
+      'Open it in AltStore, SideStore, or Sideloadly.',
       'Follow your sideloading app’s prompts to sign and install Metrolist.',
     ],
     architectures: [
@@ -134,9 +158,9 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
     detail: 'Windows 10 and newer',
     package: 'Installer or portable ZIP',
     instructions: [
-      'Download the installer for your architecture.',
-      'Run the installer and follow the prompts.',
-      'Launch Metrolist from the Start menu.',
+      'Download the EXE installer or portable ZIP for your architecture.',
+      'For the EXE, run the installer and follow the prompts, then launch Metrolist from the Start menu.',
+      'For the ZIP, extract it to a folder and run Metrolist from the extracted folder.',
     ],
     architectures: [
       {

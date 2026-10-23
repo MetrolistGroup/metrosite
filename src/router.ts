@@ -1,4 +1,4 @@
-import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router'
+import { createMemoryHistory, createRouter, createWebHistory, START_LOCATION } from 'vue-router'
 import { PAGE_META, SITE_URL, type PageMeta } from './content/site'
 import HomeView from './views/HomeView.vue'
 
@@ -13,16 +13,36 @@ const ROUTES = [
 export function createAppRouter() {
   const router = createRouter({
     history: import.meta.env.SSR ? createMemoryHistory() : createWebHistory(),
-    scrollBehavior(to, _from, savedPosition) {
+    sensitive: true,
+    scrollBehavior(to, from, savedPosition) {
       if (savedPosition) return savedPosition
-      if (to.hash) return { el: to.hash, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }
+      if (to.hash) {
+        const target = document.getElementById(to.hash.slice(1))
+        if (!target) return false
+        if (from !== START_LOCATION && to.path === from.path && to.hash !== from.hash) {
+          if (target.tabIndex < 0 && !target.hasAttribute('tabindex')) {
+            target.setAttribute('tabindex', '-1')
+            target.addEventListener('blur', () => target.removeAttribute('tabindex'), { once: true })
+          }
+          target.focus({ preventScroll: true })
+        }
+        return { el: target, top: 96, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }
+      }
       return { top: 0 }
     },
     routes: ROUTES,
   })
 
-  // The build prerenders head tags per route; this keeps them right during client navigation.
-  if (!import.meta.env.SSR) router.afterEach((to) => {
+  // Each document owns its prerendered structured data, Markdown and embed links.
+  if (!import.meta.env.SSR) router.beforeEach((to, from) => {
+    if (from !== START_LOCATION && to.path !== from.path) {
+      window.location.assign(to.fullPath)
+      return false
+    }
+  })
+
+  if (!import.meta.env.SSR) router.afterEach((to, _from, failure) => {
+    if (failure) return
     const meta = to.meta as unknown as PageMeta
     const url = `${SITE_URL}${to.path === '/' ? '/' : to.path}`
     document.title = meta.title

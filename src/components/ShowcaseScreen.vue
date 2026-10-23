@@ -20,6 +20,8 @@ const source = computed(() => {
 })
 const displayedSource = ref(source.value)
 const failed = ref(false)
+const originalSource = computed(() => !props.thumbnail && !failed.value ? displayedSource.value : undefined)
+defineExpose({ originalSource })
 // Keep the current capture visible until the next one can actually be painted.
 watch(source, async (next, _previous, onCleanup) => {
   let cancelled = false

@@ -64,6 +64,7 @@
   --md-motion-effects-slow: 300ms linear(0, 0.158, 0.413, 0.626, 0.774, 0.868, 0.925, 0.958, 0.977, 0.987, 0.993, 0.996, 1);
   /* Exits are shorter and accelerate away so they never block the next action. */
   --md-motion-exit: 160ms cubic-bezier(0.3, 0, 0.8, 0.15);
+  --md-motion-spatial-exit: var(--md-motion-exit);
   /* M3 Expressive type scale, fluid for the web. Optical size follows font
      size automatically, so tracking stays light: big text tightens itself.
      Baseline display weights stay light; emphasized words (h1/h2 > span)
@@ -120,7 +121,6 @@ html {
 }
 
 body {
-  min-width: 320px;
   overflow-x: hidden;
   background: var(--md-sys-color-background);
   color: var(--md-sys-color-on-background);
@@ -348,16 +348,6 @@ img {
   cursor: pointer;
 }
 
-#desktop,
-#features,
-#platforms,
-.faq,
-.download,
-.footer {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 700px;
-}
-
 @media (max-width: 600px) {
   .container {
     width: min(100% - 28px, 1240px);
@@ -375,6 +365,7 @@ img {
     --md-motion-spatial-fast: 0s linear;
     --md-motion-spatial-default: 0s linear;
     --md-motion-spatial-slow: 0s linear;
+    --md-motion-spatial-exit: 0s linear;
   }
 
   html {

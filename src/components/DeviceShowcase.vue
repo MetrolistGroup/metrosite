@@ -10,7 +10,9 @@ const previews = [
   { device: 'wear', name: 'Wear OS', detail: 'Use a watch as your music controller', icon: 'wearos', ratio: '1' },
 ] as const
 const view = ref<ShowcaseView>('home')
-const viewName = computed(() => SHOWCASE_VIEWS.find(item => item.key === view.value)!.name)
+const dialogView = ref<ShowcaseView>('home')
+const viewName = computed(() => SHOWCASE_VIEWS.find(item => item.key === dialogView.value)!.name)
+const fullScreen = ref<InstanceType<typeof ShowcaseScreen>>()
 const dialog = ref<HTMLDialogElement>()
 const selectedDevice = ref<ShowcaseDevice>('desktop')
 const selected = computed(() => previews.find(item => item.device === selectedDevice.value)!)
@@ -20,6 +22,8 @@ let previousOverflow = ''
 
 async function openScreenshot(device: ShowcaseDevice) {
   selectedDevice.value = device
+  // Retain the exit fade without following mosaic changes while closed.
+  dialogView.value = view.value
   dialogContentMounted.value = true
   await nextTick()
   previousOverflow = document.body.style.overflow
@@ -63,16 +67,17 @@ onBeforeUnmount(() => { if (dialog.value?.open) restoreScroll() })
   <Teleport to="body">
     <dialog ref="dialog" class="preview-dialog" :aria-label="`${selected.name} · ${selectedDevice === 'wear' ? 'Now Playing · Illustrative' : viewName} preview`" @close="restoreScroll" @click="(event) => { if (event.target === dialog) dialog?.close() }">
       <form method="dialog" class="preview-dialog__close"><button class="icon-button" aria-label="Close preview" autofocus><span class="material-symbols-rounded" aria-hidden="true">close</span></button></form>
-      <div class="preview-dialog__screen" :class="{ 'preview-dialog__screen--watch': selectedDevice === 'wear' }" :style="{ '--preview-ratio': selected.ratio }"><ShowcaseScreen v-if="dialogContentMounted" :key="selectedDevice" :device="selectedDevice" v-bind="screenProps" /></div>
+      <div class="preview-dialog__screen" :class="{ 'preview-dialog__screen--watch': selectedDevice === 'wear' }" :style="{ '--preview-ratio': selected.ratio }"><ShowcaseScreen v-if="dialogContentMounted" ref="fullScreen" :key="`${selectedDevice}-${dialogView}`" :device="selectedDevice" :view="dialogView" platform="windows" folded /></div>
+      <a v-if="fullScreen?.originalSource" class="preview-dialog__original" :href="fullScreen.originalSource" target="_blank" rel="noopener">Open full-size image (new tab)</a>
     </dialog>
   </Teleport>
 </template>
 
 <style scoped>
 .showcase { padding: 44px 0 92px; background: var(--md-sys-color-surface); }
-.showcase__heading { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 28px; }
+.showcase__heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 28px; }
 .showcase__heading > p { max-width: 48ch; color: var(--md-sys-color-on-surface-variant); font: var(--md-sys-typescale-body-large); letter-spacing: var(--md-sys-typescale-body-large-tracking); }
-.view-switch { display: flex; flex-shrink: 0; gap: 4px; padding: 5px; border-radius: 999px; background: var(--md-sys-color-surface-container-low); }
+.view-switch { display: flex; flex-wrap: wrap; max-width: 100%; flex-shrink: 0; gap: 4px; padding: 5px; border-radius: 999px; background: var(--md-sys-color-surface-container-low); }
 .view-switch button { min-height: 44px; padding: 10px 20px; border: 0; border-radius: 999px; background: transparent; color: var(--md-sys-color-on-surface-variant); cursor: pointer; font: var(--md-sys-typescale-label-large); font-variation-settings: 'ROND' 100; letter-spacing: var(--md-sys-typescale-label-large-tracking); transition: background var(--md-motion-effects-default), color var(--md-motion-effects-default); }
 .view-switch button[aria-pressed='true'] { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
 .view-switch button:hover:not([aria-pressed='true']) { background: var(--md-sys-color-surface-container-high); transition: none; }
@@ -81,8 +86,9 @@ onBeforeUnmount(() => { if (dialog.value?.open) restoreScroll() })
 .preview-tile--desktop { grid-area: desktop; background: #282230; border-top-left-radius: 48px; }
 .preview-tile--android { grid-area: android; background: #25291f; }
 .preview-tile--ios { grid-area: ios; background: #302523; border-top-right-radius: 48px; }
-.preview-tile--wear { grid-area: wear; flex-direction: row; align-items: center; justify-content: space-between; background: #29271e; border-bottom-left-radius: 48px; }
-.preview-tile figcaption { display: flex; flex-direction: column; gap: 7px; }
+.preview-tile--wear { grid-area: wear; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; background: #29271e; border-bottom-left-radius: 48px; }
+.preview-tile figcaption { display: flex; flex-direction: column; gap: 7px; min-width: 0; overflow-wrap: anywhere; }
+.preview-tile--wear figcaption { flex: 1 1 120px; }
 .preview-tile__label { display: flex; align-items: center; gap: 9px; color: var(--md-sys-color-primary); }
 .preview-tile__label img { width: 22px; height: 22px; object-fit: contain; }
 .preview-tile__label strong { font: var(--md-sys-typescale-title-medium); letter-spacing: var(--md-sys-typescale-title-medium-tracking); }
@@ -100,9 +106,10 @@ onBeforeUnmount(() => { if (dialog.value?.open) restoreScroll() })
 .preview-dialog::backdrop { background: #050307dc; opacity: 0; transition: opacity var(--md-motion-exit), display 160ms allow-discrete, overlay 160ms allow-discrete; }
 .preview-dialog[open]::backdrop { opacity: 1; transition: opacity var(--md-motion-effects-slow), display 300ms allow-discrete, overlay 300ms allow-discrete; }
 .preview-dialog__close { position: absolute; z-index: 1; top: 12px; right: 12px; }
-.preview-dialog__screen { width: min(100%, calc((100dvh - 128px) * var(--preview-ratio))); aspect-ratio: var(--preview-ratio); overflow: hidden; border-radius: 4px; transform: scale(0.92); transition: transform var(--md-motion-exit); }
+.preview-dialog__screen { width: min(100%, calc((100dvh - 128px) * var(--preview-ratio))); aspect-ratio: var(--preview-ratio); overflow: hidden; border-radius: 4px; transform: scale(0.92); transition: transform var(--md-motion-spatial-exit, var(--md-motion-exit)); }
 .preview-dialog[open] .preview-dialog__screen { transform: scale(1); transition: transform var(--md-motion-spatial-slow); }
 .preview-dialog__screen--watch { max-width: 560px; border-radius: 50%; }
+.preview-dialog__original { position: absolute; bottom: 8px; inset-inline: 20px; display: grid; place-items: center; min-height: 44px; color: var(--md-sys-color-primary); font: var(--md-sys-typescale-label-large); text-align: center; }
 @starting-style {
   .preview-dialog[open], .preview-dialog[open]::backdrop { opacity: 0; }
   .preview-dialog[open] .preview-dialog__screen { transform: scale(0.92); }
@@ -125,6 +132,9 @@ onBeforeUnmount(() => { if (dialog.value?.open) restoreScroll() })
   .preview-tile__label strong { font: var(--md-sys-typescale-title-small); letter-spacing: var(--md-sys-typescale-title-small-tracking); }
   .preview-tile__label .material-symbols-rounded { font-size: 20px; }
   .preview-tile--wear .preview-tile__screen { width: clamp(112px, 25vw, 160px); }
+}
+@media (max-width: 360px) {
+  .showcase__mosaic { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'desktop' 'android' 'ios' 'wear'; }
 }
 @media (forced-colors: active) { .view-switch button[aria-pressed='true'] { outline: 2px solid Highlight; } }
 </style>

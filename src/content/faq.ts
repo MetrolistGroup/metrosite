@@ -8,7 +8,7 @@ export type FaqItem = {
 export const FAQ_ITEMS: FaqItem[] = [
   {
     question: 'Which platforms does Metrolist support?',
-    answer: 'Metrolist runs on Android 6 and newer, iOS 17 and newer, Linux x64, macOS (Intel and Apple Silicon), and Windows 10 x64 and newer. Choose your platform in the download modal.',
+    answer: 'Metrolist runs on Android 9 and newer, iOS 17 and newer, Linux x64, macOS (Intel and Apple Silicon), and Windows 10 x64 and newer. Choose your platform in the download modal.',
   },
   {
     question: 'Can I move from the original Metrolist app?',
@@ -40,6 +40,6 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     question: 'Is there an iOS version?',
-    answer: 'Yes. Get the IPA from the download modal and install it with AltStore, SideStore, TrollStore, Sideloadly, or another sideloading app.',
+    answer: 'Yes. Get the IPA from the download modal and install it with AltStore, SideStore, or Sideloadly.',
   },
 ]

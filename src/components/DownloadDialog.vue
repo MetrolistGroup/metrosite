@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, useId } from 'vue'
+import { computed, onMounted, ref, useId } from 'vue'
 import {
   DOWNLOAD_PLATFORMS,
   findDownloadAsset,
@@ -21,16 +21,16 @@ const props = withDefaults(defineProps<{
   showTrigger: true,
 })
 
-const emit = defineEmits<{ open: [] }>()
+const emit = defineEmits<{ open: []; close: [] }>()
 const dialog = ref<HTMLDialogElement>()
 const assets = ref<ReleaseAsset[]>([])
 const releaseName = ref('')
 const isLoading = ref(false)
-const hasLoaded = ref(false)
 const loadFailed = ref(false)
 const titleId = useId()
-const noticeId = useId()
 const notice = ref<HTMLElement>()
+const supportsPopover = ref(false)
+const showInlineNotice = ref(false)
 
 function detectedPlatform(): DownloadPlatformKey {
   const agent = navigator.userAgent.toLowerCase()
@@ -44,9 +44,11 @@ function detectedPlatform(): DownloadPlatformKey {
 // Prerendered HTML can't know the visitor's platform, so detect it after hydration.
 const selectedKey = ref<DownloadPlatformKey>(props.platform ?? 'android')
 const selectedPlatform = computed(() => DOWNLOAD_PLATFORMS.find(({ key }) => key === selectedKey.value)!)
-const selectedArchitectureKey = ref(selectedPlatform.value.architectures[0]!.key)
-const selectedArchitecture = computed(() => selectedPlatform.value.architectures.find(({ key }) => key === selectedArchitectureKey.value)!)
-const selectedAsset = computed(() => findDownloadAsset(selectedKey.value, selectedArchitectureKey.value, assets.value))
+const selectedArchitectureKey = ref<string>()
+const selectedArchitecture = computed(() => selectedPlatform.value.architectures.find(({ key }) => key === selectedArchitectureKey.value))
+const selectedAsset = computed(() => selectedArchitecture.value
+  ? findDownloadAsset(selectedKey.value, selectedArchitecture.value.key, assets.value)
+  : undefined)
 const installInstructions = computed(() => selectedKey.value === 'windows' && selectedAsset.value?.name.toLowerCase().endsWith('.zip')
   ? ['Download the portable ZIP.', 'Extract it to a folder.', 'Run Metrolist from the extracted folder.']
   : selectedPlatform.value.instructions)
@@ -54,15 +56,20 @@ const releasesUrl = 'https://github.com/MetrolistGroup/Metrolist/releases/latest
 
 function selectPlatform(platform: DownloadPlatform) {
   selectedKey.value = platform.key
-  selectedArchitectureKey.value = platform.architectures[0]!.key
+  // A Mac user agent cannot reliably distinguish Apple silicon from Intel.
+  selectedArchitectureKey.value = platform.key === 'macos' && platform.architectures.length > 1
+    ? undefined
+    : platform.architectures[0]!.key
 }
+
+selectPlatform(selectedPlatform.value)
 
 function selectArchitecture(key: string) {
   selectedArchitectureKey.value = key
 }
 
 async function loadLatestRelease() {
-  if (hasLoaded.value || isLoading.value) return
+  if (isLoading.value) return
   isLoading.value = true
   loadFailed.value = false
 
@@ -70,7 +77,6 @@ async function loadLatestRelease() {
     const release = await getLatestRelease()
     assets.value = release.assets ?? []
     releaseName.value = release.name || release.tag_name || 'Latest release'
-    hasLoaded.value = true
   } catch {
     loadFailed.value = true
   } finally {
@@ -89,11 +95,22 @@ function open(platformKey?: DownloadPlatformKey) {
 defineExpose({ open })
 
 onMounted(() => {
+  supportsPopover.value = typeof notice.value?.showPopover === 'function' && typeof notice.value?.hidePopover === 'function'
   if (!props.platform) selectPlatform(DOWNLOAD_PLATFORMS.find(({ key }) => key === detectedPlatform())!)
 })
 
 function closeOnBackdrop(event: MouseEvent) {
-  if (event.target === dialog.value) dialog.value.close()
+  if (!dialog.value || event.target !== dialog.value) return
+  const { left, right, top, bottom } = dialog.value.getBoundingClientRect()
+  if (event.clientX < left || event.clientX > right || event.clientY < top || event.clientY > bottom) {
+    dialog.value.close()
+  }
+}
+
+function onClose() {
+  donateDeveloper.value = undefined
+  hideNotice()
+  emit('close')
 }
 
 // Edit this list to change who can receive donations.
@@ -104,20 +121,17 @@ const DEVELOPERS = [
   { name: 'adrielGGmotion', url: 'https://github.com/sponsors/adrielGGmotion' },
 ]
 const donateDeveloper = ref<(typeof DEVELOPERS)[number]>()
-let donateTimer: ReturnType<typeof setTimeout>
-
-function showDonate() {
-  donateDeveloper.value = DEVELOPERS[Math.floor(Math.random() * DEVELOPERS.length)]
-  clearTimeout(donateTimer)
-  donateTimer = setTimeout(() => { donateDeveloper.value = undefined }, 12000)
-}
 
 function onDownload() {
-  showDonate()
-  notice.value?.showPopover()
+  donateDeveloper.value ??= DEVELOPERS[Math.floor(Math.random() * DEVELOPERS.length)]
+  if (supportsPopover.value) notice.value?.showPopover()
+  else showInlineNotice.value = true
 }
 
-onBeforeUnmount(() => clearTimeout(donateTimer))
+function hideNotice() {
+  if (supportsPopover.value) notice.value?.hidePopover()
+  showInlineNotice.value = false
+}
 
 function formatSize(bytes?: number) {
   return bytes ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : ''
@@ -131,7 +145,7 @@ function formatSize(bytes?: number) {
   </button>
 
   <Teleport to="body">
-    <dialog ref="dialog" class="download-dialog" :aria-labelledby="titleId" @click="closeOnBackdrop">
+    <dialog ref="dialog" class="download-dialog" :aria-labelledby="titleId" @click="closeOnBackdrop" @close="onClose">
       <div class="download-dialog__header">
         <h2 :id="titleId">Choose your build</h2>
         <form method="dialog">
@@ -156,7 +170,7 @@ function formatSize(bytes?: number) {
       </div>
 
       <div v-if="selectedPlatform.architectures.length > 1" class="download-dialog__architectures">
-        <span>Architecture</span>
+        <span>{{ selectedKey === 'macos' ? 'Mac chip' : 'Architecture' }}</span>
         <div role="group" :aria-label="`${selectedPlatform.name} architecture`">
           <button
             v-for="architecture in selectedPlatform.architectures"
@@ -168,11 +182,15 @@ function formatSize(bytes?: number) {
         </div>
       </div>
 
+      <p v-if="selectedKey === 'macos' && selectedPlatform.architectures.length > 1" class="download-dialog__chip-help">
+        Choose your chip. Find Chip or Processor in Apple menu → About This Mac.
+      </p>
+
       <section class="download-dialog__selection">
         <header>
           <img :src="`/icons/${selectedPlatform.icon}.svg`" alt="" />
           <div>
-            <strong>{{ selectedPlatform.name }} · {{ selectedArchitecture.name }}</strong>
+            <strong>{{ selectedPlatform.name }} · {{ selectedArchitecture?.name ?? 'Choose your chip' }}</strong>
             <span>{{ selectedPlatform.detail }} · {{ selectedPlatform.package }}</span>
           </div>
         </header>
@@ -189,8 +207,9 @@ function formatSize(bytes?: number) {
             <h3>Download</h3>
             <p class="download-dialog__status" aria-live="polite">
               <template v-if="isLoading">Finding the latest public build…</template>
+              <template v-else-if="loadFailed">Couldn't load the latest release. Browse release files or reopen this dialog to try again.</template>
+              <template v-else-if="!selectedArchitecture">Choose your Mac chip above for a direct download, or browse release files.</template>
               <template v-else-if="selectedAsset">{{ releaseName }}<template v-if="selectedAsset.size"> · {{ formatSize(selectedAsset.size) }}</template></template>
-              <template v-else-if="loadFailed">Direct downloads will appear when releases become public.</template>
               <template v-else>No matching build was found in the latest release.</template>
             </p>
             <div class="download-dialog__download-actions">
@@ -200,9 +219,9 @@ function formatSize(bytes?: number) {
               </a>
               <a v-if="selectedAsset" :href="releasesUrl" class="btn btn-tonal" target="_blank" rel="noopener noreferrer">All builds</a>
             </div>
-            <div :id="noticeId" ref="notice" popover class="download-dialog__notice" role="note">
+            <div ref="notice" :popover="supportsPopover ? 'auto' : undefined" :hidden="!supportsPopover && !showInlineNotice" class="download-dialog__notice" role="note">
               <p><strong>Heads up.</strong> {{ HOSTING_NOTICE }}</p>
-              <button type="button" class="btn btn-tonal" :popovertarget="noticeId" popovertargetaction="hide">Got it</button>
+              <button type="button" class="btn btn-tonal" @click="hideNotice">Got it</button>
             </div>
             <p v-if="donateDeveloper" class="download-dialog__donate" role="status">
               Enjoying Metrolist?
@@ -232,7 +251,8 @@ function formatSize(bytes?: number) {
   color: var(--md-sys-color-on-surface);
   opacity: 0;
   transform: translateY(12px) scale(0.98);
-  transition: opacity var(--md-motion-exit), transform var(--md-motion-exit), display 160ms allow-discrete, overlay 160ms allow-discrete;
+  overflow-wrap: anywhere;
+  transition: opacity var(--md-motion-exit), transform var(--md-motion-spatial-exit, var(--md-motion-exit)), display 160ms allow-discrete, overlay 160ms allow-discrete;
 }
 
 .download-dialog[open] {
@@ -264,6 +284,16 @@ function formatSize(bytes?: number) {
   gap: 24px;
 }
 
+.download-dialog__header form {
+  flex-shrink: 0;
+}
+
+.download-dialog .btn {
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
+}
+
 .download-dialog__header p {
   margin-bottom: 6px;
   color: var(--md-sys-color-primary);
@@ -279,14 +309,14 @@ function formatSize(bytes?: number) {
 
 .download-dialog__platforms {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
   gap: 8px;
   margin-top: 28px;
 }
 
 .download-dialog__platforms button {
   display: grid;
-  grid-template-columns: 28px 1fr 24px;
+  grid-template-columns: 28px minmax(0, 1fr) 24px;
   gap: 12px;
   align-items: center;
   min-height: 70px;
@@ -326,20 +356,24 @@ function formatSize(bytes?: number) {
 }
 
 .download-dialog__platforms small {
-  overflow: hidden;
   color: color-mix(in srgb, currentColor 72%, transparent);
   font: var(--md-sys-typescale-body-small);
   letter-spacing: var(--md-sys-typescale-body-small-tracking);
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .download-dialog__platforms .material-symbols-rounded {
   color: currentColor;
 }
 
+.download-dialog__chip-help {
+  margin-top: 10px;
+  color: var(--md-sys-color-on-surface-variant);
+  font: var(--md-sys-typescale-body-small);
+}
+
 .download-dialog__architectures {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 16px;
   margin-top: 18px;
@@ -360,6 +394,8 @@ function formatSize(bytes?: number) {
 
 .download-dialog__architectures button {
   min-height: 38px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   padding: 8px 14px;
   border: 0;
   border-radius: var(--md-sys-shape-corner-medium);
@@ -458,20 +494,20 @@ function formatSize(bytes?: number) {
 
 .download-dialog__notice {
   width: min(360px, calc(100vw - 32px));
+  max-width: 100%;
   margin: auto;
   padding: 16px;
   border: 0;
   border-radius: var(--md-sys-shape-corner-large);
   background: var(--md-sys-color-tertiary-container);
   color: var(--md-sys-color-on-tertiary-container);
-  box-shadow: 0 4px 16px rgb(0 0 0 / 30%);
   font: var(--md-sys-typescale-body-medium);
   letter-spacing: var(--md-sys-typescale-body-medium-tracking);
 }
 
 /* Without anchor positioning the popover stays centred on screen. */
 @supports (position-area: top) {
-  .download-dialog__notice {
+  .download-dialog__notice[popover] {
     position-anchor: --download-button;
     position-area: top span-right;
     position-try-fallbacks: flip-block;
@@ -500,11 +536,14 @@ function formatSize(bytes?: number) {
   margin-top: 18px;
 }
 
-@media (max-width: 760px) {
-  .download-dialog__platforms {
-    grid-template-columns: 1fr 1fr;
+@media (forced-colors: active) {
+  .download-dialog__architectures button[aria-pressed='true'] {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
   }
+}
 
+@media (max-width: 760px) {
   .download-dialog__install {
     grid-template-columns: 1fr;
   }
@@ -514,25 +553,6 @@ function formatSize(bytes?: number) {
   .download-dialog {
     padding: 18px;
     border-radius: var(--md-sys-shape-corner-extra-large);
-  }
-
-  .download-dialog__platforms button {
-    position: relative;
-    grid-template-columns: 24px minmax(0, 1fr);
-    gap: 10px;
-    min-height: 64px;
-    padding: 10px;
-  }
-
-  .download-dialog__platforms button:last-child {
-    grid-column: 1 / -1;
-  }
-
-  .download-dialog__platforms .material-symbols-rounded {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    font-size: 18px;
   }
 
   .download-dialog__selection {

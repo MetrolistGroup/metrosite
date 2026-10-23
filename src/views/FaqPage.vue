@@ -1,16 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import NavBar from '../components/NavBar.vue'
 import FooterSection from '../components/FooterSection.vue'
 import { FAQ_ITEMS } from '../content/faq'
-
-const openItems = ref<number[]>([])
-
-function toggleItem(index: number) {
-  openItems.value = openItems.value.includes(index)
-    ? openItems.value.filter(item => item !== index)
-    : [...openItems.value, index]
-}
 </script>
 
 <template>
@@ -26,29 +17,16 @@ function toggleItem(index: number) {
       </header>
 
       <section class="faq-page__list" aria-label="Frequently asked questions">
-        <article v-for="(item, index) in FAQ_ITEMS" :key="item.question" :class="{ 'is-open': openItems.includes(index) }">
-          <button
-            type="button"
-            :id="`faq-question-${index}`"
-            class="faq-page__question"
-            :aria-expanded="openItems.includes(index)"
-            :aria-controls="`faq-answer-${index}`"
-            @click="toggleItem(index)"
-          >
-            <span class="faq-page__number">{{ String(index + 1).padStart(2, '0') }}</span>
-            <strong>{{ item.question }}</strong>
-            <span class="faq-page__mark material-symbols-rounded" aria-hidden="true">add</span>
-          </button>
-          <div
-            :id="`faq-answer-${index}`"
-            class="faq-page__answer"
-            role="region"
-            :aria-labelledby="`faq-question-${index}`"
-            :aria-hidden="!openItems.includes(index)"
-          >
-            <div><p>{{ item.answer }}</p></div>
-          </div>
-        </article>
+        <details v-for="(item, index) in FAQ_ITEMS" :key="item.question">
+          <summary class="faq-page__question">
+            <h2>
+              <span class="faq-page__number">{{ String(index + 1).padStart(2, '0') }}</span>
+              {{ item.question }}
+              <span class="faq-page__mark material-symbols-rounded" aria-hidden="true">add</span>
+            </h2>
+          </summary>
+          <div class="faq-page__answer"><p>{{ item.answer }}</p></div>
+        </details>
       </section>
 
       <div class="faq-page__back">
@@ -115,26 +93,36 @@ function toggleItem(index: number) {
   background: var(--md-sys-color-surface-container-low);
 }
 
-.faq-page__list article {
+.faq-page__list details {
   overflow: hidden;
   border-radius: var(--md-sys-shape-corner-extra-large);
   background: var(--md-sys-color-surface-container-high);
 }
 
 .faq-page__question {
+  display: block;
+  border-radius: inherit;
+  color: var(--md-sys-color-on-surface);
+  cursor: pointer;
+}
+
+.faq-page__question::-webkit-details-marker {
+  display: none;
+}
+
+.faq-page__question:focus-visible {
+  outline-offset: -6px;
+}
+
+.faq-page__question h2 {
   display: grid;
-  width: 100%;
   grid-template-columns: 50px 1fr 48px;
   gap: 18px;
   align-items: center;
   min-height: 86px;
   padding: 10px 14px;
-  border: 0;
-  background: transparent;
-  color: var(--md-sys-color-on-surface);
-  cursor: pointer;
-  font: inherit;
-  text-align: left;
+  font: var(--md-sys-typescale-title-large);
+  letter-spacing: var(--md-sys-typescale-title-large-tracking);
 }
 
 .faq-page__number,
@@ -159,27 +147,8 @@ function toggleItem(index: number) {
   transition: transform var(--md-motion-spatial-fast);
 }
 
-.faq-page__list article.is-open .faq-page__mark {
+.faq-page__list details[open] .faq-page__mark {
   transform: rotate(45deg);
-}
-
-.faq-page__question strong {
-  font: var(--md-sys-typescale-title-large);
-  letter-spacing: var(--md-sys-typescale-title-large-tracking);
-}
-
-.faq-page__answer {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows var(--md-motion-spatial-default);
-}
-
-.faq-page__answer > div {
-  overflow: hidden;
-}
-
-.faq-page__list article.is-open .faq-page__answer {
-  grid-template-rows: 1fr;
 }
 
 .faq-page__answer p {
@@ -229,7 +198,7 @@ function toggleItem(index: number) {
     font-size: 50px;
   }
 
-  .faq-page__question {
+  .faq-page__question h2 {
     grid-template-columns: 44px 1fr 44px;
     gap: 10px;
     min-height: 78px;

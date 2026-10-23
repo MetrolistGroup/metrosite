@@ -12,6 +12,10 @@ dist
 dist-ssr
 .wrangler
 *.local
+.env
+.env.*
+.dev.vars
+.dev.vars.*
 
 # Editor directories and files
 .vscode/*

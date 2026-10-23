@@ -2,6 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!-- Recovery must not block parsing or hydration if its request stalls. -->
+    <script async src="/startup.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#1a181c" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
@@ -17,16 +19,16 @@
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Metrolist running across desktop and mobile screens" />
+    <meta property="og:image:alt" content="Metrolist desktop home screen beside the headline Music for every screen." />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Metrolist · Ad-free YouTube Music client for every device" />
     <meta name="twitter:description" content="Free, open-source YouTube Music client for Android, iOS, Windows, macOS, and Linux. No ads, background play, synced lyrics, offline downloads, and casting." />
     <meta name="twitter:image" content="https://metrolist.cc/og-image.png" />
-    <meta name="twitter:image:alt" content="Metrolist running across desktop and mobile screens" />
+    <meta name="twitter:image:alt" content="Metrolist desktop home screen beside the headline Music for every screen." />
     <link rel="discord:component-embed" type="application/json" href="https://metrolist.cc/discord-embed.json" />
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <link rel="stylesheet" href="/src/style.css" />
-    <link rel="preload" href="/fonts/GoogleSansFlex.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/GoogleSansFlex.woff2?v=2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/MaterialSymbolsRounded.ttf?v=2" as="font" type="font/ttf" crossorigin />
     <title>Metrolist · Ad-free YouTube Music client for every device</title>
   </head>
