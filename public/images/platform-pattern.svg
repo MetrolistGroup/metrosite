@@ -7,35 +7,34 @@
     <symbol id="windows" viewBox="0 0 24 24"><path d="M2 3.25 10.7 2v9H2V3.25Zm9.7-1.4L22 0.4V11H11.7V1.85ZM2 12h8.7v9L2 19.75V12Zm9.7 0H22v10.6l-10.3-1.45V12Z"/></symbol>
     <symbol id="android-tv" viewBox="0 0 24 24"><path d="M3.11 3.245A3.117 3.117 0 0 0 0 6.355V13.7a1.87 1.87 0 0 0 1.878 1.878h2.588V5.124c0-.73.313-1.399.814-1.879zm3.944 0a1.87 1.87 0 0 0-1.879 1.879V7.71h16.947v.021c.73 0 1.398.313 1.878.814v-2.19a3.117 3.117 0 0 0-3.11-3.11zm12.48 5.176v10.455c0 .73-.313 1.399-.814 1.879h2.17a3.117 3.117 0 0 0 3.11-3.11V10.3a1.87 1.87 0 0 0-1.878-1.878zM0 15.475v2.17a3.117 3.117 0 0 0 3.11 3.11h13.836a1.87 1.87 0 0 0 1.878-1.879V16.29H1.878c-.73 0-1.398-.314-1.878-.814"/></symbol>
     <symbol id="android-auto" viewBox="0 0 24 24"><path d="M12 0c-.6 0-1.11.32-1.39.8L.48 18.4a1.6 1.6 0 0 0 1.39 2.4h2l7.7-13.58.43-.77 8.13 14.35h2a1.6 1.6 0 0 0 1.39-2.4L13.39.8A1.6 1.6 0 0 0 12 0zm0 7.47l-9.07 16 .54.53L12 20.8l8.53 3.2.54-.53z"/></symbol>
-    <symbol id="wearos" viewBox="0 0 24 24"><path d="M8.416 21.1346c-.9687 0-1.8938-.56-2.3135-1.5015L.2193 6.4198C-.3488 5.1432.2248 3.6472 1.5014 3.079c1.2767-.5681 2.7727.0055 3.3408 1.2821l5.8832 13.2133c.5681 1.2767-.0055 2.7727-1.2821 3.3408a2.5254 2.5254 0 01-1.0273.2194zm7.1952.0368c-.891 0-1.7412-.515-2.1268-1.3816L7.39 6.1024C6.867 4.9279 7.3955 3.5532 8.5686 3.03c1.173-.5218 2.5492.0054 3.0724 1.1785l6.0943 13.6888c.5232 1.1745-.0054 2.5492-1.1785 3.0724a2.3111 2.3111 0 01-.9456.2017zM24 5.195a2.3271 2.3271 0 01-2.3271 2.327 2.3271 2.3271 0 01-2.3271-2.327 2.3271 2.3271 0 012.327-2.3271A2.3271 2.3271 0 0124 5.1949zm-2.6119 5.116a2.4892 2.4892 0 01-2.4892 2.4893 2.4892 2.4892 0 01-2.4893-2.4892 2.4892 2.4892 0 012.4893-2.4893 2.4892 2.4892 0 012.4892 2.4893Z"/></symbol>
   </defs>
   <g fill="#CAC4D0" fill-opacity="0.1">
-    <use href="#wearos" x="-77" y="23" width="42" height="42"/>
+    <use href="#windows" x="-77" y="23" width="42" height="42"/>
     <use href="#android" x="34" y="23" width="42" height="42"/>
     <use href="#linux" x="145" y="23" width="42" height="42"/>
     <use href="#apple" x="256" y="23" width="42" height="42"/>
     <use href="#windows" x="367" y="23" width="42" height="42"/>
     <use href="#android-tv" x="478" y="23" width="42" height="42"/>
     <use href="#android-auto" x="589" y="23" width="42" height="42"/>
-    <use href="#wearos" x="700" y="23" width="42" height="42"/>
+    <use href="#windows" x="700" y="23" width="42" height="42"/>
     <use href="#android" x="811" y="23" width="42" height="42"/>
-    <use href="#wearos" x="-40" y="111" width="42" height="42"/>
+    <use href="#windows" x="-40" y="111" width="42" height="42"/>
     <use href="#android" x="71" y="111" width="42" height="42"/>
     <use href="#linux" x="182" y="111" width="42" height="42"/>
     <use href="#apple" x="293" y="111" width="42" height="42"/>
     <use href="#windows" x="404" y="111" width="42" height="42"/>
     <use href="#android-tv" x="515" y="111" width="42" height="42"/>
     <use href="#android-auto" x="626" y="111" width="42" height="42"/>
-    <use href="#wearos" x="737" y="111" width="42" height="42"/>
+    <use href="#windows" x="737" y="111" width="42" height="42"/>
     <use href="#android" x="848" y="111" width="42" height="42"/>
-    <use href="#wearos" x="-3" y="199" width="42" height="42"/>
+    <use href="#windows" x="-3" y="199" width="42" height="42"/>
     <use href="#android" x="108" y="199" width="42" height="42"/>
     <use href="#linux" x="219" y="199" width="42" height="42"/>
     <use href="#apple" x="330" y="199" width="42" height="42"/>
     <use href="#windows" x="441" y="199" width="42" height="42"/>
     <use href="#android-tv" x="552" y="199" width="42" height="42"/>
     <use href="#android-auto" x="663" y="199" width="42" height="42"/>
-    <use href="#wearos" x="774" y="199" width="42" height="42"/>
+    <use href="#windows" x="774" y="199" width="42" height="42"/>
     <use href="#android" x="885" y="199" width="42" height="42"/>
   </g>
 </svg>

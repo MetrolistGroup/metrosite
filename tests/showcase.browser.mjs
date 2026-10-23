@@ -16,7 +16,7 @@ try {
     await page.setViewportSize({ width, height })
     await page.locator('.showcase__mosaic').scrollIntoViewIfNeeded()
     await page.waitForTimeout(300)
-    assert.deepEqual(await page.locator('.preview-tile__label strong').allTextContents(), ['Desktop', 'Android', 'iOS', 'Wear OS'])
+    assert.deepEqual(await page.locator('.preview-tile__label strong').allTextContents(), ['Desktop', 'Android', 'iOS'])
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${width}px: horizontal overflow`)
     assert.ok(await page.locator('.preview-tile').evaluateAll(tiles => tiles.every(tile => {
       const bounds = tile.getBoundingClientRect()
@@ -26,7 +26,7 @@ try {
       })
     })), `${width}px: tile contents must fit without clipping`)
 
-    for (const [index, device] of ['ios', 'desktop', 'android', 'wear'].entries()) {
+    for (const [index, device] of ['ios', 'desktop', 'android'].entries()) {
       const trigger = page.locator(`.preview-tile--${device} .preview-tile__screen`)
       await trigger.scrollIntoViewIfNeeded()
       await page.waitForTimeout(200)
@@ -78,7 +78,6 @@ try {
   assert.equal(await page.locator('.showcase__mosaic .screen--ios .screen__capture').count(), 2, 'crossfade overlaps old and new captures')
   await page.waitForTimeout(400)
   assert.ok(await page.locator('.showcase__mosaic .screen__capture').evaluateAll(images => images.length === 3 && images.every(image => image.src.includes('library') && image.complete && image.naturalWidth > 0)))
-  assert.equal(await page.locator('.preview-tile--wear .screen-fade-enter-active').count(), 0, 'unchanged watch preview stays still')
 
   await page.getByRole('button', { name: 'Player', exact: true }).click()
   await page.waitForTimeout(100)
@@ -105,13 +104,13 @@ try {
   assert.match(await page.locator('.preview-dialog__screen img').getAttribute('src'), /folded-player/)
   await page.keyboard.press('Escape')
 
-  await page.getByRole('button', { name: 'Enlarge Wear OS app preview' }).focus()
+  await page.getByRole('button', { name: 'Enlarge iOS app preview' }).focus()
   await page.keyboard.press('Enter')
-  assert.ok(await page.locator('.preview-dialog__screen--watch .watch-preview').isVisible())
-  assert.match(await page.locator('.preview-tile--wear').innerText(), /Illustrative player preview/)
+  assert.ok(await page.locator('.preview-dialog__screen .screen--ios .screen__capture').isVisible())
+  assert.match(await page.locator('.preview-dialog').getAttribute('aria-label'), /iOS · Player preview/)
   await page.keyboard.press('Escape')
   assert.deepEqual(errors, [])
-  console.log('PASS borderless surfaces, reduced motion, keyboard access and labeled illustrated watch')
+  console.log('PASS borderless surfaces, reduced motion, keyboard access and labeled iOS preview')
 } finally {
   await browser.close()
 }
