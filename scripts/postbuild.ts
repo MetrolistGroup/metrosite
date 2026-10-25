@@ -1,7 +1,9 @@
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { FAQ_ITEMS, type FaqItem } from '../src/content/faq'
+import { GUIDES, GUIDE_INDEX_META, GUIDE_REVIEW_DATE } from '../src/content/guides'
 import { PAGE_META, REPO_URL, SITE_URL, type PageMeta } from '../src/content/site'
-import { faqMarkdown, homeMarkdown, llmsTxt, privacyMarkdown } from './markdown'
+import { faqMarkdown, guideMarkdown, guidesIndexMarkdown, homeMarkdown, llmsTxt, privacyMarkdown } from './markdown'
+import { guidesFeed } from './feed'
 
 const dist = new URL('../dist/', import.meta.url)
 const source = await readFile(new URL('index.html', dist), 'utf8')
@@ -34,6 +36,7 @@ function app(operatingSystem: string, screenshot: string | string[]) {
   return {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
+    '@id': `${SITE_URL}/#app`,
     name: 'Metrolist',
     alternateName: 'Metrolist Music',
     url: `${SITE_URL}/`,
@@ -74,6 +77,7 @@ type Page = {
   file: string
   meta: PageMeta
   canonical?: boolean
+  ogType?: 'article'
   /** Discord component embed file, linked from the page head. */
   embed?: string
   schemas?: object[]
@@ -98,6 +102,42 @@ const pages: Page[] = [
   },
   { path: '/faq', file: 'faq.html', meta: PAGE_META.faq, embed: 'discord-embed-faq.json', schemas: [faq(FAQ_ITEMS), breadcrumbs('FAQ', '/faq')], markdown: ['faq.md', faqMarkdown()] },
   { path: '/privacy', file: 'privacy.html', meta: PAGE_META.privacy, embed: 'discord-embed-privacy.json', schemas: [breadcrumbs('Privacy policy', '/privacy')], markdown: ['privacy.md', privacyMarkdown(await readFile(new URL('../src/views/PrivacyPage.vue', import.meta.url), 'utf8'))] },
+  {
+    path: '/guides', file: 'guides.html', meta: GUIDE_INDEX_META,
+    markdown: ['guides.md', guidesIndexMarkdown()],
+    schemas: [
+      {
+        '@context': 'https://schema.org', '@type': 'CollectionPage', '@id': `${SITE_URL}/guides#collection`,
+        name: GUIDE_INDEX_META.title, description: GUIDE_INDEX_META.description, url: `${SITE_URL}/guides`,
+        inLanguage: 'en', isPartOf: { '@id': `${SITE_URL}/#website` },
+        mainEntity: {
+          '@type': 'ItemList', itemListOrder: 'https://schema.org/ItemListUnordered', numberOfItems: GUIDES.length,
+          itemListElement: GUIDES.map((guide, index) => ({ '@type': 'ListItem', position: index + 1, name: guide.heading, url: `${SITE_URL}/guides/${guide.slug}` })),
+        },
+      },
+      breadcrumbs('Guides', '/guides'),
+    ],
+  },
+  ...GUIDES.map((guide): Page => {
+    const path = `/guides/${guide.slug}`
+    const url = `${SITE_URL}${path}`
+    const trail = breadcrumbs('Guides', '/guides')
+    return {
+      path, file: `guides/${guide.slug}.html`, meta: guide.meta, ogType: 'article',
+      markdown: [`guides/${guide.slug}.md`, guideMarkdown(guide)],
+      schemas: [
+        {
+          '@context': 'https://schema.org', '@type': 'Article', '@id': `${url}#article`,
+          headline: guide.heading, description: guide.meta.description, abstract: guide.intro, url, mainEntityOfPage: url,
+          inLanguage: 'en', isPartOf: { '@id': `${SITE_URL}/guides#collection` }, about: { '@id': `${SITE_URL}/#app` },
+          articleSection: guide.sections.map(section => section.heading),
+          citation: [...new Set(guide.sections.flatMap(section => section.links?.map(link => link.href) ?? []))],
+          author: ORGANIZATION, publisher: ORGANIZATION, dateModified: GUIDE_REVIEW_DATE,
+        },
+        { ...trail, itemListElement: [...trail.itemListElement, { '@type': 'ListItem', position: 3, name: guide.heading, item: url }] },
+      ],
+    }
+  }),
   { path: '/listen', file: 'listen.html', meta: PAGE_META.listen },
   { path: '/404', file: '404.html', meta: PAGE_META.notFound, canonical: false },
 ]
@@ -126,6 +166,7 @@ async function renderPage(page: Page) {
   for (const [attribute, name, value] of [
     ['name', 'robots', escapeHtml(meta.robots)],
     ['name', 'description', description],
+    ['property', 'og:type', page.ogType ?? 'website'],
     ['property', 'og:title', title],
     ['property', 'og:description', description],
     ['property', 'og:url', escapeHtml(url)],
@@ -141,11 +182,15 @@ async function renderPage(page: Page) {
   html = html.replace(/\s*<link rel="discord:component-embed"[^>]*>/, '')
   if (page.embed) html = html.replace('</head>', () => `  <link rel="discord:component-embed" type="application/json" href="${SITE_URL}/${page.embed}" />\n  </head>`)
   if (page.markdown) html = html.replace('</head>', () => `  <link rel="alternate" type="text/markdown" href="/${page.markdown[0]}" />\n  </head>`)
+  if (meta.robots.startsWith('index')) html = html.replace('</head>', () => `  <link rel="alternate" type="application/rss+xml" title="Metrolist guides" href="${SITE_URL}/feed.xml" />\n  </head>`)
   for (const schema of page.schemas ?? []) {
     html = html.replace('</head>', () => `  <script type="application/ld+json">${JSON.stringify(schema).replaceAll('<', '\\u003c')}</script>\n  </head>`)
   }
 
   const rendered = await render(path === '/404' ? '/__not-found' : path)
+  if (meta.robots.startsWith('index') && rendered.modules.has('src/views/NotFoundPage.vue')) {
+    throw new Error(`Indexable route ${path} rendered NotFoundPage; register its Vue route before publishing`)
+  }
   html = html
     .replace('</head>', () => `  ${preloadLinks(rendered.modules)}\n  </head>`)
     // Vue hydrates body teleports starting from the body's first child.
@@ -158,7 +203,11 @@ async function renderPage(page: Page) {
   const target = new URL(page.file, dist)
   await mkdir(new URL('.', target), { recursive: true })
   await writeFile(target, html)
-  if (page.markdown) await writeFile(new URL(page.markdown[0], dist), page.markdown[1])
+  if (page.markdown) {
+    const markdownTarget = new URL(page.markdown[0], dist)
+    await mkdir(new URL('.', markdownTarget), { recursive: true })
+    await writeFile(markdownTarget, page.markdown[1])
+  }
 }
 
 for (const page of pages) await renderPage(page)
@@ -175,6 +224,7 @@ ${indexable.map(page => `  <url>
 await writeFile(new URL('llms.txt', dist), llmsTxt())
 // One-fetch copy of every page for agents that read llms-full.txt.
 await writeFile(new URL('llms-full.txt', dist), pages.flatMap(page => page.markdown ? [page.markdown[1].trim()] : []).join('\n\n---\n\n') + '\n')
+await writeFile(new URL('feed.xml', dist), guidesFeed(GUIDES))
 await rm(new URL('.vite/', dist), { recursive: true })
 
 // Discord component embeds (3,000-byte limit); the og:* tags remain the fallback.
@@ -243,6 +293,10 @@ await writeFile(new URL('_headers', dist), `/*
 /llms*.txt
   Content-Type: text/plain; charset=utf-8
 
+/feed.xml
+  Content-Type: application/rss+xml; charset=utf-8
+
 /listen
   X-Robots-Tag: noindex, follow
-`)
+
+${pages.flatMap(page => page.markdown ? [`/${page.markdown[0]}\n  Link: <${SITE_URL}${page.path}>; rel="canonical"\n`] : []).join('\n')}`)

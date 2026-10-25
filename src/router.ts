@@ -1,4 +1,5 @@
 import { createMemoryHistory, createRouter, createWebHistory, START_LOCATION } from 'vue-router'
+import { GUIDES, GUIDE_INDEX_META } from './content/guides'
 import { PAGE_META, SITE_URL, type PageMeta } from './content/site'
 import HomeView from './views/HomeView.vue'
 
@@ -7,6 +8,14 @@ const ROUTES = [
   { path: '/listen', name: 'listen', component: () => import('./views/ListenPage.vue'), meta: PAGE_META.listen },
   { path: '/faq', name: 'faq', component: () => import('./views/FaqPage.vue'), meta: PAGE_META.faq },
   { path: '/privacy', name: 'privacy', component: () => import('./views/PrivacyPage.vue'), meta: PAGE_META.privacy },
+  ...GUIDES.map(guide => ({
+    path: `/guides/${guide.slug}`,
+    name: `guide-${guide.slug}`,
+    component: () => import('./views/GuidesPage.vue'),
+    props: { slug: guide.slug },
+    meta: guide.meta,
+  })),
+  { path: '/guides', name: 'guides', component: () => import('./views/GuidesPage.vue'), meta: GUIDE_INDEX_META },
   { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('./views/NotFoundPage.vue'), meta: PAGE_META.notFound },
 ]
 

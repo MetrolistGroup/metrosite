@@ -1,6 +1,7 @@
 import { expect, test } from 'bun:test'
 import { FAQ_ITEMS, FAQ_TOPICS } from '../src/content/faq'
-import { HOSTING_NOTICE } from '../src/content/site'
+import { HOSTING_NOTICE, SITE_URL } from '../src/content/site'
+import { GUIDES } from '../src/content/guides'
 import { faqMarkdown } from '../scripts/markdown'
 
 test('FAQ topics and questions are unique, populated, and complete in Markdown', () => {
@@ -18,6 +19,24 @@ test('FAQ topics and questions are unique, populated, and complete in Markdown',
     expect(item.question.trim()).not.toBe('')
     expect(item.answer.trim()).not.toBe('')
     expect(markdown).toContain(`## ${item.question}\n\n${item.answer}`)
+  }
+})
+
+test('FAQ reading links resolve to actual guides and section anchors', () => {
+  const links = FAQ_ITEMS.flatMap(item => item.guide ? [item.guide] : [])
+  expect(links.length).toBeGreaterThan(0)
+  for (const link of links) {
+    const url = new URL(link.href, SITE_URL)
+    expect(url.origin).toBe(SITE_URL)
+    expect(link.label.trim()).not.toBe('')
+    if (url.pathname === '/guides') {
+      expect(url.hash).toBe('')
+      continue
+    }
+    const guide = GUIDES.find(item => url.pathname === `/guides/${item.slug}`)
+    expect(guide).toBeDefined()
+    if (url.hash) expect(guide!.sections.map(section => section.id)).toContain(url.hash.slice(1))
+    expect(faqMarkdown()).toContain(`${SITE_URL}${link.href}`)
   }
 })
 

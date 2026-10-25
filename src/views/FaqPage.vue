@@ -55,7 +55,10 @@ const topicGroups = FAQ_TOPICS.map(topic => ({
                     <span class="faq-page__mark" aria-hidden="true"></span>
                   </h3>
                 </summary>
-                <div class="faq-page__answer"><p>{{ item.answer }}</p></div>
+                <div class="faq-page__answer">
+                  <p>{{ item.answer }}</p>
+                  <p v-if="item.guide"><RouterLink :to="item.guide.href">{{ item.guide.label }}</RouterLink></p>
+                </div>
               </details>
             </div>
           </section>
@@ -255,7 +258,8 @@ const topicGroups = FAQ_TOPICS.map(topic => ({
   letter-spacing: var(--md-sys-typescale-body-medium-tracking);
 }
 
-.faq-page__support a {
+.faq-page__support a,
+.faq-page__answer a {
   color: var(--md-sys-color-primary);
 }
 

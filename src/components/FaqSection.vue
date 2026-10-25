@@ -23,7 +23,10 @@ const topItems = FAQ_ITEMS.slice(0, 5)
               <span class="faq__mark material-symbols-rounded" aria-hidden="true">add</span>
             </h3>
           </summary>
-          <div class="faq__answer"><p>{{ item.answer }}</p></div>
+          <div class="faq__answer">
+            <p>{{ item.answer }}</p>
+            <p v-if="item.guide"><RouterLink :to="item.guide.href">{{ item.guide.label }}</RouterLink></p>
+          </div>
         </details>
       </div>
     </div>
@@ -114,6 +117,11 @@ const topItems = FAQ_ITEMS.slice(0, 5)
   color: var(--md-sys-color-on-surface-variant);
   font: var(--md-sys-typescale-body-medium);
   letter-spacing: var(--md-sys-typescale-body-medium-tracking);
+}
+
+.faq__answer a {
+  color: var(--md-sys-color-primary);
+  text-underline-offset: 4px;
 }
 
 @media (max-width: 820px) {

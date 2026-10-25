@@ -8,7 +8,7 @@ Source code for the official [Metrolist](https://github.com/MetrolistGroup/Metro
 - Vite
 - Cloudflare Workers
 
-`bun run build` prerenders every route to static HTML (Vue SSR), then writes per-route metadata, JSON-LD, Markdown twins, `llms.txt`, and `sitemap.xml`. After deploying, run `bun run indexnow` to ask Bing and other IndexNow engines to recrawl.
+`bun run build` prerenders every route to static HTML (Vue SSR), then writes per-route metadata, JSON-LD, Markdown twins, `llms.txt`, `sitemap.xml`, and the guide RSS feed at `/feed.xml`. After deploying, run `bun run indexnow` to ask Bing and other IndexNow engines to recrawl. The [search discovery checklist](docs/search-discovery.md) covers domain verification, sitemap submission, and crawler access at launch.
 
 Browser checks use an external Playwright installation: `PLAYWRIGHT_MODULE=/path/to/playwright/index.mjs bun run test:browser` (install Chromium from that external installation with `bunx playwright install chromium` if needed). The runner serves the fresh build on its own loopback Vite preview server with an OS-assigned port, runs suites sequentially with the same `PLAYWRIGHT_MODULE`, and closes the server even when a suite fails. Vite preview does not reproduce Cloudflare routing or `_headers`; validate those separately with Wrangler.
 

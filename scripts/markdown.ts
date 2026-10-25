@@ -1,6 +1,7 @@
 import { DOWNLOAD_PLATFORMS } from '../src/content/downloads'
 import { FAQ_ITEMS } from '../src/content/faq'
 import { FEATURES } from '../src/content/features'
+import { GUIDES, GUIDE_COLLECTIONS, GUIDE_DISCLOSURE, GUIDE_INDEX_META, GUIDE_REVIEW_DATE, getRelatedGuides, type Guide } from '../src/content/guides'
 import { HOSTING_NOTICE, PAGE_META, REPO_URL as REPO, SITE_URL } from '../src/content/site'
 
 // shortcut: conversion covers simple legal markup (headings, paragraphs, lists, links, bold); use a parser if templates get nested.
@@ -30,6 +31,8 @@ export function homeMarkdown() {
 
 Metrolist is built with Kotlin Multiplatform. Source code: ${REPO} (GPL-3.0).
 
+Source: ${SITE_URL}/
+
 ## Features
 
 ${FEATURES.map(feature => `- **${feature.label}:** ${feature.body}`).join('\n')}
@@ -49,14 +52,54 @@ ${platform.instructions.map((step, index) => `${index + 1}. ${step}`).join('\n')
 export function faqMarkdown() {
   return `# Metrolist FAQ
 
-${FAQ_ITEMS.map(({ question, answer }) => `## ${question}\n\n${answer}`).join('\n\n')}
+Source: ${SITE_URL}/faq
+
+${FAQ_ITEMS.map(({ question, answer, guide }) => `## ${question}\n\n${answer}${guide ? `\n\n${markdownLink(guide.label, `${SITE_URL}${guide.href}`)}` : ''}`).join('\n\n')}
 `
 }
 
 export function privacyMarkdown(vueSource: string) {
   const template = vueSource.match(/<header class="privacy-page__header">([\s\S]*?)<\/article>/)?.[1]
   if (!template) throw new Error('Privacy policy content was not found')
-  return `${htmlToMarkdown(template)}\n`
+  return `${htmlToMarkdown(template)}\n\nSource: ${SITE_URL}/privacy\n`
+}
+
+const escapeMarkdown = (text: string) => text
+  .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+  .replace(/[\\`*_[\]{}()#+.!|~-]/g, '\\$&')
+const markdownLink = (label: string, href: string) => `[${escapeMarkdown(label)}](${href.replace(/[\\\s<>]/g, encodeURIComponent).replaceAll('(', '%28').replaceAll(')', '%29')})`
+
+export function guideMarkdown(guide: Guide) {
+  const related = getRelatedGuides(guide.slug)
+  return `# ${escapeMarkdown(guide.heading)}
+
+${escapeMarkdown(guide.intro)}
+
+${escapeMarkdown(GUIDE_DISCLOSURE)}
+
+Source: ${SITE_URL}/guides/${guide.slug}
+Reviewed: ${GUIDE_REVIEW_DATE}
+
+${guide.sections.map(section => `## ${escapeMarkdown(section.heading)}
+
+${section.paragraphs.map(escapeMarkdown).join('\n\n')}${section.links?.length ? `\n\n${section.links.map(link => `- ${markdownLink(link.label, link.href)}`).join('\n')}` : ''}`).join('\n\n')}
+
+${related.length ? `## Related guides\n\n${related.map(item => `- ${markdownLink(item.heading, `${SITE_URL}/guides/${item.slug}`)}`).join('\n')}\n\n` : ''}${markdownLink('All guides', `${SITE_URL}/guides`)}
+`
+}
+
+export function guidesIndexMarkdown() {
+  return `# YouTube Music app guides
+
+${escapeMarkdown(GUIDE_INDEX_META.description)}
+
+${escapeMarkdown(GUIDE_DISCLOSURE)}
+
+Source: ${SITE_URL}/guides
+Reviewed: ${GUIDE_REVIEW_DATE}
+
+${GUIDE_COLLECTIONS.map(collection => `## ${escapeMarkdown(collection.heading)}\n\n${collection.guides.map(guide => `### ${markdownLink(guide.heading, `${SITE_URL}/guides/${guide.slug}`)}\n\n${escapeMarkdown(guide.meta.description)}`).join('\n\n')}`).join('\n\n')}
+`
 }
 
 export function llmsTxt() {
@@ -68,12 +111,17 @@ Metrolist is free and open source (GPL-3.0). It is not affiliated with YouTube o
 
 ${HOSTING_NOTICE}
 
+Each Markdown page names its canonical HTML source.
+
 ## Pages
 
 - [Overview](${SITE_URL}/index.md): features, supported platforms, and install steps
 - [FAQ](${SITE_URL}/faq.md): platforms, migration, accounts, safety, updates, and imports
 - [Privacy policy](${SITE_URL}/privacy.md): app data, optional Sentry diagnostics, and website hosting
-- [Everything in one file](${SITE_URL}/llms-full.txt): all of the above pages
+- [Guides](${SITE_URL}/guides.md): ${markdownLink('HTML topic index', `${SITE_URL}/guides`)} for comparisons, installation, library, and playback
+${GUIDES.map(guide => `- ${markdownLink(guide.heading, `${SITE_URL}/guides/${guide.slug}.md`)}: ${escapeMarkdown(guide.meta.description)}`).join('\n')}
+- [Guide feed](${SITE_URL}/feed.xml): RSS links and summaries for every guide
+- [Everything in one file](${SITE_URL}/llms-full.txt): HTML page text
 
 ## Project
 
