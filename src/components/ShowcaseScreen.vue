@@ -52,7 +52,7 @@ const platformName = computed(() => props.device === 'desktop' ? 'Desktop' : pro
       </div>
       <div v-else class="screen__missing" role="img" :aria-label="`${screenName} capture for ${platformName} is not available`">
         <img src="/logo.svg" alt="" width="48" height="48" />
-        <strong>{{ screenName }}</strong><span>Capture coming soon</span>
+        <strong>{{ screenName }}</strong><span>Screenshot unavailable</span>
       </div>
     </Transition>
   </div>

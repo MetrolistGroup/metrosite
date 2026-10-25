@@ -16,7 +16,7 @@ const topItems = FAQ_ITEMS.slice(0, 5)
       </header>
 
       <div class="faq__list">
-        <details v-for="item in topItems" :key="item.question">
+        <details v-for="item in topItems" :key="item.question" class="faq-disclosure">
           <summary class="faq__question">
             <h3>
               {{ item.question }}

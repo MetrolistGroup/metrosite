@@ -41,7 +41,7 @@ function openDownload(platform: DownloadPlatformKey) {
 
   <section id="platforms" class="platforms">
     <div class="container platforms__layout">
-      <header><h2>One codebase.<br /><span>Every place to press play.</span></h2><p>Kotlin Multiplatform keeps the foundation shared while each interface fits the screen around it.</p></header>
+      <header><h2>Supported<br /><span>platforms</span></h2><p>Select a platform for downloads and installation instructions.</p></header>
       <div class="platforms__list">
         <button v-for="platform in DOWNLOAD_PLATFORMS" :key="platform.name" type="button" aria-haspopup="dialog" @click="openDownload(platform.key)">
           <span class="platforms__icon"><img :src="`/icons/${platform.icon}.svg`" alt="" /></span>

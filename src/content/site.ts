@@ -15,7 +15,7 @@ export type PageMeta = {
 
 export const PAGE_META = {
   home: {
-    title: 'Metrolist · Ad-free YouTube Music client for every device',
+    title: 'Metrolist · Music without the noise',
     description: 'Free, open-source YouTube Music client for Android, iOS, Windows, macOS, and Linux. No ads, background play, synced lyrics, offline downloads, and casting.',
     robots: INDEX,
   },
@@ -26,7 +26,7 @@ export const PAGE_META = {
   },
   listen: {
     title: 'Listen Together · Metrolist',
-    description: 'Join a Metrolist listening room and share the soundtrack with friends.',
+    description: 'Join a Metrolist listening room for synchronized playback with friends.',
     robots: 'noindex, follow',
   },
   privacy: {

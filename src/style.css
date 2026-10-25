@@ -348,6 +348,28 @@ img {
   cursor: pointer;
 }
 
+@supports selector(details::details-content) {
+  .faq-disclosure::details-content {
+    display: grid;
+    grid-template-rows: 0fr;
+    overflow: clip;
+    opacity: 0;
+    content-visibility: hidden;
+    transition: grid-template-rows 260ms var(--md-sys-motion-standard), opacity var(--md-motion-effects-fast), content-visibility 260ms allow-discrete;
+  }
+
+  .faq-disclosure[open]::details-content {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    content-visibility: visible;
+  }
+
+  .faq-disclosure > :not(summary) {
+    min-height: 0;
+    overflow: hidden;
+  }
+}
+
 @media (max-width: 600px) {
   .container {
     width: min(100% - 28px, 1240px);
@@ -370,6 +392,10 @@ img {
 
   html {
     scroll-behavior: auto;
+  }
+
+  .faq-disclosure::details-content {
+    transition: none;
   }
 
   *,

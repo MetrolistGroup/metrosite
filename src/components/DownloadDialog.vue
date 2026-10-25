@@ -147,7 +147,7 @@ function formatSize(bytes?: number) {
   <Teleport to="body">
     <dialog ref="dialog" class="download-dialog" :aria-labelledby="titleId" @click="closeOnBackdrop" @close="onClose">
       <div class="download-dialog__header">
-        <h2 :id="titleId">Choose your build</h2>
+        <h2 :id="titleId">Download Metrolist</h2>
         <form method="dialog">
           <button class="icon-button" type="submit" aria-label="Close download selector">
             <span class="material-symbols-rounded" aria-hidden="true">close</span>
@@ -206,7 +206,7 @@ function formatSize(bytes?: number) {
           <div>
             <h3>Download</h3>
             <p class="download-dialog__status" aria-live="polite">
-              <template v-if="isLoading">Finding the latest public build…</template>
+              <template v-if="isLoading">Loading the latest release…</template>
               <template v-else-if="loadFailed">Couldn't load the latest release. Browse release files or reopen this dialog to try again.</template>
               <template v-else-if="!selectedArchitecture">Choose your Mac chip above for a direct download, or browse release files.</template>
               <template v-else-if="selectedAsset">{{ releaseName }}<template v-if="selectedAsset.size"> · {{ formatSize(selectedAsset.size) }}</template></template>
@@ -220,11 +220,11 @@ function formatSize(bytes?: number) {
               <a v-if="selectedAsset" :href="releasesUrl" class="btn btn-tonal" target="_blank" rel="noopener noreferrer">All builds</a>
             </div>
             <div ref="notice" :popover="supportsPopover ? 'auto' : undefined" :hidden="!supportsPopover && !showInlineNotice" class="download-dialog__notice" role="note">
-              <p><strong>Heads up.</strong> {{ HOSTING_NOTICE }}</p>
-              <button type="button" class="btn btn-tonal" @click="hideNotice">Got it</button>
+              <p>{{ HOSTING_NOTICE }}</p>
+              <button type="button" class="btn btn-tonal" @click="hideNotice">Dismiss notice</button>
             </div>
             <p v-if="donateDeveloper" class="download-dialog__donate" role="status">
-              Enjoying Metrolist?
+              Support development.
               <a :href="donateDeveloper.url" target="_blank" rel="noopener noreferrer">Donate to {{ donateDeveloper.name }}</a>
             </p>
           </div>

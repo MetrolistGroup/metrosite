@@ -12,9 +12,9 @@ try {
 
   const index = 'index, follow, max-image-preview:large, max-snippet:-1'
   const expected = [
-    ['', 'Metrolist · Ad-free YouTube Music client for every device', index, 'Metrolist brings YouTube Music to every screen.'],
-    ['faq', 'Metrolist FAQ · Install, sign in, update, and import playlists', index, 'Answers before the first track.'],
-    ['listen?code=ABC123', 'Listen Together · Metrolist', 'noindex, follow', 'Join the same room.'],
+    ['', 'Metrolist · Music without the noise', index, 'Music without the noise'],
+    ['faq', 'Metrolist FAQ · Install, sign in, update, and import playlists', index, 'Frequently asked questions'],
+    ['listen?code=ABC123', 'Listen Together · Metrolist', 'noindex, follow', 'Join a listening room'],
   ]
   for (const [route, title, robots, heading] of expected) {
     const raw = await (await fetch(new URL(route, base))).text()
@@ -33,7 +33,7 @@ try {
   assert.equal(await page.title(), 'Page not found · Metrolist')
   assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'), 'noindex, nofollow')
   assert.equal(await page.locator('link[rel="canonical"]').count(), 0)
-  assert.match(await page.locator('h1').innerText(), /isn’t in the queue/)
+  assert.equal(await page.locator('h1').innerText(), 'Page not found')
 
   const sitemap = await (await fetch(new URL('sitemap.xml', base))).text()
   for (const path of ['/', '/faq', '/privacy']) {
@@ -50,7 +50,7 @@ try {
   await notice.waitFor()
   assert.match(await notice.innerText(), /does not host/)
   if (process.env.SCREENSHOT) await page.screenshot({ path: process.env.SCREENSHOT })
-  await notice.getByRole('button', { name: 'Got it' }).click()
+  await notice.getByRole('button', { name: 'Dismiss notice' }).click()
   await notice.waitFor({ state: 'hidden' })
   assert.equal(await page.locator('.download-dialog[open]').count(), 1, 'dismissing the notice keeps the download dialog open')
   console.log('PASS prerendered routes, download notice, metadata, structured data, sitemap, indexing rules and not-found view')

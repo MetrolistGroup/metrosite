@@ -7,14 +7,14 @@ import DownloadDialog from './DownloadDialog.vue'
     <div class="container">
       <div class="download__panel">
         <div class="download__copy">
-          <h2 id="download-title">Put your library on a <span>bigger screen.</span></h2>
-          <p>Select Android, iOS, Linux, macOS, or Windows and get the right Metrolist build for your device.</p>
+          <h2 id="download-title">Install <span>Metrolist</span></h2>
+          <p>Get the latest release from GitHub.</p>
         </div>
         <div class="download__actions">
-          <DownloadDialog label="Choose a build" button-class="btn btn-filled btn-lg" />
+          <DownloadDialog label="Download Metrolist" button-class="btn btn-filled btn-lg" />
           <a href="https://github.com/MetrolistGroup/Metrolist" class="btn btn-outlined" target="_blank" rel="noopener noreferrer">
             <span class="material-symbols-rounded" aria-hidden="true">code</span>
-            Read the source
+            View source
           </a>
         </div>
       </div>

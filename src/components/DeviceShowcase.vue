@@ -5,8 +5,8 @@ import ShowcaseScreen from './ShowcaseScreen.vue'
 
 const previews = [
   { device: 'desktop', name: 'Desktop', detail: 'Windows · Linux · macOS', icon: 'desktop_windows', ratio: '2000 / 1091' },
-  { device: 'android', name: 'Android', detail: 'The original home of Metrolist', icon: 'android', ratio: '1080 / 2364' },
-  { device: 'ios', name: 'iOS', detail: 'Feels right at home on an iPhone', icon: 'apple', ratio: '1320 / 2868' },
+  { device: 'android', name: 'Android', detail: 'Android 9 and newer', icon: 'android', ratio: '1080 / 2364' },
+  { device: 'ios', name: 'iOS', detail: 'iOS 17 and newer', icon: 'apple', ratio: '1320 / 2868' },
 ] as const
 const view = ref<ShowcaseView>('home')
 const dialogView = ref<ShowcaseView>('home')
@@ -38,10 +38,10 @@ onBeforeUnmount(() => { if (dialog.value?.open) restoreScroll() })
 </script>
 
 <template>
-  <section id="desktop" class="showcase" aria-label="Metrolist on every platform">
+  <section id="desktop" class="showcase" aria-label="Metrolist app previews">
     <div class="container">
       <header class="showcase__heading">
-        <p>From your phone to your workspace.<br />A familiar player, with room to be itself on every device.</p>
+        <p>Preview the desktop and mobile apps.<br />Switch between Home, Library, and Player views.</p>
         <div class="view-switch" role="group" aria-label="App preview">
           <button v-for="screen in SHOWCASE_VIEWS" :key="screen.key" type="button" :aria-pressed="view === screen.key" @click="view = screen.key">{{ screen.name }}</button>
         </div>

@@ -56,7 +56,7 @@ async function copyCode() {
       <header class="listen__hero">
         <div>
           <p class="section-label"><span class="material-symbols-rounded" aria-hidden="true">groups</span>Listen Together</p>
-          <h1>Join the <span>same room.</span></h1>
+          <h1>Join a <span>listening room</span></h1>
           <p>Open this invitation on a device with Metrolist to keep playback synchronized with friends.</p>
         </div>
         <span class="listen__hero-icon material-symbols-rounded" aria-hidden="true">groups</span>
@@ -103,7 +103,7 @@ async function copyCode() {
           <div class="listen__guide-top"><span class="material-symbols-rounded" aria-hidden="true">download</span><small>Step 2</small></div>
           <h2>Install the app</h2>
           <p>Metrolist is available for Android, iOS, Linux, macOS, and Windows from GitHub.</p>
-          <DownloadDialog label="Choose a build" button-class="btn btn-outlined btn-lg" />
+          <DownloadDialog label="Download Metrolist" button-class="btn btn-outlined btn-lg" />
         </article>
       </div>
     </div>

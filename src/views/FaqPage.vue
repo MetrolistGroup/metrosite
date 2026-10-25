@@ -1,40 +1,70 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import NavBar from '../components/NavBar.vue'
 import FooterSection from '../components/FooterSection.vue'
-import { FAQ_ITEMS } from '../content/faq'
+import { FAQ_ITEMS, FAQ_TOPICS } from '../content/faq'
+
+const route = useRoute()
+const mounted = ref(false)
+onMounted(() => { mounted.value = true })
+const currentTopic = (id: string) => mounted.value && route.hash === `#${id}` ? 'location' : undefined
+
+const topicGroups = FAQ_TOPICS.map(topic => ({
+  ...topic,
+  items: FAQ_ITEMS.filter(item => item.topic === topic.id),
+}))
 </script>
 
 <template>
   <NavBar />
   <main id="main" class="faq-page">
-    <div class="container">
-      <header class="faq-page__hero">
-        <div>
-          <h1>Answers before the <span>first track.</span></h1>
-          <p>Platforms, migration, accounts, updates, and the practical details of using Metrolist.</p>
-        </div>
-        <span class="faq-page__hero-icon material-symbols-rounded" aria-hidden="true">help</span>
+    <div class="container faq-page__container">
+      <header class="faq-page__header">
+        <nav class="faq-page__breadcrumb" aria-label="Breadcrumb">
+          <RouterLink to="/">Home</RouterLink>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">FAQ</span>
+        </nav>
+        <h1>Frequently asked questions</h1>
       </header>
 
-      <section class="faq-page__list" aria-label="Frequently asked questions">
-        <details v-for="(item, index) in FAQ_ITEMS" :key="item.question">
-          <summary class="faq-page__question">
-            <h2>
-              <span class="faq-page__number">{{ String(index + 1).padStart(2, '0') }}</span>
-              {{ item.question }}
-              <span class="faq-page__mark material-symbols-rounded" aria-hidden="true">add</span>
-            </h2>
-          </summary>
-          <div class="faq-page__answer"><p>{{ item.answer }}</p></div>
-        </details>
-      </section>
+      <div class="faq-page__layout">
+        <nav class="faq-page__index" aria-label="FAQ topics">
+          <p class="faq-page__eyebrow">Topics</p>
+          <ul>
+            <li v-for="topic in FAQ_TOPICS" :key="topic.id">
+              <RouterLink :to="{ path: '/faq', hash: `#${topic.id}` }" :aria-current="currentTopic(topic.id)">{{ topic.title }}</RouterLink>
+            </li>
+          </ul>
+        </nav>
 
-      <div class="faq-page__back">
-        <RouterLink to="/" class="btn btn-outlined btn-lg">
-          <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
-          Back to home
-        </RouterLink>
-        <p>Still stuck? <a href="https://github.com/MetrolistGroup/Metrolist/issues" target="_blank" rel="noopener noreferrer">Ask on GitHub</a>.</p>
+        <div class="faq-page__content">
+          <section
+            v-for="topic in topicGroups"
+            :key="topic.id"
+            class="faq-page__topic"
+            :aria-labelledby="topic.id"
+          >
+            <h2 :id="topic.id" tabindex="-1">{{ topic.title }}</h2>
+            <div class="faq-page__questions">
+              <details v-for="item in topic.items" :key="item.question" class="faq-disclosure">
+                <summary class="faq-page__question">
+                  <h3>
+                    {{ item.question }}
+                    <span class="faq-page__mark" aria-hidden="true"></span>
+                  </h3>
+                </summary>
+                <div class="faq-page__answer"><p>{{ item.answer }}</p></div>
+              </details>
+            </div>
+          </section>
+
+          <footer class="faq-page__support">
+            <a href="https://github.com/MetrolistGroup/Metrolist/issues" target="_blank" rel="noopener noreferrer">Report an issue on GitHub</a>
+            <RouterLink :to="{ path: '/faq', hash: '#main' }">Back to top</RouterLink>
+          </footer>
+        </div>
       </div>
     </div>
   </main>
@@ -43,65 +73,113 @@ import { FAQ_ITEMS } from '../content/faq'
 
 <style scoped>
 .faq-page {
-  padding: 28px 0 112px;
+  padding: clamp(40px, 6vw, 80px) 0 104px;
   background: var(--md-sys-color-surface);
+  overflow-wrap: anywhere;
 }
 
-.faq-page__hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 220px;
-  gap: 48px;
-  align-items: end;
-  padding: clamp(32px, 6vw, 72px);
-  border-radius: 44px 44px 16px 44px;
-  background: var(--md-sys-color-surface-container-low);
+.faq-page__container {
+  max-width: 1080px;
+}
+
+.faq-page__header {
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.faq-page__eyebrow {
+  color: var(--md-sys-color-on-surface-variant);
+  font: var(--md-sys-typescale-label-medium);
+  letter-spacing: var(--md-sys-typescale-label-medium-tracking);
+  text-transform: uppercase;
 }
 
 .faq-page h1 {
-  max-width: 830px;
-  margin: 24px 0;
-  font: var(--md-sys-typescale-display-large);
-  letter-spacing: var(--md-sys-typescale-display-large-tracking);
+  max-width: 820px;
+  margin-top: 16px;
+  font: var(--md-sys-typescale-display-small);
+  letter-spacing: var(--md-sys-typescale-display-small-tracking);
 }
 
-.faq-page h1 span {
+.faq-page__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--md-sys-color-on-surface-variant);
+  font: var(--md-sys-typescale-label-large);
+}
+
+.faq-page__breadcrumb a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: inherit;
+}
+
+.faq-page__layout {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: clamp(40px, 6vw, 80px);
+  margin-top: 48px;
+}
+
+.faq-page__index {
+  align-self: start;
+}
+
+.faq-page__index ul {
+  display: grid;
+  margin-top: 14px;
+  list-style: none;
+}
+
+.faq-page__index a {
+  display: block;
+  padding-block: 12px;
+  color: var(--md-sys-color-on-surface-variant);
+  font: var(--md-sys-typescale-label-large);
+  letter-spacing: var(--md-sys-typescale-label-large-tracking);
+  text-decoration-color: var(--md-sys-color-outline);
+}
+
+.faq-page__index a[aria-current='location'] {
+  color: var(--md-sys-color-primary);
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 2px;
+}
+
+.faq-page a {
+  text-underline-offset: 4px;
+}
+
+.faq-page a:hover {
   color: var(--md-sys-color-primary);
 }
 
-.faq-page__hero p:last-child {
-  max-width: 620px;
-  color: var(--md-sys-color-on-surface-variant);
-  font: var(--md-sys-typescale-body-large);
-  letter-spacing: var(--md-sys-typescale-body-large-tracking);
+.faq-page__topic + .faq-page__topic {
+  margin-top: 56px;
 }
 
-.faq-page__hero-icon {
-  width: 190px;
-  height: 190px;
-  border-radius: 56px 56px 20px 56px;
-  background: var(--md-sys-color-secondary-container);
-  color: var(--md-sys-color-on-secondary-container);
-  font-size: 96px;
+.faq-page__topic h2 {
+  margin-bottom: 20px;
+  font: var(--md-sys-typescale-headline-medium);
+  letter-spacing: var(--md-sys-typescale-headline-medium-tracking);
 }
 
-.faq-page__list {
-  display: grid;
-  gap: 6px;
-  margin-top: 24px;
-  padding: 10px;
-  border-radius: 16px 40px 40px 40px;
+.faq-page__questions {
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.faq-page__questions details {
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.faq-page__questions details[open] {
   background: var(--md-sys-color-surface-container-low);
-}
-
-.faq-page__list details {
-  overflow: hidden;
-  border-radius: var(--md-sys-shape-corner-extra-large);
-  background: var(--md-sys-color-surface-container-high);
 }
 
 .faq-page__question {
   display: block;
-  border-radius: inherit;
   color: var(--md-sys-color-on-surface);
   cursor: pointer;
 }
@@ -111,107 +189,113 @@ import { FAQ_ITEMS } from '../content/faq'
 }
 
 .faq-page__question:focus-visible {
-  outline-offset: -6px;
+  outline-offset: -3px;
 }
 
-.faq-page__question h2 {
+.faq-page__question h3 {
   display: grid;
-  grid-template-columns: 50px 1fr 48px;
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) 16px;
+  gap: 24px;
   align-items: center;
-  min-height: 86px;
-  padding: 10px 14px;
-  font: var(--md-sys-typescale-title-large);
-  letter-spacing: var(--md-sys-typescale-title-large-tracking);
-}
-
-.faq-page__number,
-.faq-page__mark {
-  display: grid;
-  width: 44px;
-  height: 44px;
-  place-items: center;
-  border-radius: var(--md-sys-shape-corner-full);
-  background: color-mix(in srgb, currentColor 10%, transparent);
-}
-
-.faq-page__number {
-  color: var(--md-sys-color-primary);
-  font: var(--md-sys-typescale-label-medium);
-  font-variation-settings: 'ROND' 100;
-  letter-spacing: var(--md-sys-typescale-label-medium-tracking);
-  font-variant-numeric: tabular-nums;
+  min-height: 72px;
+  padding: 20px 16px;
+  font: var(--md-sys-typescale-title-medium);
+  letter-spacing: var(--md-sys-typescale-title-medium-tracking);
+  text-wrap: wrap;
 }
 
 .faq-page__mark {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.faq-page__mark::before,
+.faq-page__mark::after {
+  content: '';
+  position: absolute;
+  background: currentColor;
+}
+
+.faq-page__mark::before {
+  inset: 7px 0 auto;
+  height: 2px;
+}
+
+.faq-page__mark::after {
+  inset: 0 auto 0 7px;
+  width: 2px;
   transition: transform var(--md-motion-spatial-fast);
 }
 
-.faq-page__list details[open] .faq-page__mark {
-  transform: rotate(45deg);
+.faq-page__questions details[open] .faq-page__mark::after {
+  transform: scaleY(0);
+}
+
+.faq-page__answer {
+  color: var(--md-sys-color-on-surface-variant);
+  font: var(--md-sys-typescale-body-large);
+  letter-spacing: var(--md-sys-typescale-body-large-tracking);
 }
 
 .faq-page__answer p {
-  max-width: 820px;
-  padding: 0 70px 28px 82px;
-  color: var(--md-sys-color-on-surface-variant);
-  font: var(--md-sys-typescale-body-medium);
-  letter-spacing: var(--md-sys-typescale-body-medium-tracking);
+  padding: 0 56px 24px 16px;
 }
 
-.faq-page__back {
+.faq-page__support {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   justify-content: space-between;
-  gap: 30px;
-  margin-top: 32px;
-  padding: 24px;
-  border-radius: var(--md-sys-shape-corner-extra-large);
-  background: var(--md-sys-color-surface-container-low);
-}
-
-.faq-page__back p {
+  align-items: baseline;
+  gap: 16px 32px;
+  margin-top: 48px;
   color: var(--md-sys-color-on-surface-variant);
   font: var(--md-sys-typescale-body-medium);
   letter-spacing: var(--md-sys-typescale-body-medium-tracking);
 }
 
-.faq-page__back a:not(.btn) {
+.faq-page__support a {
   color: var(--md-sys-color-primary);
 }
 
-@media (max-width: 780px) {
+@media (min-width: 901px) and (min-height: 700px) {
+  .faq-page__index {
+    position: sticky;
+    top: 112px;
+  }
+}
+
+@media (max-width: 900px) {
+  .faq-page__layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+    margin-top: 32px;
+  }
+
+  .faq-page__index ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 28px;
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 600px) {
   .faq-page {
-    padding-top: 14px;
+    padding-bottom: 72px;
   }
 
-  .faq-page__hero {
-    grid-template-columns: 1fr;
-    padding: 32px 24px;
-    border-radius: 32px 32px 14px 32px;
+  .faq-page__header {
+    padding-bottom: 28px;
   }
 
-  .faq-page__hero-icon {
-    width: 96px;
-    height: 96px;
-    border-radius: 30px 30px 10px 30px;
-    font-size: 50px;
-  }
-
-  .faq-page__question h2 {
-    grid-template-columns: 44px 1fr 44px;
-    gap: 10px;
-    min-height: 78px;
-    padding-inline: 8px;
+  .faq-page__topic + .faq-page__topic {
+    margin-top: 40px;
   }
 
   .faq-page__answer p {
-    padding: 0 20px 24px 62px;
-  }
-
-  .faq-page__back {
-    align-items: flex-start;
-    flex-direction: column;
+    padding-right: 16px;
   }
 }
 </style>

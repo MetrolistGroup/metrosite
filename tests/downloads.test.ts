@@ -50,6 +50,7 @@ test('generated platform content has accurate requirements and both Windows inst
   for (const content of [home, faqMarkdown()]) {
     expect(content).toContain('Android 9 and newer')
     expect(content).toContain('iOS 17 and newer')
+    expect(content).toContain('macOS 15 and newer')
     expect(content).not.toContain('TrollStore')
   }
   expect(home).toContain('For the EXE, run the installer')

@@ -8,7 +8,7 @@ import NavBar from '../components/NavBar.vue'
   <main id="main" class="not-found">
     <section class="container not-found__panel" aria-labelledby="not-found-title">
       <p>404</p>
-      <h1 id="not-found-title">This track isn’t in the queue.</h1>
+      <h1 id="not-found-title">Page not found</h1>
       <RouterLink to="/" class="btn btn-filled btn-lg">
         <span class="material-symbols-rounded" aria-hidden="true">home</span>
         Back to home

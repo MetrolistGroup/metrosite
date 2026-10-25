@@ -26,9 +26,9 @@ onMounted(async () => {
     <div class="container">
       <div class="hero__layout">
         <div class="hero__copy">
-          <h1 id="hero-title">Metrolist brings YouTube Music to <span>every screen.</span></h1>
+          <h1 id="hero-title">Music <span>without the noise</span></h1>
           <p class="hero__lede">
-            An open-source YouTube Music client for Android, iOS, Linux, macOS, and Windows, with ad-free playback and a layout that fits each platform.
+            An open-source YouTube Music client for Android, iOS, Linux, macOS, and Windows.
           </p>
           <div class="hero__actions">
             <DownloadDialog button-class="btn btn-filled btn-lg" />
@@ -42,8 +42,8 @@ onMounted(async () => {
         <div class="hero__signal">
           <span class="hero__signal-icon material-symbols-rounded" aria-hidden="true">desktop_windows</span>
           <div>
-            <strong>Desktop has entered the playlist.</strong>
-            <p>One Kotlin Multiplatform foundation, fit for every screen.</p>
+            <strong>Kotlin Multiplatform</strong>
+            <p>Shared code for mobile and desktop apps.</p>
           </div>
           <dl class="hero__stats" aria-label="Metrolist repository statistics">
             <div><dt>License</dt><dd>GPL-3.0</dd></div>

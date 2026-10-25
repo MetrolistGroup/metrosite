@@ -131,7 +131,7 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
     key: 'macos',
     icon: 'macos',
     name: 'macOS',
-    detail: 'Apple silicon and Intel',
+    detail: 'macOS 15 and newer · Apple silicon and Intel',
     package: 'DMG',
     instructions: [
       'Download and open the DMG for your Mac.',
