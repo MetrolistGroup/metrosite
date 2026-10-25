@@ -48,7 +48,7 @@ const topItems = FAQ_ITEMS.slice(0, 5)
 .faq header {
   align-self: start;
   padding: 36px;
-  border-radius: 44px 16px 44px 44px;
+  border-radius: var(--md-sys-shape-corner-extra-large);
   background: var(--md-sys-color-tertiary-container);
   color: var(--md-sys-color-on-tertiary-container);
 }
@@ -61,16 +61,24 @@ const topItems = FAQ_ITEMS.slice(0, 5)
 
 .faq__list {
   display: grid;
-  gap: 6px;
-  padding: 10px;
-  border-radius: 16px 40px 40px 40px;
-  background: var(--md-sys-color-surface-container);
+  gap: 3px;
+  align-self: start;
 }
 
 .faq__list details {
   overflow: hidden;
-  border-radius: var(--md-sys-shape-corner-extra-large);
-  background: var(--md-sys-color-surface-container-high);
+  border-radius: 4px;
+  background: var(--md-sys-color-surface-container);
+}
+
+.faq__list details:first-child {
+  border-top-left-radius: var(--md-sys-shape-corner-extra-large);
+  border-top-right-radius: var(--md-sys-shape-corner-extra-large);
+}
+
+.faq__list details:last-child {
+  border-bottom-left-radius: var(--md-sys-shape-corner-extra-large);
+  border-bottom-right-radius: var(--md-sys-shape-corner-extra-large);
 }
 
 .faq__question {
@@ -132,19 +140,11 @@ const topItems = FAQ_ITEMS.slice(0, 5)
   .faq__layout {
     grid-template-columns: 1fr;
   }
-
-  .faq header {
-    border-radius: 36px 14px 36px 36px;
-  }
 }
 
 @media (max-width: 520px) {
   .faq header {
     padding: 28px 24px;
-  }
-
-  .faq__list {
-    padding: 6px;
   }
 
   .faq__question h3 {

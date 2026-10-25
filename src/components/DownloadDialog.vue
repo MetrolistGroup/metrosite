@@ -327,11 +327,10 @@ function formatSize(bytes?: number) {
   color: var(--md-sys-color-on-surface);
   cursor: pointer;
   text-align: left;
-  transition: background var(--md-motion-effects-default), color var(--md-motion-effects-default), border-radius var(--md-motion-spatial-fast);
+  transition: background var(--md-motion-effects-default), color var(--md-motion-effects-default);
 }
 
 .download-dialog__platforms button[aria-pressed='true'] {
-  border-radius: var(--md-sys-shape-corner-extra-large);
   background: var(--md-sys-color-primary-container);
   color: var(--md-sys-color-on-primary-container);
 }
@@ -405,7 +404,7 @@ function formatSize(bytes?: number) {
   font: var(--md-sys-typescale-label-large);
   font-variation-settings: 'ROND' 100;
   letter-spacing: var(--md-sys-typescale-label-large-tracking);
-  transition: background var(--md-motion-effects-default), color var(--md-motion-effects-default), border-radius var(--md-motion-spatial-fast);
+  transition: background var(--md-motion-effects-default), color var(--md-motion-effects-default);
 }
 
 .download-dialog__platforms button:hover:not([aria-pressed='true']),
@@ -414,13 +413,7 @@ function formatSize(bytes?: number) {
   transition: none;
 }
 
-.download-dialog__platforms button:active,
-.download-dialog__architectures button:active {
-  border-radius: var(--md-sys-shape-corner-small);
-}
-
 .download-dialog__architectures button[aria-pressed='true'] {
-  border-radius: 19px;
   background: var(--md-sys-color-secondary-container);
   color: var(--md-sys-color-on-secondary-container);
 }
