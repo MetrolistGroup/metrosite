@@ -46,7 +46,7 @@ try {
       await page.keyboard.press('Tab')
       assert.ok(await page.evaluate(() => document.activeElement === document.body || document.querySelector('.preview-dialog').contains(document.activeElement)), 'Tab must not focus background controls')
       if (index === 0) await page.keyboard.press('Escape')
-      else if (index === 1) await page.getByRole('button', { name: 'Close preview', exact: true }).click()
+      else if (index === 1) await page.getByRole('button', { name: 'Close dialog', exact: true }).click()
       else await page.mouse.click(5, height / 2)
       await page.waitForFunction(() => {
         const dialog = document.querySelector('.preview-dialog')

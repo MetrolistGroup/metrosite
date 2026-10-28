@@ -39,7 +39,7 @@ try {
   for (const path of ['/', '/faq', '/privacy']) {
     assert.match(sitemap, new RegExp(`<loc>https://metrolist.cc${path}</loc>`), `sitemap lists ${path}`)
   }
-  assert.doesNotMatch(sitemap, /listen/, 'sitemap omits noindex pages')
+  assert.doesNotMatch(sitemap, /<loc>https:\/\/metrolist\.cc\/listen(?:[/?<])/, 'sitemap omits noindex invitation pages')
   const schemas = [...(await (await fetch(new URL('', base))).text()).matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map(match => JSON.parse(match[1])['@type'])
   assert.deepEqual(schemas.sort(), ['Organization', 'SoftwareApplication', 'WebSite'])
   await page.goto(base, { waitUntil: 'networkidle' })

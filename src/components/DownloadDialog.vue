@@ -247,41 +247,20 @@ function formatSize(bytes?: number) {
   overflow: auto;
   margin: auto;
   padding: 28px;
-  border: 0;
   border-radius: var(--md-sys-shape-corner-extra-large-increased);
-  background: var(--md-sys-color-surface);
-  color: var(--md-sys-color-on-surface);
-  opacity: 0;
   transform: translateY(12px) scale(0.98);
   overflow-wrap: anywhere;
-  transition: opacity var(--md-motion-exit), transform var(--md-motion-spatial-exit, var(--md-motion-exit)), display 160ms allow-discrete, overlay 160ms allow-discrete;
+  transition: var(--site-dialog-transition), transform var(--md-motion-spatial-exit);
 }
 
 .download-dialog[open] {
-  opacity: 1;
   transform: none;
-  transition: opacity var(--md-motion-effects-default), transform var(--md-motion-spatial-default), display 420ms allow-discrete, overlay 420ms allow-discrete;
-}
-
-.download-dialog::backdrop {
-  background: color-mix(in srgb, var(--md-sys-color-scrim, #000) 76%, transparent);
-  opacity: 0;
-  transition: opacity var(--md-motion-exit), display 160ms allow-discrete, overlay 160ms allow-discrete;
-}
-
-.download-dialog[open]::backdrop {
-  opacity: 1;
-  transition: opacity var(--md-motion-effects-slow), display 300ms allow-discrete, overlay 300ms allow-discrete;
+  transition: var(--site-dialog-transition), transform var(--md-motion-spatial-default);
 }
 
 @starting-style {
   .download-dialog[open] {
-    opacity: 0;
     transform: translateY(12px) scale(0.98);
-  }
-
-  .download-dialog[open]::backdrop {
-    opacity: 0;
   }
 }
 
