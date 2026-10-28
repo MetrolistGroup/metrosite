@@ -25,7 +25,7 @@ import DownloadDialog from './DownloadDialog.vue'
 <style scoped>
 .download {
   padding: 84px 0;
-  background: var(--md-sys-color-surface);
+  background: var(--md-sys-color-surface) url('/images/platform-pattern.svg') left top / 666px auto repeat;
 }
 
 .download__panel {
@@ -51,7 +51,6 @@ import DownloadDialog from './DownloadDialog.vue'
 
 .download__copy > p {
   max-width: 560px;
-  color: color-mix(in srgb, var(--md-sys-color-on-primary-container) 78%, transparent);
   font: var(--md-sys-typescale-body-large);
   letter-spacing: var(--md-sys-typescale-body-large-tracking);
 }
