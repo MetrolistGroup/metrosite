@@ -10,13 +10,13 @@ export const LIBRARY_GUIDES: readonly Guide[] = [
       description: 'Save songs and playlists for offline playback in Metrolist, understand downloads versus cache, and avoid losing audio when moving a library.',
       robots: PAGE_META.home.robots,
     },
-    intro: 'Download your songs before disconnecting. Metrolist plays completed downloads on Android, iOS, and desktop. A song appearing in your library or listening history does not mean its audio is saved on the device.',
+    intro: 'Download your songs before disconnecting. Metrolist plays completed downloads on Android, iOS, and desktop. Check for a completed download on each device; a library or listening history entry alone does not give you an offline copy.',
     sections: [
       {
         id: 'save-the-audio',
         heading: 'Save songs while you are online',
         paragraphs: [
-          'Use the download action for a song or playlist while the device has an internet connection. Wait for the downloads to finish. An unfinished transfer cannot provide the whole song after you disconnect.',
+          'Connect to the internet, then use the download action for a song or playlist. Wait for every download to finish before disconnecting; an unfinished transfer cannot play the whole song.',
           'Before a flight or train journey, turn off the network and try the songs you intend to play. Check them on the device you will take with you. Saving a playlist on your computer does not place its audio on your phone.',
         ],
         links: [{ label: 'Metrolist offline playback FAQ', href: 'https://metrolist.cc/faq' }],
@@ -25,7 +25,7 @@ export const LIBRARY_GUIDES: readonly Guide[] = [
         id: 'downloads-and-cache',
         heading: 'A download is different from the playback cache',
         paragraphs: [
-          'Metrolist can cache songs as you listen. A cache is useful for repeated playback, but do not rely on a song being cached just because you started it. Playback may have ended before the full audio was saved.',
+          'Metrolist can cache songs as you listen, which helps with repeated playback. Do not assume the cache contains a whole song just because you started it; playback may stop before Metrolist saves all the audio.',
           'Choose downloads for music you want to take offline. Check free space before saving a large playlist, and review what you remove when clearing app storage. Uninstalling or clearing app data can remove local files and settings.',
         ],
         links: [{ label: 'Metrolist downloads and caching', href: 'https://metrolist.cc/#features' }],
@@ -34,8 +34,8 @@ export const LIBRARY_GUIDES: readonly Guide[] = [
         id: 'moving-a-library',
         heading: 'Download again after moving your library',
         paragraphs: [
-          'A Metrolist backup carries library information and supported settings. It excludes downloaded audio. After restoring that backup on a second device, download the songs there before expecting offline playback.',
-          'Restore replaces the destination library, so create a backup there first if it contains anything you want to keep. Store backup files privately. They can include account credentials even though they do not include the audio files.',
+          'A Metrolist backup includes library information and supported settings, but excludes downloaded audio. After you restore a backup on a second device, download the songs on that device before listening offline.',
+          'Before you restore, back up the destination if it contains anything you want to keep. Restoring replaces that library. Keep backup files private; they can include account credentials even though they exclude audio files.',
         ],
         links: [{ label: 'What a Metrolist backup transfers', href: 'https://metrolist.cc/faq' }],
       },
@@ -43,7 +43,7 @@ export const LIBRARY_GUIDES: readonly Guide[] = [
         id: 'quality-and-access',
         heading: 'Check quality and service access before the trip',
         paragraphs: [
-          'Metrolist still obtains songs from YouTube Music. A failed download may reflect unavailable content, a connection problem, or a service change. Resolve it while you are online rather than treating a queued request as a saved file.',
+          'Metrolist obtains songs from YouTube Music. If a download fails, check for unavailable content, connection problems, or service changes while you are online. Resolve the failure before disconnecting; a queued request is not a saved file.',
           'Premium-only audio quality needs your own YouTube Music Premium subscription. Offline listening in a third-party client does not grant an account entitlement or bypass DRM.',
         ],
         links: [{ label: 'Metrolist media and Premium notice', href: 'https://metrolist.cc/faq' }],
@@ -65,7 +65,7 @@ export const LIBRARY_GUIDES: readonly Guide[] = [
         heading: 'Start with the playlist link',
         paragraphs: [
           'Use the Share option on the Spotify playlist and copy its link. Check that you copied the playlist rather than one song inside it. The URL importer needs to read the playlist before it can search for tracks.',
-          'If it cannot read the link, check that the playlist still exists and that the link gives access to it. A private playlist can need a different import route than a public share link. Do not make a personal playlist public just to follow a guide unless you are comfortable sharing it.',
+          'If Metrolist cannot read the link, check that the playlist still exists and that the link gives access to it. For a private playlist, you may need a different import route. Do not make a personal playlist public just to follow a guide unless you are comfortable sharing it.',
         ],
         links: [{ label: 'Metrolist Spotify import instructions', href: 'https://metrolist.cc/faq' }],
       },
@@ -73,8 +73,8 @@ export const LIBRARY_GUIDES: readonly Guide[] = [
         id: 'run-the-import',
         heading: 'Import the tracks in Metrolist',
         paragraphs: [
-          'Open Settings > Backup & import, use the playlist import option, and paste the Spotify link. Keep the device online while Metrolist reads the list and searches YouTube Music. Larger playlists take more requests than a short test playlist.',
-          'Check the reported result before starting again. An interrupted import can leave a partial playlist. Look at that playlist and the destination you selected before retrying, especially if you already keep another version of the same list.',
+          'Open Settings > Backup & import, choose the playlist import option, and paste the Spotify link. Keep the device online while Metrolist reads the list and searches YouTube Music. Larger playlists require more requests than a short test playlist.',
+          'Read the import result before retrying. If the import stops early, inspect the partial playlist and the destination you selected, especially if you already keep another version of the same list.',
         ],
         links: [{ label: 'Metrolist library and import help', href: 'https://metrolist.cc/faq' }],
       },
@@ -82,8 +82,8 @@ export const LIBRARY_GUIDES: readonly Guide[] = [
         id: 'check-the-recordings',
         heading: 'Listen to a few matches',
         paragraphs: [
-          'The same song can appear as a studio recording, a live performance, a remix, or a music video. Compare the artist, title, and duration on a few tracks. Search manually for a replacement if a match is wrong.',
-          'Some tracks may be missing because YouTube Music does not offer the same recording in your region. A local file added to a Spotify playlist is also different from a track available through its public catalog. A name in the source playlist is not proof that matching audio exists on YouTube Music.',
+          'Compare the artist, title, and duration on a few tracks. The same song can appear as a studio recording, a live performance, a remix, or a music video. Search manually for a replacement if a match is wrong.',
+          'If tracks are missing, check whether YouTube Music offers those recordings in your region. Spotify playlists can also include local files outside its public catalog. Do not assume YouTube Music has matching audio just because the source playlist names a track.',
         ],
         links: [
           { label: 'Metrolist import matching limitations', href: 'https://metrolist.cc/faq' },
@@ -94,8 +94,8 @@ export const LIBRARY_GUIDES: readonly Guide[] = [
         id: 'after-importing',
         heading: 'Save the imported songs for offline listening',
         paragraphs: [
-          'Once the matches are right, use Metrolist to download the songs if you need them offline. Importing the track list does not download Spotify audio or transfer its subscription benefits.',
-          'Treat the import as a copy of the playlist at that point. Editing Spotify later is separate from editing the Metrolist result. Keep the original list until you have checked the songs you care about.',
+          'After you check and correct the matches, download the songs in Metrolist if you need them offline. Importing the track list does not download Spotify audio or transfer its subscription benefits.',
+          'Treat the import as a snapshot of the playlist. Edit the Spotify and Metrolist copies separately; later Spotify changes do not update the import. Keep the original list until you have checked the songs you care about.',
         ],
         links: [{ label: 'Metrolist offline playback and account guidance', href: 'https://metrolist.cc/faq' }],
       },
@@ -109,14 +109,14 @@ export const LIBRARY_GUIDES: readonly Guide[] = [
       description: 'What works in Metrolist without signing in, when a YouTube Music account helps, and why account-free listening is different from anonymous listening.',
       robots: PAGE_META.home.robots,
     },
-    intro: 'You can search and play music in Metrolist without signing in to Google. Background playback is available too. Sign in if you want access to the playlists and library saved in your YouTube Music account.',
+    intro: 'You can search for music, play songs, and keep listening in the background without signing in to Google. Sign in if you want to load the playlists and library from your YouTube Music account.',
     sections: [
       {
         id: 'start-listening',
         heading: 'Start without signing in',
         paragraphs: [
           'Open Metrolist and search for a song, album, or artist. You can listen without connecting a Google account. The app also supports song downloads for later offline playback.',
-          'The content still comes from YouTube Music. You need network access for searches, streams, and new downloads, and the service can restrict what is available by region or account. Skipping sign-in does not make every track available.',
+          'Keep your device online for searches, streams, and new downloads. The content comes from YouTube Music, which can restrict availability by region or account. Skipping sign-in does not make every track available.',
         ],
         links: [{ label: 'Metrolist sign-in and playback FAQ', href: 'https://metrolist.cc/faq' }],
       },
@@ -124,8 +124,8 @@ export const LIBRARY_GUIDES: readonly Guide[] = [
         id: 'when-sign-in-helps',
         heading: 'Sign in when you need your account library',
         paragraphs: [
-          'Your saved YouTube Music playlists, albums, artists, and songs belong to that account. Metrolist needs a sign-in to load them. A local library on one device is a separate matter. Use a Metrolist backup to move local library information and supported settings to another device.',
-          'A backup restore replaces the destination library and excludes downloaded audio. Back up the destination before restoring, and keep the file private because it can contain credentials.',
+          'Sign in to load the playlists, albums, artists, and songs from your YouTube Music account. Your local Metrolist library is separate from that account library. Use a Metrolist backup to move local library information and supported settings to another device.',
+          'Back up the destination library before restoring; the restore replaces it and excludes downloaded audio. Keep backup files private because they can contain credentials.',
         ],
         links: [{ label: 'Account libraries and Metrolist backups', href: 'https://metrolist.cc/faq' }],
       },
@@ -134,7 +134,7 @@ export const LIBRARY_GUIDES: readonly Guide[] = [
         heading: 'Account-free listening still makes network requests',
         paragraphs: [
           'YouTube or Google receives the requests needed to search for and play music. Your network connection still reveals information such as an IP address to the services you contact. Listening without a Google account is not a promise of anonymity.',
-          'Lyrics providers and optional integrations receive the information needed when you use those functions. Supported Metrolist builds also have optional Sentry error reporting. It is off by default and starts after you enable it. The privacy policy explains those requests and what diagnostic reports can include.',
+          'Lyrics providers and optional integrations receive the information they need when you use those functions. Supported Metrolist builds also offer optional Sentry error reporting, which stays off by default and starts only after you enable it. Read the privacy policy to learn about these requests and what diagnostic reports can include.',
         ],
         links: [
           { label: 'Metrolist privacy policy', href: 'https://metrolist.cc/privacy' },
@@ -146,7 +146,7 @@ export const LIBRARY_GUIDES: readonly Guide[] = [
         heading: 'A free client does not provide a Premium account',
         paragraphs: [
           'Metrolist provides ad-free background playback as a third-party client. Premium-only audio quality still requires your own eligible YouTube Music Premium subscription and account access.',
-          'Using third-party clients may violate the YouTube Terms of Service. Consider that before signing in to an account you rely on. Having access to the source code does not guarantee that YouTube will never restrict an account.',
+          'Read the YouTube Terms of Service before signing in to an account you rely on. Using third-party clients may violate those terms. Do not assume that access to the source code protects your account from YouTube restrictions.',
         ],
         links: [{ label: 'YouTube Terms of Service', href: 'https://www.youtube.com/static?template=terms' }],
       },

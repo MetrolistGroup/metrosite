@@ -7,19 +7,30 @@ import { HOSTING_NOTICE, PAGE_META, REPO_URL as REPO, SITE_URL } from '../src/co
 // shortcut: conversion covers simple legal markup (headings, paragraphs, lists, links, bold); use a parser if templates get nested.
 export function htmlToMarkdown(html: string) {
   return html
-    // Escape literal text before adding Markdown syntax; leave entities for the reader to decode once.
+    // Keep tags and named/numeric entities separate so they survive text escaping.
     .split(/(<[^>]+>|&(?:#\d+|#x[\da-f]+|[a-z][a-z\d]+);)/gi)
+    // Escape literal Markdown punctuation; odd-indexed tags/entities stay intact for later conversion.
     .map((part, index) => index % 2 ? part : part.replace(/[\\`*_[\]{}()#+.!|>~-]/g, '\\$&'))
     .join('')
+    // Remove template whitespace before lists and wrappers so it cannot indent Markdown bullets.
     .replace(/\s*(<\/?(?:ul|li|section|article|header)\b)/g, '$1')
+    // Keep each anchor's label and href as a Markdown link before stripping HTML tags.
     .replace(/<a [^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g, '[$2]($1)')
+    // Turn <strong> boundaries into Markdown bold markers.
     .replace(/<\/?strong>/g, '**')
+    // Preserve h1–h3 levels as # headings, separated from surrounding content.
     .replace(/<h([1-3])[^>]*>([\s\S]*?)<\/h\1>/g, (_, level, text) => `\n\n${'#'.repeat(Number(level))} ${text}\n\n`)
+    // Put each list item on its own Markdown bullet line.
     .replace(/<li>([\s\S]*?)<\/li>/g, '\n- $1')
+    // Separate paragraphs with blank lines so adjacent blocks do not run together.
     .replace(/<p[^>]*>([\s\S]*?)<\/p>/g, '\n\n$1\n\n')
+    // Drop remaining markup after extracting the supported Markdown structure.
     .replace(/<[^>]+>/g, '')
+    // Collapse spaces and tabs without losing paragraph or list line breaks.
     .replace(/[ \t]+/g, ' ')
+    // Remove spaces around line breaks to avoid accidental indentation or hard breaks.
     .replace(/ *\n */g, '\n')
+    // Keep at most one blank line between blocks.
     .replace(/\n{3,}/g, '\n\n')
     .trim()
 }

@@ -23,6 +23,8 @@ const SCREENSHOTS = {
   ios: assetUrl('iphone-17-player-dark'),
 }
 
+// Schema: https://schema.org/Organization
+// Google: https://developers.google.com/search/docs/appearance/structured-data/organization
 const ORGANIZATION = {
   '@type': 'Organization',
   '@id': `${SITE_URL}/#organization`,
@@ -32,6 +34,8 @@ const ORGANIZATION = {
   sameAs: ['https://github.com/MetrolistGroup', REPO_URL, 'https://hosted.weblate.org/projects/Metrolist/'],
 }
 
+// Schema: https://schema.org/SoftwareApplication
+// Google: https://developers.google.com/search/docs/appearance/structured-data/software-app
 function app(operatingSystem: string, screenshot: string | string[]) {
   return {
     '@context': 'https://schema.org',
@@ -57,12 +61,16 @@ function app(operatingSystem: string, screenshot: string | string[]) {
   }
 }
 
+// Schema: https://schema.org/FAQPage
+// Google markup and eligibility: https://developers.google.com/search/docs/appearance/structured-data/faqpage
 const faq = (items: FaqItem[]) => ({
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: items.map(item => ({ '@type': 'Question', name: item.question, acceptedAnswer: { '@type': 'Answer', text: item.answer } })),
 })
 
+// Schema: https://schema.org/BreadcrumbList
+// Google: https://developers.google.com/search/docs/appearance/structured-data/breadcrumb
 const breadcrumbs = (name: string, path: string) => ({
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
@@ -95,6 +103,7 @@ const pages: Page[] = [
     markdown: ['index.md', homeMarkdown()],
     images: [SCREENSHOTS.desktopHome, SCREENSHOTS.desktop, SCREENSHOTS.android, SCREENSHOTS.ios],
     schemas: [
+      // Schema: https://schema.org/WebSite; Google: https://developers.google.com/search/docs/appearance/site-names
       { '@context': 'https://schema.org', '@type': 'WebSite', '@id': `${SITE_URL}/#website`, name: 'Metrolist', alternateName: ['Metrolist Music', 'metrolist.cc'], url: `${SITE_URL}/`, publisher: { '@id': `${SITE_URL}/#organization` } },
       { '@context': 'https://schema.org', ...ORGANIZATION },
       app('Android, iOS, Windows, macOS, Linux', Object.values(SCREENSHOTS)),
@@ -107,6 +116,7 @@ const pages: Page[] = [
     markdown: ['guides.md', guidesIndexMarkdown()],
     schemas: [
       {
+        // Index schema: https://schema.org/CollectionPage with https://schema.org/ItemList
         '@context': 'https://schema.org', '@type': 'CollectionPage', '@id': `${SITE_URL}/guides#collection`,
         name: GUIDE_INDEX_META.title, description: GUIDE_INDEX_META.description, url: `${SITE_URL}/guides`,
         inLanguage: 'en', isPartOf: { '@id': `${SITE_URL}/#website` },
@@ -127,6 +137,8 @@ const pages: Page[] = [
       markdown: [`guides/${guide.slug}.md`, guideMarkdown(guide)],
       schemas: [
         {
+          // Schema: https://schema.org/Article
+          // Google: https://developers.google.com/search/docs/appearance/structured-data/article
           '@context': 'https://schema.org', '@type': 'Article', '@id': `${url}#article`,
           headline: guide.heading, description: guide.meta.description, abstract: guide.intro, url, mainEntityOfPage: url,
           inLanguage: 'en', isPartOf: { '@id': `${SITE_URL}/guides#collection` }, about: { '@id': `${SITE_URL}/#app` },
@@ -229,7 +241,7 @@ await rm(new URL('.vite/', dist), { recursive: true })
 
 // Discord component embeds (3,000-byte limit); the og:* tags remain the fallback.
 const button = (label: string, url: string) => ({ type: 2, style: 5, label, url })
-const embed = (path: string, heading: string, body: string, buttons: ReturnType<typeof button>[], image?: string) => ({
+const embed = (path: string, heading: string, body: string, buttons: ReturnType<typeof button>[]) => ({
   component: {
     type: 17,
     accent_color: 14268927,
@@ -239,7 +251,6 @@ const embed = (path: string, heading: string, body: string, buttons: ReturnType<
         components: [{ type: 10, content: `## [${heading}](${SITE_URL}${path})\n${body}` }],
         accessory: button('Open', `${SITE_URL}${path}`),
       },
-      ...(image ? [{ type: 12, items: [{ media: { url: image }, description: 'Metrolist running across desktop and mobile screens' }] }] : []),
       { type: 14, divider: true, spacing: 1 },
       { type: 1, components: buttons },
     ],
@@ -278,7 +289,7 @@ for (const [file, payload] of Object.entries(embeds)) {
   await writeFile(new URL(file, dist), json)
 }
 
-// JSON-LD blocks are data, not script, so script-src needs no inline hashes.
+// JSON-LD data blocks bypass script execution/CSP checks: https://html.spec.whatwg.org/multipage/scripting.html#prepare-the-script-element
 await writeFile(new URL('_headers', dist), `/*
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self' https://api.github.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
   Permissions-Policy: camera=(), geolocation=(), microphone=()
