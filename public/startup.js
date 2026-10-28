@@ -10,7 +10,7 @@
     const notice = document.createElement('section')
     notice.id = 'page-load-error'
     notice.setAttribute('role', 'alert')
-    notice.style.cssText = 'position:fixed;inset:auto 16px 16px;z-index:1000;padding:20px;background:var(--md-sys-color-error-container);color:var(--md-sys-color-on-error-container);max-height:calc(100dvh - 32px);overflow:auto'
+    notice.style.cssText = 'position:fixed;inset:auto 16px 16px;z-index:1000;padding:20px;background:var(--md-sys-color-error-container, #93000a);color:var(--md-sys-color-on-error-container, #ffdad6);max-height:calc(100dvh - 32px);overflow:auto'
     const message = document.createElement('p')
     message.textContent = 'This page could not finish loading. Check your connection, then reload to try again.'
     const retry = document.createElement('button')
