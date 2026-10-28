@@ -44,9 +44,8 @@
   --md-sys-color-error-container: #93000a;
   --md-sys-color-on-error-container: #ffdad6;
   --md-sys-color-scrim: #000000;
-  /* Desktop uses the supplied Google Accounts blue pair; mobile keeps its existing palette. */
-  --md-extended-color-desktop-container: #04409f;
-  --md-extended-color-on-desktop-container: #d0e4ff;
+  --md-extended-color-desktop-container: #282230;
+  --md-extended-color-on-desktop-container: var(--md-sys-color-on-primary-container);
   --md-extended-color-android-container: #25291f;
   --md-extended-color-on-android-container: #c3d5b0;
   --md-extended-color-ios-container: #302523;
@@ -205,6 +204,32 @@ img {
 .container {
   width: min(100% - 40px, 1240px);
   margin-inline: auto;
+}
+
+.section-band {
+  position: relative;
+  background: var(--md-sys-color-surface-container-low);
+}
+
+.section-band::before,
+.section-band::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset-inline: 0;
+  height: clamp(24px, 4vw, 48px);
+  background: var(--md-sys-color-surface-container-low);
+  mask: url('/images/section-curve.svg') center / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+.section-band::before {
+  bottom: calc(100% - 1px);
+}
+
+.section-band::after {
+  top: calc(100% - 1px);
+  transform: rotate(180deg);
 }
 
 .material-symbols-rounded {

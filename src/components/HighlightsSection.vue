@@ -18,13 +18,12 @@ function openDownload(platform: DownloadPlatformKey) {
 <template>
   <DeviceShowcase />
 
-  <section id="features" class="features" :class="{ 'is-paused': animationsPaused }" aria-labelledby="features-title">
+  <section id="features" class="features section-band" :class="{ 'is-paused': animationsPaused }" aria-labelledby="features-title">
     <div class="container">
-      <div class="features__progress" aria-hidden="true" />
       <h2 id="features-title" class="sr-only">Metrolist features</h2>
       <div class="features__grid">
         <article v-for="(feature, index) in features" :key="feature.label" class="features__card" :class="`features__card--${index + 1}`">
-          <div class="features__top"><ShapeBackdrop :shape="feature.shape" :color="feature.iconBackground" class="features__icon"><span class="features__icon-glyph material-symbols-rounded" :style="{ color: feature.iconColor }" aria-hidden="true">{{ feature.icon }}</span></ShapeBackdrop><span class="features__label">{{ feature.label }}</span><button v-if="index === 1" type="button" class="lyrics-toggle" :aria-label="animationsPaused ? 'Resume lyrics animation and decorative wave' : 'Pause lyrics animation and decorative wave'" :aria-pressed="animationsPaused" @click="animationsPaused = !animationsPaused"><span class="material-symbols-rounded" aria-hidden="true">{{ animationsPaused ? 'play_arrow' : 'pause' }}</span></button></div>
+          <div class="features__top"><ShapeBackdrop :shape="feature.shape" :color="feature.iconBackground" class="features__icon"><span class="features__icon-glyph material-symbols-rounded" :style="{ color: feature.iconColor }" aria-hidden="true">{{ feature.icon }}</span></ShapeBackdrop><span class="features__label">{{ feature.label }}</span><button v-if="index === 1" type="button" class="lyrics-toggle" :aria-label="animationsPaused ? 'Resume lyrics animation' : 'Pause lyrics animation'" :aria-pressed="animationsPaused" @click="animationsPaused = !animationsPaused"><span class="material-symbols-rounded" aria-hidden="true">{{ animationsPaused ? 'play_arrow' : 'pause' }}</span></button></div>
           <div v-if="index === 1" class="features__lyrics" aria-hidden="true">
             <div v-for="(line, lineIndex) in lyrics" :key="line" class="lyrics-line" :style="{ '--line-delay': `${lineIndex === 0 ? 0 : (lineIndex - 3) * 3}s` }">
               <span v-for="(word, wordIndex) in line.split(' ')" :key="wordIndex" class="lyrics-word" :style="{ '--word': wordIndex }">{{ word }}</span>
@@ -61,35 +60,10 @@ function openDownload(platform: DownloadPlatformKey) {
 
 .features {
   --animation-play-state: running;
-  background: linear-gradient(to bottom, var(--md-sys-color-surface), var(--md-sys-color-surface-container-low) 32px);
-}
-
-.features > .container {
-  position: relative;
-}
-
-.features__progress {
-  position: absolute;
-  top: -99px;
-  inset-inline: 0;
-  height: 14px;
-  background: var(--md-sys-color-primary);
-  opacity: 0.6;
-  -webkit-mask: url('/images/wave-mask.svg') repeat-x left center / 28px 14px;
-  mask: url('/images/wave-mask.svg') repeat-x left center / 28px 14px;
-  animation: progress-wave 900ms linear infinite;
-  animation-play-state: var(--animation-play-state);
 }
 
 .features.is-paused {
   --animation-play-state: paused;
-}
-
-@keyframes progress-wave {
-  to {
-    -webkit-mask-position: 28px center;
-    mask-position: 28px center;
-  }
 }
 
 .platforms h2 {
@@ -357,10 +331,6 @@ function openDownload(platform: DownloadPlatformKey) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .features__progress {
-    animation: none;
-  }
-
   .lyrics-toggle {
     display: none;
   }
@@ -491,10 +461,6 @@ function openDownload(platform: DownloadPlatformKey) {
   .features,
   .platforms {
     padding: 72px 0;
-  }
-
-  .features__progress {
-    top: -79px;
   }
 
   .platforms__layout {

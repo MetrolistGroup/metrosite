@@ -5,7 +5,7 @@ const topItems = FAQ_ITEMS.slice(0, 5)
 </script>
 
 <template>
-  <section id="faq" class="faq">
+  <section id="faq" class="faq section-band">
     <div class="container faq__layout">
       <header>
         <h2>Common questions</h2>
@@ -38,7 +38,6 @@ const topItems = FAQ_ITEMS.slice(0, 5)
 <style scoped>
 .faq {
   padding: 108px 0;
-  background: var(--md-sys-color-surface-container-low);
 }
 
 .faq__layout {
