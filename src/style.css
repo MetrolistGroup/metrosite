@@ -17,8 +17,6 @@
 
 :root {
   color-scheme: dark;
-  --md-sys-color-background: #121113;
-  --md-sys-color-on-background: #ebe4eb;
   --md-sys-color-surface: #121113;
   --md-sys-color-surface-dim: #0e0d0f;
   --md-sys-color-surface-container-lowest: #0b0a0c;
@@ -43,6 +41,15 @@
   --md-sys-color-outline: #9a919c;
   --md-sys-color-outline-variant: #4d464f;
   --md-sys-color-error: #ffb4ab;
+  --md-sys-color-error-container: #93000a;
+  --md-sys-color-on-error-container: #ffdad6;
+  --md-sys-color-scrim: #000000;
+  --md-extended-color-desktop-container: #04409f;
+  --md-extended-color-on-desktop-container: #d0e4ff;
+  --md-extended-color-android-container: #25291f;
+  --md-extended-color-on-android-container: #c3d5b0;
+  --md-extended-color-ios-container: #302523;
+  --md-extended-color-on-ios-container: #ffdbd0;
   --md-sys-shape-corner-extra-small: 4px;
   --md-sys-shape-corner-small: 8px;
   --md-sys-shape-corner-medium: 12px;
@@ -53,15 +60,13 @@
   --md-sys-shape-corner-full: 999px;
   --md-sys-motion-standard: cubic-bezier(0.2, 0, 0, 1);
   --md-sys-motion-expressive: cubic-bezier(0.05, 0.7, 0.1, 1);
-  /* M3 Expressive motion scheme springs (mass 1) sampled into linear().
-     Spatial: position, scale, rotation, shape; may overshoot.
-     Effects: opacity, color; critically damped, never overshoot. */
-  --md-motion-spatial-fast: 350ms linear(0, 0.072, 0.238, 0.44, 0.638, 0.806, 0.934, 1.021, 1.071, 1.092, 1.093, 1.081, 1.063, 1.044, 1.026, 1.012, 1.002, 0.995, 0.992, 0.991, 0.992, 0.993, 0.995, 0.997, 1);
-  --md-motion-spatial-default: 420ms linear(0, 0.048, 0.161, 0.301, 0.444, 0.576, 0.69, 0.784, 0.858, 0.913, 0.953, 0.98, 0.997, 1.008, 1.013, 1.015, 1.015, 1.013, 1.011, 1.009, 1.007, 1.005, 1.004, 1.003, 1);
-  --md-motion-spatial-slow: 570ms linear(0, 0.047, 0.157, 0.294, 0.435, 0.567, 0.681, 0.775, 0.85, 0.906, 0.947, 0.976, 0.995, 1.006, 1.012, 1.015, 1.015, 1.014, 1.012, 1.01, 1.008, 1.006, 1.004, 1.003, 1);
-  --md-motion-effects-fast: 140ms linear(0, 0.162, 0.421, 0.635, 0.782, 0.874, 0.929, 0.961, 0.979, 0.988, 0.994, 0.997, 1);
-  --md-motion-effects-default: 220ms linear(0, 0.167, 0.431, 0.645, 0.791, 0.881, 0.934, 0.964, 0.981, 0.99, 0.995, 0.997, 1);
-  --md-motion-effects-slow: 300ms linear(0, 0.158, 0.413, 0.626, 0.774, 0.868, 0.925, 0.958, 0.977, 0.987, 0.993, 0.996, 1);
+  /* M3 Expressive web curves: https://m3.material.io/styles/motion/overview/specs */
+  --md-motion-spatial-fast: 350ms cubic-bezier(0.42, 1.67, 0.21, 0.9);
+  --md-motion-spatial-default: 500ms cubic-bezier(0.38, 1.21, 0.22, 1);
+  --md-motion-spatial-slow: 650ms cubic-bezier(0.39, 1.29, 0.35, 0.98);
+  --md-motion-effects-fast: 150ms cubic-bezier(0.31, 0.94, 0.34, 1);
+  --md-motion-effects-default: 200ms cubic-bezier(0.34, 0.8, 0.34, 1);
+  --md-motion-effects-slow: 300ms cubic-bezier(0.34, 0.88, 0.34, 1);
   /* Exits are shorter and accelerate away so they never block the next action. */
   --md-motion-exit: 160ms cubic-bezier(0.3, 0, 0.8, 0.15);
   --md-motion-spatial-exit: var(--md-motion-exit);
@@ -103,7 +108,7 @@
   --md-sys-typescale-emphasized-weight: 820;
   --md-sys-state-hover: 8%;
   --md-sys-state-focus: 10%;
-  --md-sys-state-pressed: 10%;
+  --md-sys-state-pressed: 12%;
 }
 
 *,
@@ -117,13 +122,14 @@
 html {
   scrollbar-gutter: stable;
   scroll-behavior: smooth;
+  /* Keep anchor targets clear of the fixed header. */
   scroll-padding-top: 96px;
 }
 
 body {
   overflow-x: hidden;
-  background: var(--md-sys-color-background);
-  color: var(--md-sys-color-on-background);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
   font: 400 1rem / 1.5 var(--md-ref-typeface);
   font-optical-sizing: auto;
 }
@@ -191,7 +197,7 @@ img {
 }
 
 :focus-visible {
-  outline: 3px solid var(--md-sys-color-primary);
+  outline: 3px solid var(--md-sys-color-secondary);
   outline-offset: 3px;
 }
 
@@ -231,7 +237,6 @@ img {
   font: var(--md-sys-typescale-label-small);
   font-variation-settings: 'ROND' 100;
   letter-spacing: var(--md-sys-typescale-label-small-tracking);
-  text-transform: uppercase;
 }
 
 .btn {
@@ -346,6 +351,39 @@ img {
   background: var(--md-sys-color-surface-container-high);
   color: var(--md-sys-color-on-surface);
   cursor: pointer;
+}
+
+/* Components can append transform transitions with var(--site-dialog-transition). */
+.site-dialog {
+  --site-dialog-transition: opacity var(--md-motion-exit), display 160ms allow-discrete, overlay 160ms allow-discrete;
+  border: 0;
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  opacity: 0;
+  transition: var(--site-dialog-transition);
+}
+
+.site-dialog[open] {
+  --site-dialog-transition: opacity var(--md-motion-effects-default), display 650ms allow-discrete, overlay 650ms allow-discrete;
+  opacity: 1;
+}
+
+.site-dialog::backdrop {
+  background: color-mix(in srgb, var(--md-sys-color-scrim) 76%, transparent);
+  opacity: 0;
+  transition: opacity var(--md-motion-exit), display 160ms allow-discrete, overlay 160ms allow-discrete;
+}
+
+.site-dialog[open]::backdrop {
+  opacity: 1;
+  transition: opacity var(--md-motion-effects-slow), display 300ms allow-discrete, overlay 300ms allow-discrete;
+}
+
+@starting-style {
+  .site-dialog[open],
+  .site-dialog[open]::backdrop {
+    opacity: 0;
+  }
 }
 
 @supports selector(details::details-content) {

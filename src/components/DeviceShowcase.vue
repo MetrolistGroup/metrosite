@@ -4,7 +4,7 @@ import { SHOWCASE_VIEWS, type ShowcaseDevice, type ShowcaseView } from '../conte
 import ShowcaseScreen from './ShowcaseScreen.vue'
 
 const previews = [
-  { device: 'desktop', name: 'Desktop', detail: 'Windows · Linux · macOS', icon: 'desktop_windows', ratio: '2000 / 1091' },
+  { device: 'desktop', name: 'Desktop', detail: 'Windows/Linux/macOS', icon: 'desktop_windows', ratio: '2000 / 1091' },
   { device: 'android', name: 'Android', detail: 'Android 9 and newer', icon: 'android', ratio: '1080 / 2364' },
   { device: 'ios', name: 'iOS', detail: 'iOS 17 and newer', icon: 'apple', ratio: '1320 / 2868' },
 ] as const
@@ -58,73 +58,288 @@ onBeforeUnmount(() => { if (dialog.value?.open) restoreScroll() })
           </button>
         </figure>
       </div>
-      <p class="showcase__note"><span class="material-symbols-rounded" aria-hidden="true">open_in_new</span>Select a screen for a closer look.</p>
     </div>
   </section>
 
   <Teleport to="body">
-    <dialog ref="dialog" class="preview-dialog" :aria-label="`${selected.name} · ${viewName} preview`" @close="restoreScroll" @click="(event) => { if (event.target === dialog) dialog?.close() }">
-      <form method="dialog" class="preview-dialog__close"><button class="icon-button" aria-label="Close preview" autofocus><span class="material-symbols-rounded" aria-hidden="true">close</span></button></form>
+    <dialog ref="dialog" class="site-dialog preview-dialog" :aria-label="`${selected.name} · ${viewName} preview`" @close="restoreScroll" @click="(event) => { if (event.target === dialog) dialog?.close() }">
+      <form method="dialog" class="preview-dialog__close"><button class="icon-button" aria-label="Close dialog" title="Close dialog" autofocus><span class="material-symbols-rounded" aria-hidden="true">close</span></button></form>
       <div class="preview-dialog__screen" :style="{ '--preview-ratio': selected.ratio }"><ShowcaseScreen v-if="dialogContentMounted" ref="fullScreen" :key="`${selectedDevice}-${dialogView}`" :device="selectedDevice" :view="dialogView" platform="windows" folded /></div>
-      <a v-if="fullScreen?.originalSource" class="preview-dialog__original" :href="fullScreen.originalSource" target="_blank" rel="noopener">Open full-size image (new tab)</a>
+      <a v-if="fullScreen?.originalSource" class="preview-dialog__original" :href="fullScreen.originalSource" target="_blank" rel="noopener">Open image in new tab</a>
     </dialog>
   </Teleport>
 </template>
 
 <style scoped>
-.showcase { padding: 44px 0 92px; background: var(--md-sys-color-surface); }
-.showcase__heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 28px; }
-.showcase__heading > p { max-width: 48ch; color: var(--md-sys-color-on-surface-variant); font: var(--md-sys-typescale-body-large); letter-spacing: var(--md-sys-typescale-body-large-tracking); }
-.view-switch { display: flex; flex-wrap: wrap; max-width: 100%; flex-shrink: 0; gap: 4px; padding: 5px; border-radius: 999px; background: var(--md-sys-color-surface-container-low); }
-.view-switch button { min-height: 44px; padding: 10px 20px; border: 0; border-radius: 999px; background: transparent; color: var(--md-sys-color-on-surface-variant); cursor: pointer; font: var(--md-sys-typescale-label-large); font-variation-settings: 'ROND' 100; letter-spacing: var(--md-sys-typescale-label-large-tracking); transition: background var(--md-motion-effects-default), color var(--md-motion-effects-default); }
-.view-switch button[aria-pressed='true'] { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
-.view-switch button:hover:not([aria-pressed='true']) { background: var(--md-sys-color-surface-container-high); transition: none; }
-.showcase__mosaic { display: grid; grid-template-columns: minmax(0, 2.6fr) repeat(2, minmax(0, 1fr)); grid-template-areas: 'desktop android ios'; gap: 14px; }
-.preview-tile { display: flex; flex-direction: column; min-width: 0; gap: 24px; padding: 24px; border-radius: 28px; background: var(--md-sys-color-surface-container-low); }
-.preview-tile--desktop { grid-area: desktop; background: #282230; border-top-left-radius: 48px; }
-.preview-tile--android { grid-area: android; background: #25291f; }
-.preview-tile--ios { grid-area: ios; background: #302523; border-top-right-radius: 48px; }
-.preview-tile figcaption { display: flex; flex-direction: column; gap: 7px; min-width: 0; overflow-wrap: anywhere; }
-.preview-tile__label { display: flex; align-items: center; gap: 9px; color: var(--md-sys-color-primary); }
-.preview-tile__label img { width: 22px; height: 22px; object-fit: contain; }
-.preview-tile__label strong { font: var(--md-sys-typescale-title-medium); letter-spacing: var(--md-sys-typescale-title-medium-tracking); }
-.preview-tile--android .preview-tile__label { color: #c3d5b0; }
-.preview-tile--ios .preview-tile__label { color: var(--md-sys-color-tertiary); }
-.preview-tile__detail { color: var(--md-sys-color-on-surface-variant); font: var(--md-sys-typescale-body-small); letter-spacing: var(--md-sys-typescale-body-small-tracking); }
-.preview-tile__screen { display: block; flex: none; width: 100%; aspect-ratio: var(--preview-ratio); margin-block: auto; padding: 0; overflow: hidden; border: 0; border-radius: 6px; background: #141217; cursor: zoom-in; }
-.showcase__note { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 20px; color: var(--md-sys-color-on-surface-variant); font: var(--md-sys-typescale-body-small); letter-spacing: var(--md-sys-typescale-body-small-tracking); }
-.showcase__note .material-symbols-rounded { font-size: 18px; }
-.preview-dialog { position: fixed; inset: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 64px 20px; overflow: hidden; border: 0; background: transparent; color: var(--md-sys-color-on-surface); opacity: 0; transition: opacity var(--md-motion-exit), display 160ms allow-discrete, overlay 160ms allow-discrete; }
-.preview-dialog[open] { display: grid; place-items: center; opacity: 1; transition: opacity var(--md-motion-effects-default), display 570ms allow-discrete, overlay 570ms allow-discrete; }
-.preview-dialog::backdrop { background: #050307dc; opacity: 0; transition: opacity var(--md-motion-exit), display 160ms allow-discrete, overlay 160ms allow-discrete; }
-.preview-dialog[open]::backdrop { opacity: 1; transition: opacity var(--md-motion-effects-slow), display 300ms allow-discrete, overlay 300ms allow-discrete; }
-.preview-dialog__close { position: absolute; z-index: 1; top: 12px; right: 12px; }
-.preview-dialog__screen { width: min(100%, calc((100dvh - 128px) * var(--preview-ratio))); aspect-ratio: var(--preview-ratio); overflow: hidden; border-radius: 4px; transform: scale(0.92); transition: transform var(--md-motion-spatial-exit, var(--md-motion-exit)); }
-.preview-dialog[open] .preview-dialog__screen { transform: scale(1); transition: transform var(--md-motion-spatial-slow); }
-.preview-dialog__original { position: absolute; bottom: 8px; inset-inline: 20px; display: grid; place-items: center; min-height: 44px; color: var(--md-sys-color-primary); font: var(--md-sys-typescale-label-large); text-align: center; }
+.showcase {
+  padding: 44px 0 92px;
+  background: var(--md-sys-color-surface);
+}
+
+.showcase__heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.showcase__heading > p {
+  max-width: 48ch;
+  color: var(--md-sys-color-on-surface-variant);
+  font: var(--md-sys-typescale-body-large);
+  letter-spacing: var(--md-sys-typescale-body-large-tracking);
+}
+
+.view-switch {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 100%;
+  flex-shrink: 0;
+  gap: 4px;
+  padding: 5px;
+  border-radius: 999px;
+  background: var(--md-sys-color-surface-container-low);
+}
+
+.view-switch button {
+  min-height: 44px;
+  padding: 10px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+  cursor: pointer;
+  font: var(--md-sys-typescale-label-large);
+  font-variation-settings: 'ROND' 100;
+  letter-spacing: var(--md-sys-typescale-label-large-tracking);
+  transition: background var(--md-motion-effects-default), color var(--md-motion-effects-default);
+}
+
+.view-switch button[aria-pressed='true'] {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+}
+
+.view-switch button:hover:not([aria-pressed='true']) {
+  background: var(--md-sys-color-surface-container-high);
+  transition: none;
+}
+
+.showcase__mosaic {
+  display: grid;
+  grid-template-columns: minmax(0, 2.6fr) repeat(2, minmax(0, 1fr));
+  grid-template-areas: 'desktop android ios';
+  gap: 14px;
+}
+
+.preview-tile {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 24px;
+  padding: 24px;
+  border-radius: 28px;
+  background: var(--md-sys-color-surface-container-low);
+}
+
+.preview-tile--desktop {
+  grid-area: desktop;
+  background: var(--md-extended-color-desktop-container);
+  color: var(--md-extended-color-on-desktop-container);
+  border-top-left-radius: 48px;
+}
+
+.preview-tile--android {
+  grid-area: android;
+  background: var(--md-extended-color-android-container);
+  color: var(--md-extended-color-on-android-container);
+}
+
+.preview-tile--ios {
+  grid-area: ios;
+  background: var(--md-extended-color-ios-container);
+  color: var(--md-extended-color-on-ios-container);
+  border-top-right-radius: 48px;
+}
+
+.preview-tile figcaption {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.preview-tile__label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.preview-tile__label img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.preview-tile__label strong {
+  font: var(--md-sys-typescale-title-medium);
+  letter-spacing: var(--md-sys-typescale-title-medium-tracking);
+}
+
+.preview-tile__detail {
+  font: var(--md-sys-typescale-body-small);
+  letter-spacing: var(--md-sys-typescale-body-small-tracking);
+}
+
+.preview-tile__screen {
+  display: block;
+  flex: none;
+  width: 100%;
+  aspect-ratio: var(--preview-ratio);
+  margin-block: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 6px;
+  background: var(--md-sys-color-surface);
+  cursor: zoom-in;
+}
+
+.preview-dialog {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 64px 20px;
+  overflow: hidden;
+  background: transparent;
+}
+
+.preview-dialog[open] {
+  display: grid;
+  place-items: center;
+}
+
+.preview-dialog__close {
+  position: absolute;
+  z-index: 1;
+  top: 12px;
+  right: 12px;
+}
+
+.preview-dialog__screen {
+  width: min(100%, calc((100dvh - 128px) * var(--preview-ratio)));
+  aspect-ratio: var(--preview-ratio);
+  overflow: hidden;
+  border-radius: 4px;
+  transform: scale(0.92);
+  transition: transform var(--md-motion-spatial-exit, var(--md-motion-exit));
+}
+
+.preview-dialog[open] .preview-dialog__screen {
+  transform: scale(1);
+  transition: transform var(--md-motion-spatial-slow);
+}
+
+.preview-dialog__original {
+  position: absolute;
+  bottom: 8px;
+  inset-inline: 20px;
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  color: var(--md-sys-color-primary);
+  font: var(--md-sys-typescale-label-large);
+  text-align: center;
+}
+
 @starting-style {
-  .preview-dialog[open], .preview-dialog[open]::backdrop { opacity: 0; }
-  .preview-dialog[open] .preview-dialog__screen { transform: scale(0.92); }
+  .preview-dialog[open] .preview-dialog__screen {
+    transform: scale(0.92);
+  }
 }
+
 @media (max-width: 1000px) {
-  .showcase__mosaic { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-areas: 'desktop desktop' 'android ios'; }
-  .preview-tile--android .preview-tile__screen, .preview-tile--ios .preview-tile__screen { max-width: 240px; align-self: center; }
-  .preview-tile--ios { border-top-right-radius: 28px; }
-  .preview-tile--desktop { border-top-right-radius: 48px; }
+  .showcase__mosaic {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas: 'desktop desktop' 'android ios';
+  }
+
+  .preview-tile--android .preview-tile__screen,
+  .preview-tile--ios .preview-tile__screen {
+    max-width: 240px;
+    align-self: center;
+  }
+
+  .preview-tile--ios {
+    border-top-right-radius: 28px;
+  }
+
+  .preview-tile--desktop {
+    border-top-right-radius: 48px;
+  }
 }
+
 @media (max-width: 700px) {
-  .showcase { padding: 24px 0 64px; }
-  .showcase__heading { flex-direction: column; align-items: start; gap: 20px; }
-  .view-switch { align-self: stretch; }
-  .view-switch button { flex: 1; padding-inline: 12px; }
-  .showcase__mosaic { gap: 10px; }
-  .preview-tile { padding: 16px; gap: 18px; border-radius: 24px; }
-  .preview-tile__label { gap: 6px; }
-  .preview-tile__label strong { font: var(--md-sys-typescale-title-small); letter-spacing: var(--md-sys-typescale-title-small-tracking); }
-  .preview-tile__label .material-symbols-rounded { font-size: 20px; }
+  .showcase {
+    padding: 24px 0 64px;
+  }
+
+  .showcase__heading {
+    flex-direction: column;
+    align-items: start;
+    gap: 20px;
+  }
+
+  .view-switch {
+    align-self: stretch;
+  }
+
+  .view-switch button {
+    flex: 1;
+    padding-inline: 12px;
+  }
+
+  .showcase__mosaic {
+    gap: 10px;
+  }
+
+  .preview-tile {
+    padding: 16px;
+    gap: 18px;
+    border-radius: 24px;
+  }
+
+  .preview-tile__label {
+    gap: 6px;
+  }
+
+  .preview-tile__label strong {
+    font: var(--md-sys-typescale-title-small);
+    letter-spacing: var(--md-sys-typescale-title-small-tracking);
+  }
+
+  .preview-tile__label .material-symbols-rounded {
+    font-size: 20px;
+  }
 }
+
 @media (max-width: 360px) {
-  .showcase__mosaic { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'desktop' 'android' 'ios'; }
+  .showcase__mosaic {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'desktop' 'android' 'ios';
+  }
 }
-@media (forced-colors: active) { .view-switch button[aria-pressed='true'] { outline: 2px solid Highlight; } }
+
+@media (forced-colors: active) {
+  .view-switch button[aria-pressed='true'] {
+    outline: 2px solid Highlight;
+  }
+}
 </style>
