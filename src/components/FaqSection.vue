@@ -9,25 +9,27 @@ const topItems = FAQ_ITEMS.slice(0, 5)
     <div class="container faq__layout">
       <header>
         <h2>Common questions</h2>
-        <RouterLink to="/faq" class="btn btn-tonal">
-          View the full FAQ
-          <span class="material-symbols-rounded" aria-hidden="true">arrow_outward</span>
-        </RouterLink>
       </header>
 
-      <div class="faq__list">
-        <details v-for="item in topItems" :key="item.question" class="faq-disclosure">
-          <summary class="faq__question">
-            <h3>
-              {{ item.question }}
-              <span class="faq__mark material-symbols-rounded" aria-hidden="true">add</span>
-            </h3>
-          </summary>
-          <div class="faq__answer">
-            <p>{{ item.answer }}</p>
-            <p v-if="item.guide"><RouterLink :to="item.guide.href">{{ item.guide.label }}</RouterLink></p>
-          </div>
-        </details>
+      <div>
+        <div class="faq__list">
+          <details v-for="item in topItems" :key="item.question" class="faq-disclosure">
+            <summary class="faq__question">
+              <h3>
+                {{ item.question }}
+                <span class="faq__mark material-symbols-rounded" aria-hidden="true">add</span>
+              </h3>
+            </summary>
+            <div class="faq__answer">
+              <p>{{ item.answer }}</p>
+              <p v-if="item.guide"><RouterLink :to="item.guide.href">{{ item.guide.label }}</RouterLink></p>
+            </div>
+          </details>
+        </div>
+        <RouterLink to="/faq" class="btn btn-tonal faq__more">
+          See the FAQ
+          <span class="material-symbols-rounded" aria-hidden="true">arrow_outward</span>
+        </RouterLink>
       </div>
     </div>
   </section>
@@ -54,9 +56,12 @@ const topItems = FAQ_ITEMS.slice(0, 5)
 }
 
 .faq h2 {
-  margin: 0 0 32px;
   font: var(--md-sys-typescale-display-medium);
   letter-spacing: var(--md-sys-typescale-display-medium-tracking);
+}
+
+.faq__more {
+  margin-top: 24px;
 }
 
 .faq__list {
@@ -111,7 +116,7 @@ const topItems = FAQ_ITEMS.slice(0, 5)
   width: 44px;
   height: 44px;
   border-radius: var(--md-sys-shape-corner-full);
-  background: color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, var(--md-sys-color-primary) 12%, transparent);
   transition: transform var(--md-motion-spatial-fast);
 }
 
@@ -129,7 +134,7 @@ const topItems = FAQ_ITEMS.slice(0, 5)
 
 .faq__answer a {
   color: var(--md-sys-color-primary);
-  text-underline-offset: 4px;
+  text-underline-offset: 2px;
 }
 
 @media (max-width: 820px) {

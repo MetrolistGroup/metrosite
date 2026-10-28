@@ -28,6 +28,8 @@ const releaseName = ref('')
 const isLoading = ref(false)
 const loadFailed = ref(false)
 const titleId = useId()
+const architectureId = useId()
+const architectureHelpId = useId()
 const notice = ref<HTMLElement>()
 const supportsPopover = ref(false)
 const showInlineNotice = ref(false)
@@ -85,7 +87,7 @@ async function loadLatestRelease() {
 }
 
 function open(platformKey?: DownloadPlatformKey) {
-  const platform = DOWNLOAD_PLATFORMS.find(({ key }) => key === platformKey)
+  const platform = DOWNLOAD_PLATFORMS.find(({ key }) => key === (platformKey ?? props.platform))
   if (platform) selectPlatform(platform)
   emit('open')
   dialog.value?.showModal()
@@ -145,11 +147,11 @@ function formatSize(bytes?: number) {
   </button>
 
   <Teleport to="body">
-    <dialog ref="dialog" class="download-dialog" :aria-labelledby="titleId" @click="closeOnBackdrop" @close="onClose">
+    <dialog ref="dialog" class="site-dialog download-dialog" :aria-labelledby="titleId" @click="closeOnBackdrop" @close="onClose">
       <div class="download-dialog__header">
         <h2 :id="titleId">Download Metrolist</h2>
         <form method="dialog">
-          <button class="icon-button" type="submit" aria-label="Close download selector">
+          <button class="icon-button" type="submit" aria-label="Close dialog" title="Close dialog">
             <span class="material-symbols-rounded" aria-hidden="true">close</span>
           </button>
         </form>
@@ -170,8 +172,8 @@ function formatSize(bytes?: number) {
       </div>
 
       <div v-if="selectedPlatform.architectures.length > 1" class="download-dialog__architectures">
-        <span>{{ selectedKey === 'macos' ? 'Mac chip' : 'Architecture' }}</span>
-        <div role="group" :aria-label="`${selectedPlatform.name} architecture`">
+        <h3 :id="architectureId">Architecture</h3>
+        <div role="group" :aria-labelledby="architectureId" :aria-describedby="selectedKey === 'macos' ? architectureHelpId : undefined">
           <button
             v-for="architecture in selectedPlatform.architectures"
             :key="architecture.key"
@@ -182,15 +184,15 @@ function formatSize(bytes?: number) {
         </div>
       </div>
 
-      <p v-if="selectedKey === 'macos' && selectedPlatform.architectures.length > 1" class="download-dialog__chip-help">
-        Choose your chip. Find Chip or Processor in Apple menu → About This Mac.
+      <p v-if="selectedKey === 'macos' && selectedPlatform.architectures.length > 1" :id="architectureHelpId" class="download-dialog__architecture-help">
+        Open Apple menu &gt; About This Mac. If Chip shows an Apple M-series name, choose Apple silicon. If Processor shows Intel, choose Intel.
       </p>
 
       <section class="download-dialog__selection">
         <header>
           <img :src="`/icons/${selectedPlatform.icon}.svg`" alt="" />
           <div>
-            <strong>{{ selectedPlatform.name }} · {{ selectedArchitecture?.name ?? 'Choose your chip' }}</strong>
+            <strong>{{ selectedPlatform.name }} · {{ selectedArchitecture?.name ?? 'Select an architecture' }}</strong>
             <span>{{ selectedPlatform.detail }} · {{ selectedPlatform.package }}</span>
           </div>
         </header>
@@ -205,10 +207,10 @@ function formatSize(bytes?: number) {
 
           <div>
             <h3>Download</h3>
-            <p class="download-dialog__status" aria-live="polite">
+            <p class="download-dialog__status" role="status" aria-atomic="true">
               <template v-if="isLoading">Loading the latest release…</template>
               <template v-else-if="loadFailed">Couldn't load the latest release. Browse release files or reopen this dialog to try again.</template>
-              <template v-else-if="!selectedArchitecture">Choose your Mac chip above for a direct download, or browse release files.</template>
+              <template v-else-if="!selectedArchitecture">Select an architecture above for a direct download, or browse release files.</template>
               <template v-else-if="selectedAsset">{{ releaseName }}<template v-if="selectedAsset.size"> · {{ formatSize(selectedAsset.size) }}</template></template>
               <template v-else>No matching build was found in the latest release.</template>
             </p>
@@ -245,36 +247,21 @@ function formatSize(bytes?: number) {
   overflow: auto;
   margin: auto;
   padding: 28px;
-  border: 0;
   border-radius: var(--md-sys-shape-corner-extra-large-increased);
-  background: var(--md-sys-color-surface-container);
-  color: var(--md-sys-color-on-surface);
-  opacity: 0;
   transform: translateY(12px) scale(0.98);
   overflow-wrap: anywhere;
   transition: opacity var(--md-motion-exit), transform var(--md-motion-spatial-exit, var(--md-motion-exit)), display 160ms allow-discrete, overlay 160ms allow-discrete;
 }
 
 .download-dialog[open] {
-  opacity: 1;
   transform: none;
   transition: opacity var(--md-motion-effects-default), transform var(--md-motion-spatial-default), display 420ms allow-discrete, overlay 420ms allow-discrete;
 }
 
-.download-dialog::backdrop {
-  background: rgb(0 0 0 / 76%);
-  opacity: 0;
-  transition: opacity var(--md-motion-exit), display 160ms allow-discrete, overlay 160ms allow-discrete;
-}
-
-.download-dialog[open]::backdrop {
-  opacity: 1;
-  transition: opacity var(--md-motion-effects-slow), display 300ms allow-discrete, overlay 300ms allow-discrete;
-}
-
 @starting-style {
-  .download-dialog[open] { opacity: 0; transform: translateY(12px) scale(0.98); }
-  .download-dialog[open]::backdrop { opacity: 0; }
+  .download-dialog[open] {
+    transform: translateY(12px) scale(0.98);
+  }
 }
 
 .download-dialog__header {
@@ -355,16 +342,20 @@ function formatSize(bytes?: number) {
 }
 
 .download-dialog__platforms small {
-  color: color-mix(in srgb, currentColor 72%, transparent);
+  color: var(--md-sys-color-on-surface-variant);
   font: var(--md-sys-typescale-body-small);
   letter-spacing: var(--md-sys-typescale-body-small-tracking);
+}
+
+.download-dialog__platforms button[aria-pressed='true'] small {
+  color: inherit;
 }
 
 .download-dialog__platforms .material-symbols-rounded {
   color: currentColor;
 }
 
-.download-dialog__chip-help {
+.download-dialog__architecture-help {
   margin-top: 10px;
   color: var(--md-sys-color-on-surface-variant);
   font: var(--md-sys-typescale-body-small);
@@ -378,7 +369,7 @@ function formatSize(bytes?: number) {
   margin-top: 18px;
 }
 
-.download-dialog__architectures > span {
+.download-dialog__architectures > h3 {
   color: var(--md-sys-color-on-surface-variant);
   font: var(--md-sys-typescale-label-medium);
   font-variation-settings: 'ROND' 100;
@@ -422,7 +413,7 @@ function formatSize(bytes?: number) {
   margin-top: 16px;
   padding: 20px;
   border-radius: var(--md-sys-shape-corner-extra-large);
-  background: var(--md-sys-color-surface-container-highest);
+  background: var(--md-sys-color-surface-container);
 }
 
 .download-dialog__selection > header {
@@ -530,7 +521,11 @@ function formatSize(bytes?: number) {
 }
 
 @media (forced-colors: active) {
+  .download-dialog__platforms button[aria-pressed='true'],
   .download-dialog__architectures button[aria-pressed='true'] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
     outline: 2px solid Highlight;
     outline-offset: 2px;
   }

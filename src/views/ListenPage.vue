@@ -214,7 +214,6 @@ async function copyCode() {
   font: var(--md-sys-typescale-label-small);
   font-variation-settings: 'ROND' 100;
   letter-spacing: var(--md-sys-typescale-label-small-tracking);
-  text-transform: uppercase;
 }
 
 .listen__room strong {
@@ -304,7 +303,6 @@ async function copyCode() {
   font: var(--md-sys-typescale-label-small);
   font-variation-settings: 'ROND' 100;
   letter-spacing: var(--md-sys-typescale-label-small-tracking);
-  text-transform: uppercase;
 }
 
 .listen__guides h2 {

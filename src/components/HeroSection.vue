@@ -42,8 +42,8 @@ onMounted(async () => {
         <div class="hero__signal">
           <span class="hero__signal-icon material-symbols-rounded" aria-hidden="true">desktop_windows</span>
           <div>
-            <strong>Kotlin Multiplatform</strong>
-            <p>Shared code for mobile and desktop apps.</p>
+            <strong>Mobile and desktop</strong>
+            <p>The same Metrolist app across all your devices.</p>
           </div>
           <dl class="hero__stats" aria-label="Metrolist repository statistics">
             <div><dt>License</dt><dd>GPL-3.0</dd></div>
@@ -134,7 +134,6 @@ onMounted(async () => {
 }
 
 .hero__signal p {
-  color: color-mix(in srgb, var(--md-sys-color-on-secondary-container) 78%, transparent);
   font: var(--md-sys-typescale-body-medium);
   letter-spacing: var(--md-sys-typescale-body-medium-tracking);
 }
@@ -151,11 +150,9 @@ onMounted(async () => {
 
 .hero__stats dt {
   margin-bottom: 3px;
-  color: color-mix(in srgb, var(--md-sys-color-on-secondary-container) 70%, transparent);
   font: var(--md-sys-typescale-label-small);
   font-variation-settings: 'ROND' 100;
   letter-spacing: var(--md-sys-typescale-label-small-tracking);
-  text-transform: uppercase;
 }
 
 .hero__stats dd {

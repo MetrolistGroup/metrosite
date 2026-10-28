@@ -105,8 +105,7 @@ const links = [
 }
 
 .footer__links a:hover {
-  background: var(--md-sys-color-primary-container);
-  color: var(--md-sys-color-on-primary-container);
+  background: var(--md-sys-color-surface-container-highest);
 }
 
 .footer__links .material-symbols-rounded {
@@ -118,7 +117,7 @@ const links = [
   justify-content: space-between;
   gap: 30px 60px;
   padding-top: 28px;
-  color: color-mix(in srgb, var(--md-sys-color-on-surface-variant) 72%, transparent);
+  color: var(--md-sys-color-on-surface-variant);
   font: var(--md-sys-typescale-body-small);
   letter-spacing: var(--md-sys-typescale-body-small-tracking);
 }

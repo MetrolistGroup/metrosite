@@ -94,7 +94,6 @@ const topicGroups = FAQ_TOPICS.map(topic => ({
   color: var(--md-sys-color-on-surface-variant);
   font: var(--md-sys-typescale-label-medium);
   letter-spacing: var(--md-sys-typescale-label-medium-tracking);
-  text-transform: uppercase;
 }
 
 .faq-page h1 {
