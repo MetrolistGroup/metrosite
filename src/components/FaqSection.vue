@@ -5,30 +5,31 @@ const topItems = FAQ_ITEMS.slice(0, 5)
 </script>
 
 <template>
-  <section id="faq" class="faq">
-    <div class="container">
-      <header class="faq__header">
-        <h2 class="faq__title">Quick answers.</h2>
-        <p class="faq__sub">Got questions? We've got you covered.</p>
+  <section id="faq" class="faq section-band">
+    <div class="container faq__layout">
+      <header>
+        <h2>Common questions</h2>
       </header>
 
-      <div class="faq__card" role="region" aria-label="Frequently asked questions">
-        <details v-for="item in topItems" :key="item.question" class="faq__item">
-          <summary class="faq__q">
-            <span class="faq__q-text">{{ item.question }}</span>
-            <span class="faq__chev icon" aria-hidden="true">arrow_forward</span>
-          </summary>
-          <div class="faq__a">
-            <p>{{ item.answer }}</p>
-          </div>
-        </details>
-
-        <div class="faq__cta">
-          <RouterLink to="/faq" class="btn btn-tonal btn-lg">
-            Got more questions? View full FAQ
-            <span class="icon" aria-hidden="true" style="font-size: 1.125rem">arrow_forward</span>
-          </RouterLink>
+      <div>
+        <div class="faq__list">
+          <details v-for="item in topItems" :key="item.question" class="faq-disclosure">
+            <summary class="faq__question">
+              <h3>
+                {{ item.question }}
+                <span class="faq__mark material-symbols-rounded" aria-hidden="true">add</span>
+              </h3>
+            </summary>
+            <div class="faq__answer">
+              <p>{{ item.answer }}</p>
+              <p v-if="item.guide"><RouterLink :to="item.guide.href">{{ item.guide.label }}</RouterLink></p>
+            </div>
+          </details>
         </div>
+        <RouterLink to="/faq" class="btn btn-tonal faq__more">
+          See the FAQ
+          <span class="material-symbols-rounded" aria-hidden="true">arrow_outward</span>
+        </RouterLink>
       </div>
     </div>
   </section>
@@ -36,111 +37,134 @@ const topItems = FAQ_ITEMS.slice(0, 5)
 
 <style scoped>
 .faq {
-  padding: 80px 0;
+  padding: 108px 0;
 }
 
-.faq__header {
-  text-align: center;
-  margin-bottom: 28px;
+.faq__layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.65fr) minmax(0, 1.35fr);
+  gap: 24px;
 }
 
-.faq__title {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 900;
-  font-size: clamp(2rem, 4vw, 2.75rem);
-  letter-spacing: -0.025em;
-  color: var(--md-on-background);
-  margin-bottom: 10px;
+.faq header {
+  align-self: start;
+  padding: 36px;
+  border-radius: var(--md-sys-shape-corner-extra-large);
+  background: var(--md-sys-color-tertiary-container);
+  color: var(--md-sys-color-on-tertiary-container);
 }
 
-.faq__sub {
-  font-size: 1.0625rem;
-  color: var(--md-on-surface-variant);
-  max-width: 60ch;
-  margin: 0 auto;
+.faq h2 {
+  font: var(--md-sys-typescale-display-medium);
+  letter-spacing: var(--md-sys-typescale-display-medium-tracking);
 }
 
-.faq__card {
-  max-width: 900px;
-  margin: 0 auto;
-  border-radius: var(--r-2xl);
-  background: var(--md-sc);
+.faq__more {
+  margin-top: 24px;
+}
+
+.faq__list {
+  display: grid;
+  gap: 3px;
+  align-self: start;
+}
+
+.faq__list details {
   overflow: hidden;
+  border-radius: 4px;
+  background: var(--md-sys-color-surface-container);
 }
 
-.faq__item {
-  border-bottom: 1px solid var(--md-outline-variant);
+.faq__list details:first-child {
+  border-top-left-radius: var(--md-sys-shape-corner-extra-large);
+  border-top-right-radius: var(--md-sys-shape-corner-extra-large);
 }
 
-.faq__item:last-of-type {
-  border-bottom: none;
+.faq__list details:last-child {
+  border-bottom-left-radius: var(--md-sys-shape-corner-extra-large);
+  border-bottom-right-radius: var(--md-sys-shape-corner-extra-large);
 }
 
-.faq__q {
-  list-style: none;
+.faq__question {
+  display: block;
+  border-radius: inherit;
+  color: var(--md-sys-color-on-surface);
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 18px 20px;
-  color: var(--md-on-surface);
-  user-select: none;
 }
 
-.faq__q::-webkit-details-marker {
+.faq__question::-webkit-details-marker {
   display: none;
 }
 
-.faq__q-text {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 900;
-  font-size: 1.0625rem;
-  letter-spacing: -0.01em;
+.faq__question:focus-visible {
+  outline-offset: -6px;
 }
 
-.faq__chev {
-  pointer-events: none;
-  transform: rotate(0deg);
-  transition: transform var(--t-std), opacity var(--t-fast);
-  opacity: 0.7;
+.faq__question h3 {
+  display: grid;
+  grid-template-columns: 1fr 44px;
+  gap: 18px;
+  align-items: center;
+  min-height: 78px;
+  padding: 10px 12px 10px 24px;
+  font: var(--md-sys-typescale-title-medium);
+  letter-spacing: var(--md-sys-typescale-title-medium-tracking);
 }
 
-.faq__item[open] .faq__chev {
-  transform: rotate(90deg);
-  opacity: 1;
+.faq__mark {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: color-mix(in srgb, var(--md-sys-color-primary) 12%, transparent);
+  transition: transform var(--md-motion-spatial-fast);
 }
 
-.faq__a {
-  padding: 0 20px 18px;
-  color: var(--md-on-surface-variant);
+.faq__list details[open] .faq__mark {
+  transform: rotate(45deg);
 }
 
-.faq__a p {
-  margin: 0;
-  line-height: 1.75;
-  font-size: 0.9375rem;
-  max-width: 76ch;
+.faq__answer p {
+  max-width: 680px;
+  padding: 0 76px 24px 24px;
+  color: var(--md-sys-color-on-surface-variant);
+  font: var(--md-sys-typescale-body-medium);
+  letter-spacing: var(--md-sys-typescale-body-medium-tracking);
 }
 
-.faq__cta {
-  display: flex;
-  justify-content: center;
-  padding: 20px;
-  background: color-mix(in srgb, var(--md-sc) 75%, var(--md-secondary-container));
+.faq__answer a {
+  color: var(--md-sys-color-primary);
+  text-underline-offset: 2px;
 }
 
-@media (min-width: 640px) {
-  .faq__q {
-    padding: 20px 28px;
+@media (max-width: 820px) {
+  .faq {
+    padding: 80px 0;
   }
 
-  .faq__a {
-    padding: 0 28px 22px;
+  .faq__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .faq header {
+    padding: 28px 24px;
   }
 
-  .faq__cta {
-    padding: 26px;
+  .faq__question h3 {
+    grid-template-columns: 1fr 40px;
+    gap: 10px;
+    min-height: 72px;
+    padding: 8px 8px 8px 16px;
+  }
+
+  .faq__mark {
+    width: 40px;
+    height: 40px;
+  }
+
+  .faq__answer p {
+    padding: 0 58px 22px 16px;
   }
 }
 </style>
