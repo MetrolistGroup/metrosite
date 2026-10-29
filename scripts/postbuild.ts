@@ -2,6 +2,7 @@ import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { FAQ_ITEMS, type FaqItem } from '../src/content/faq'
 import { GUIDES, GUIDE_INDEX_META, GUIDE_REVIEW_DATE } from '../src/content/guides'
 import { PAGE_META, REPO_URL, SITE_URL, type PageMeta } from '../src/content/site'
+import { SHARE_ID_PATHS, SHARE_PATHS } from '../src/content/share'
 import { faqMarkdown, guideMarkdown, guidesIndexMarkdown, homeMarkdown, llmsTxt, privacyMarkdown } from './markdown'
 import { guidesFeed } from './feed'
 
@@ -151,6 +152,8 @@ const pages: Page[] = [
     }
   }),
   { path: '/listen', file: 'listen.html', meta: PAGE_META.listen },
+  { path: '/party', file: 'party.html', meta: PAGE_META.listen },
+  ...SHARE_PATHS.map(path => ({ path, file: `${path.slice(1)}.html`, meta: PAGE_META.share })),
   { path: '/404', file: '404.html', meta: PAGE_META.notFound, canonical: false },
 ]
 
@@ -238,6 +241,8 @@ await writeFile(new URL('llms.txt', dist), llmsTxt())
 await writeFile(new URL('llms-full.txt', dist), pages.flatMap(page => page.markdown ? [page.markdown[1].trim()] : []).join('\n\n---\n\n') + '\n')
 await writeFile(new URL('feed.xml', dist), guidesFeed(GUIDES))
 await rm(new URL('.vite/', dist), { recursive: true })
+// Serve the same hydration shell for arbitrary album and artist IDs without a 404.
+await writeFile(new URL('_redirects', dist), SHARE_ID_PATHS.map(path => `${path}/* ${path} 200`).join('\n') + '\n')
 
 // Discord component embeds (3,000-byte limit); the og:* tags remain the fallback.
 const button = (label: string, url: string) => ({ type: 2, style: 5, label, url })
@@ -307,7 +312,6 @@ await writeFile(new URL('_headers', dist), `/*
 /feed.xml
   Content-Type: application/rss+xml; charset=utf-8
 
-/listen
-  X-Robots-Tag: noindex, follow
+${['/listen', '/party', ...SHARE_PATHS, ...SHARE_ID_PATHS.map(path => `${path}/*`)].map(path => `${path}\n  X-Robots-Tag: noindex, follow\n`).join('\n')}
 
 ${pages.flatMap(page => page.markdown ? [`/${page.markdown[0]}\n  Link: <${SITE_URL}${page.path}>; rel="canonical"\n`] : []).join('\n')}`)

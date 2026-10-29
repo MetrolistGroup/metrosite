@@ -1,17 +1,10 @@
 export function roomCodeFromQuery(value: unknown): string {
-  // Android's legacy parser uses six characters; shared MobileRoutes accepts eight.
-  return typeof value === 'string' && (value.length === 6 || value.length === 8) && !/[^A-Za-z0-9]/.test(value) ? value : ''
+  // KMP party invitations allow up to 64 letters, numbers, underscores, or hyphens.
+  return typeof value === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(value) ? value : ''
 }
 
-export function listenAppUrl(code: string, userAgent: string, maxTouchPoints: number): string {
-  if (!roomCodeFromQuery(code)) return ''
-  // AndroidManifest registers HTTPS /listen, not the metrolist scheme.
-  if (/android/i.test(userAgent)) return `https://metrolist.cc/listen?code=${code}`
-  // iOS Info.plist registers metrolist; MobileRoutes requires exactly eight characters.
-  if (code.length === 8 && (/iphone|ipad|ipod/i.test(userAgent) || (/macintosh/i.test(userAgent) && maxTouchPoints > 1))) {
-    return `metrolist://listen-together/${code}`
-  }
-  return ''
+export function listenAppUrl(code: string): string {
+  return roomCodeFromQuery(code) ? `metrolist://party?r=${code}` : ''
 }
 
 export async function copyRoomCode(code: string): Promise<boolean> {

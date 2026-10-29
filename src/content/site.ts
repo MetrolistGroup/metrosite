@@ -29,6 +29,11 @@ export const PAGE_META = {
     description: 'Join a Metrolist listening room for synchronized playback with friends.',
     robots: 'noindex, follow',
   },
+  share: {
+    title: 'Shared music · Metrolist',
+    description: 'Open a shared song, playlist, album, or artist in Metrolist or YouTube Music.',
+    robots: 'noindex, follow',
+  },
   privacy: {
     title: 'Privacy policy · Metrolist',
     description: 'Learn how Metrolist handles local app data, optional Sentry diagnostics, third-party services, and website requests.',

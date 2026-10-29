@@ -93,8 +93,15 @@ nodes.delete('page-load-error')
 
 const { createAppRouter } = await import('../src/router.ts')
 const router = createAppRouter()
-for (const path of ['/FAQ', '/Privacy', '/LISTEN']) assert.equal(router.resolve(path).name, 'not-found')
-for (const path of ['/faq', '/privacy', '/listen']) assert.equal(router.resolve(path).name, path.slice(1))
+for (const path of ['/FAQ', '/Privacy', '/LISTEN', '/WATCH', '/PARTY', '/CHANNEL/UC123']) assert.equal(router.resolve(path).name, 'not-found')
+for (const path of ['/faq', '/privacy', '/listen', '/party']) assert.equal(router.resolve(path).name, path.slice(1))
+for (const path of ['/watch?v=123456789', '/playlist?list=PL123', '/browse/MPREb_123', '/channel/UC123', '/album/MPREb_123', '/artist/UC123', '/open?url=https%3A%2F%2Fmusic.youtube.com%2Fwatch%3Fv%3D123456789']) {
+  const resolved = router.resolve(path)
+  assert.equal(resolved.name, `share-${path.split(/[/?]/)[1]}`)
+  assert.equal(resolved.meta.robots, 'noindex, follow')
+}
+assert.equal(router.resolve('/party?r=listentogetherid').query.r, 'listentogetherid')
+assert.equal(router.resolve('/listen?code=listentogetherid').query.code, 'listentogetherid')
 
 await router.push('/privacy?source=initial')
 assert.deepEqual(assigned, [], 'START navigation must stay in the app')
@@ -147,6 +154,10 @@ await serverRouter.push('/FAQ')
 assert.equal(serverRouter.currentRoute.value.name, 'not-found')
 await serverRouter.push('/faq')
 assert.equal(serverRouter.currentRoute.value.name, 'faq')
+for (const [path, name] of [['/party?r=listentogetherid', 'party'], ['/watch?v=123456789', 'share-watch'], ['/browse/MPREb_123', 'share-browse'], ['/channel/UC123', 'share-channel']]) {
+  await serverRouter.push(path)
+  assert.equal(serverRouter.currentRoute.value.name, name)
+}
 await serverRouter.isReady()
 delete process.env.SSR
 globalThis.window = clientWindow

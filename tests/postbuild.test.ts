@@ -3,6 +3,7 @@ import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { PAGE_META, REPO_URL, SITE_URL } from '../src/content/site'
+import { SHARE_ID_PATHS, SHARE_PATHS } from '../src/content/share'
 import { GUIDES, GUIDE_INDEX_META, GUIDE_REVIEW_DATE } from '../src/content/guides'
 
 const root = new URL('../', import.meta.url)
@@ -16,7 +17,9 @@ const routes = [
   ['index', '/', PAGE_META.home], ['faq', '/faq', PAGE_META.faq],
   ['privacy', '/privacy', PAGE_META.privacy], ['guides', '/guides', GUIDE_INDEX_META],
   ...GUIDES.map(guide => [`guides/${guide.slug}`, `/guides/${guide.slug}`, guide.meta] as const),
-  ['listen', '/listen', PAGE_META.listen], ['404', '/404', PAGE_META.notFound],
+  ['listen', '/listen', PAGE_META.listen], ['party', '/party', PAGE_META.listen],
+  ...SHARE_PATHS.map(path => [path.slice(1), path, PAGE_META.share] as const),
+  ['404', '/404', PAGE_META.notFound],
 ] as const
 
 // Run the real generator with a stub renderer, without a build, network, or changes to the checkout.
@@ -164,7 +167,10 @@ for (const ending of [' />', '/>', '>']) {
       expect(headers).toContain('/*.md\n  X-Robots-Tag: noindex')
       expect(headers).not.toContain('\n/guides\n')
       expect(headers).toContain('/feed.xml\n  Content-Type: application/rss+xml; charset=utf-8')
-      expect(headers).toContain('/listen\n  X-Robots-Tag: noindex, follow')
+      for (const path of ['/listen', '/party', ...SHARE_PATHS, ...SHARE_ID_PATHS.map(path => `${path}/*`)]) {
+        expect(headers).toContain(`${path}\n  X-Robots-Tag: noindex, follow`)
+      }
+      expect(await readFile(join(dist, '_redirects'), 'utf8')).toBe(SHARE_ID_PATHS.map(path => `${path}/* ${path} 200`).join('\n') + '\n')
       const indexable = routes.filter(([, , meta]) => meta.robots.startsWith('index'))
       const sitemap = await readFile(join(dist, 'sitemap.xml'), 'utf8')
       expect([...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(match => match[1])).toEqual(indexable.map(([, path]) => SITE_URL + path))

@@ -1,11 +1,19 @@
 import { createMemoryHistory, createRouter, createWebHistory, START_LOCATION } from 'vue-router'
 import { GUIDES, GUIDE_INDEX_META } from './content/guides'
 import { PAGE_META, SITE_URL, type PageMeta } from './content/site'
+import { SHARE_ID_PATHS, SHARE_PATHS } from './content/share'
 import HomeView from './views/HomeView.vue'
 
 const ROUTES = [
   { path: '/', name: 'home', component: HomeView, meta: PAGE_META.home },
   { path: '/listen', name: 'listen', component: () => import('./views/ListenPage.vue'), meta: PAGE_META.listen },
+  { path: '/party', name: 'party', component: () => import('./views/ListenPage.vue'), meta: PAGE_META.listen },
+  ...SHARE_PATHS.map(path => ({
+    path: SHARE_ID_PATHS.some(base => base === path) ? `${path}/:id?` : path,
+    name: `share-${path.slice(1)}`,
+    component: () => import('./views/SharePage.vue'),
+    meta: PAGE_META.share,
+  })),
   { path: '/faq', name: 'faq', component: () => import('./views/FaqPage.vue'), meta: PAGE_META.faq },
   { path: '/privacy', name: 'privacy', component: () => import('./views/PrivacyPage.vue'), meta: PAGE_META.privacy },
   ...GUIDES.map(guide => ({

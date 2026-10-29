@@ -2,8 +2,8 @@ import { afterEach, expect, mock, test } from 'bun:test'
 import { parseQuery } from 'vue-router'
 import { copyRoomCode, listenAppUrl, roomCodeFromQuery } from '../src/content/listen'
 
-test('accepts legacy and current room codes without changing their text', () => {
-  for (const code of ['ABC123', 'abc123', 'ROOM1234', 'room1234']) {
+test('accepts legacy and KMP party room codes without changing their text', () => {
+  for (const code of ['ABC123', 'abc123', 'ROOM1234', 'room1234', 'listentogetherid', 'room_id-1', 'A', 'A'.repeat(64)]) {
     expect(roomCodeFromQuery(parseQuery(`code=${code}`).code)).toBe(code)
   }
   expect(roomCodeFromQuery(parseQuery('code=%41BC123').code)).toBe('ABC123')
@@ -11,7 +11,7 @@ test('accepts legacy and current room codes without changing their text', () => 
 
 test('rejects malformed, ambiguous, control-containing and oversized invitations', () => {
   for (const query of [
-    '', 'code', 'code=', 'code=ABCDE', 'code=ABCDEFG', 'code=ABCDEFGHI',
+    '', 'code', 'code=', `code=${'A'.repeat(65)}`,
     'code=ABC123&code=DEF456', 'code[]=ABC123', 'code=ABC+123', 'code=%20ABC123',
     'code=ABC123%20', 'code=ABCDE%0A', 'code=ABCDEFG%0A', 'code=AB%0D%0ACD',
     'code=ABC%0012', 'code=ABC%0912', 'code=ABC%7F12', 'code=%', 'code=%C0%AF',
@@ -25,18 +25,12 @@ test('rejects malformed, ambiguous, control-containing and oversized invitations
   }
 })
 
-test('uses only verified platform launch contracts', () => {
-  expect(listenAppUrl('ABC123', 'Android', 5)).toBe('https://metrolist.cc/listen?code=ABC123')
-  expect(listenAppUrl('room1234', 'Android', 5)).toBe('https://metrolist.cc/listen?code=room1234')
-  for (const agent of ['iPhone', 'iPad', 'iPod', 'Macintosh']) {
-    expect(listenAppUrl('room1234', agent, 5)).toBe('metrolist://listen-together/room1234')
-    expect(listenAppUrl('ABC123', agent, 5)).toBe('')
+test('uses the KMP party scheme registered on mobile and desktop', () => {
+  for (const code of ['ABC123', 'room1234', 'listentogetherid', 'room_id-1']) {
+    expect(listenAppUrl(code)).toBe(`metrolist://party?r=${code}`)
   }
-  for (const agent of ['Macintosh', 'Windows', 'Linux', 'unknown']) {
-    expect(listenAppUrl('ROOM1234', agent, 0)).toBe('')
-  }
-  expect(listenAppUrl('ABC123/evil', 'Android', 5)).toBe('')
-  expect(listenAppUrl('ROOM1234\n', 'iPhone', 5)).toBe('')
+  expect(listenAppUrl('ABC123/evil')).toBe('')
+  expect(listenAppUrl('ROOM1234\n')).toBe('')
 })
 
 const originalNavigator = Object.getOwnPropertyDescriptor(globalThis, 'navigator')

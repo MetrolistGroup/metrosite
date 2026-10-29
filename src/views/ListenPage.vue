@@ -11,10 +11,10 @@ let feedbackTimer: ReturnType<typeof setTimeout> | undefined
 // The page is prerendered without a query, so read the room code only after hydration.
 const hydrated = ref(false)
 onMounted(() => { hydrated.value = true })
-const code = computed(() => hydrated.value ? roomCodeFromQuery(route.query.code) : '')
-const invalidCode = computed(() => hydrated.value && route.query.code !== undefined && !code.value)
-const openInAppUrl = computed(() => code.value ? listenAppUrl(code.value, navigator.userAgent, navigator.maxTouchPoints) : '')
-const androidLink = computed(() => openInAppUrl.value.startsWith('https:'))
+const roomQuery = computed(() => route.name === 'party' ? route.query.r ?? route.query.code : route.query.code)
+const code = computed(() => hydrated.value ? roomCodeFromQuery(roomQuery.value) : '')
+const invalidCode = computed(() => hydrated.value && roomQuery.value !== undefined && !code.value)
+const openInAppUrl = computed(() => listenAppUrl(code.value))
 
 function clearFeedback() {
   clearTimeout(feedbackTimer)
@@ -75,7 +75,7 @@ async function copyCode() {
 
       <section v-else class="listen__empty">
         <span class="material-symbols-rounded" aria-hidden="true">link_off</span>
-        <div><h2>{{ invalidCode ? 'Invalid room code' : 'No room code found' }}</h2><p>Use a Listen Together link shared from Metrolist. Room codes contain six or eight letters and numbers.</p></div>
+        <div><h2>{{ invalidCode ? 'Invalid room code' : 'No room code found' }}</h2><p>Use a Listen Together link shared from Metrolist. Room codes can contain up to 64 letters, numbers, underscores, or hyphens.</p></div>
       </section>
       <p class="listen__feedback" role="status" aria-atomic="true">{{ copyStatus === 'success' ? 'Room code copied.' : copyStatus === 'error' ? 'Could not copy the room code. Select the code above and copy it manually.' : '' }}</p>
 
@@ -90,11 +90,10 @@ async function copyCode() {
             <li>If the code is not accepted, ask the host for a new invitation and check that your app versions are compatible.</li>
           </ol>
           <template v-if="openInAppUrl">
-            <p v-if="androidLink">On Android, you can also try the invitation link. Allow Metrolist to open supported links from <strong>metrolist.cc</strong> in system app settings. If this page reopens or the room does not appear, join manually above.</p>
-            <p v-else>On iPhone or iPad with Metrolist installed, try opening this room directly. If it does not open, join manually above.</p>
+            <p>If Metrolist is installed, try opening this room directly. If your browser cannot open the app or the room does not appear, join manually above.</p>
             <a :href="openInAppUrl" class="btn btn-filled btn-lg">
               <span class="material-symbols-rounded" aria-hidden="true">open_in_new</span>
-              {{ androidLink ? 'Try Android app link' : 'Open in Metrolist' }}
+              Open in Metrolist
             </a>
           </template>
         </article>
