@@ -2,6 +2,8 @@ import { DOWNLOAD_PLATFORMS } from '../src/content/downloads'
 import { FAQ_ITEMS } from '../src/content/faq'
 import { FEATURES } from '../src/content/features'
 import { GUIDES, GUIDE_COLLECTIONS, GUIDE_DISCLOSURE, GUIDE_INDEX_META, GUIDE_REVIEW_DATE, getRelatedGuides, type Guide } from '../src/content/guides'
+import { EXPORT_FORMATS } from '../src/content/lyrics/export'
+import { IMPORT_FORMATS } from '../src/content/lyrics/import'
 import { HOSTING_NOTICE, PAGE_META, REPO_URL as REPO, SITE_URL } from '../src/content/site'
 
 // shortcut: conversion covers simple legal markup (headings, paragraphs, lists, links, bold); use a parser if templates get nested.
@@ -69,6 +71,35 @@ ${FAQ_ITEMS.map(({ question, answer, guide }) => `## ${question}\n\n${answer}${g
 `
 }
 
+export function syncMarkdown() {
+  const imports = Object.entries(IMPORT_FORMATS).filter(([key]) => key !== 'auto').map(([, label]) => label)
+  return `# Lyrics sync
+
+${PAGE_META.sync.description}
+
+Source: ${SITE_URL}/sync
+
+## How it works
+
+1. Choose the song audio. It plays from your device and is never uploaded.
+2. Paste lyrics or open a lyrics file. Existing timings are kept.
+3. In line mode, tap Space or the tap pad when each line starts. In word mode, hold for each word, or tap quickly to let a word last until the next tap.
+4. Fix lines with nudges, edits, undo, and preview, then export.
+
+Drafts are saved in your browser, so a reload does not lose your work.
+
+## Import formats
+
+${imports.map(label => `- ${escapeMarkdown(label)}`).join('\n')}
+
+## Export formats
+
+${Object.values(EXPORT_FORMATS).map(format => `- ${escapeMarkdown(format.label)}: ${escapeMarkdown(format.detail)}`).join('\n')}
+
+MLX is the default and keeps every timing, singer, background vocal, translation, and romanization.
+`
+}
+
 export function privacyMarkdown(vueSource: string) {
   const template = vueSource.match(/<header class="privacy-page__header">([\s\S]*?)<\/article>/)?.[1]
   if (!template) throw new Error('Privacy policy content was not found')
@@ -128,6 +159,7 @@ Each Markdown page names its canonical HTML source.
 
 - [Overview](${SITE_URL}/index.md): features, supported platforms, and install steps
 - [FAQ](${SITE_URL}/faq.md): platforms, migration, accounts, safety, updates, and imports
+- [Lyrics sync](${SITE_URL}/sync.md): time lyrics in the browser and export MLX, LRC, Enhanced LRC, or TTML
 - [Privacy policy](${SITE_URL}/privacy.md): app data, optional Sentry diagnostics, and website hosting
 - [Guides](${SITE_URL}/guides.md): ${markdownLink('HTML topic index', `${SITE_URL}/guides`)} for comparisons, installation, library, and playback
 ${GUIDES.map(guide => `- ${markdownLink(guide.heading, `${SITE_URL}/guides/${guide.slug}.md`)}: ${escapeMarkdown(guide.meta.description)}`).join('\n')}

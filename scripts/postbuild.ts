@@ -3,7 +3,7 @@ import { FAQ_ITEMS, type FaqItem } from '../src/content/faq'
 import { GUIDES, GUIDE_INDEX_META, GUIDE_REVIEW_DATE } from '../src/content/guides'
 import { PAGE_META, REPO_URL, SITE_URL, type PageMeta } from '../src/content/site'
 import { SHARE_ID_PATHS, SHARE_PATHS } from '../src/content/share'
-import { faqMarkdown, guideMarkdown, guidesIndexMarkdown, homeMarkdown, llmsTxt, privacyMarkdown } from './markdown'
+import { faqMarkdown, guideMarkdown, guidesIndexMarkdown, homeMarkdown, llmsTxt, privacyMarkdown, syncMarkdown } from './markdown'
 import { guidesFeed } from './feed'
 
 const dist = new URL('../dist/', import.meta.url)
@@ -151,6 +151,7 @@ const pages: Page[] = [
       ],
     }
   }),
+  { path: '/sync', file: 'sync.html', meta: PAGE_META.sync, schemas: [breadcrumbs('Lyrics sync', '/sync')], markdown: ['sync.md', syncMarkdown()] },
   { path: '/listen', file: 'listen.html', meta: PAGE_META.listen },
   { path: '/party', file: 'party.html', meta: PAGE_META.listen },
   ...SHARE_PATHS.map(path => ({ path, file: `${path.slice(1)}.html`, meta: PAGE_META.share })),

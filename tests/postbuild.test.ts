@@ -17,7 +17,7 @@ const routes = [
   ['index', '/', PAGE_META.home], ['faq', '/faq', PAGE_META.faq],
   ['privacy', '/privacy', PAGE_META.privacy], ['guides', '/guides', GUIDE_INDEX_META],
   ...GUIDES.map(guide => [`guides/${guide.slug}`, `/guides/${guide.slug}`, guide.meta] as const),
-  ['listen', '/listen', PAGE_META.listen], ['party', '/party', PAGE_META.listen],
+  ['sync', '/sync', PAGE_META.sync], ['listen', '/listen', PAGE_META.listen], ['party', '/party', PAGE_META.listen],
   ...SHARE_PATHS.map(path => [path.slice(1), path, PAGE_META.share] as const),
   ['404', '/404', PAGE_META.notFound],
 ] as const

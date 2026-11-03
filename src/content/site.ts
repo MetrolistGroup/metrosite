@@ -34,6 +34,11 @@ export const PAGE_META = {
     description: 'Open a shared song, playlist, album, or artist in Metrolist or YouTube Music.',
     robots: 'noindex, follow',
   },
+  sync: {
+    title: 'Lyrics sync · Metrolist',
+    description: 'Sync lyrics line by line or word by word in your browser, then export MLX, LRC, Enhanced LRC, or TTML for Metrolist.',
+    robots: INDEX,
+  },
   privacy: {
     title: 'Privacy policy · Metrolist',
     description: 'Learn how Metrolist handles local app data, optional Sentry diagnostics, third-party services, and website requests.',

@@ -94,7 +94,7 @@ nodes.delete('page-load-error')
 const { createAppRouter } = await import('../src/router.ts')
 const router = createAppRouter()
 for (const path of ['/FAQ', '/Privacy', '/LISTEN', '/WATCH', '/PARTY', '/CHANNEL/UC123']) assert.equal(router.resolve(path).name, 'not-found')
-for (const path of ['/faq', '/privacy', '/listen', '/party']) assert.equal(router.resolve(path).name, path.slice(1))
+for (const path of ['/faq', '/privacy', '/sync', '/listen', '/party']) assert.equal(router.resolve(path).name, path.slice(1))
 for (const path of ['/watch?v=123456789', '/playlist?list=PL123', '/browse/MPREb_123', '/channel/UC123', '/album/MPREb_123', '/artist/UC123', '/open?url=https%3A%2F%2Fmusic.youtube.com%2Fwatch%3Fv%3D123456789']) {
   const resolved = router.resolve(path)
   assert.equal(resolved.name, `share-${path.split(/[/?]/)[1]}`)
