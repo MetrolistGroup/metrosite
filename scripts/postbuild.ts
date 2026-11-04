@@ -297,7 +297,7 @@ for (const [file, payload] of Object.entries(embeds)) {
 
 // JSON-LD data blocks bypass script execution/CSP checks: https://html.spec.whatwg.org/multipage/scripting.html#prepare-the-script-element
 await writeFile(new URL('_headers', dist), `/*
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self' https://api.github.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; media-src 'self' blob:; connect-src 'self' https://api.github.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
   Permissions-Policy: camera=(), geolocation=(), microphone=()
   Referrer-Policy: strict-origin-when-cross-origin
   Strict-Transport-Security: max-age=31536000
