@@ -1,0 +1,562 @@
+<script setup lang="ts">
+import { computed, onMounted, ref, useId } from 'vue'
+import {
+  DOWNLOAD_PLATFORMS,
+  findDownloadAsset,
+  getLatestRelease,
+  type DownloadPlatform,
+  type DownloadPlatformKey,
+  type ReleaseAsset,
+} from '../content/downloads'
+import { HOSTING_NOTICE } from '../content/site'
+
+const props = withDefaults(defineProps<{
+  label?: string
+  buttonClass?: string
+  platform?: DownloadPlatformKey
+  showTrigger?: boolean
+}>(), {
+  label: 'Download Metrolist',
+  buttonClass: 'btn btn-filled',
+  showTrigger: true,
+})
+
+const emit = defineEmits<{ open: []; close: [] }>()
+const dialog = ref<HTMLDialogElement>()
+const assets = ref<ReleaseAsset[]>([])
+const releaseName = ref('')
+const isLoading = ref(false)
+const loadFailed = ref(false)
+const titleId = useId()
+const architectureId = useId()
+const architectureHelpId = useId()
+const notice = ref<HTMLElement>()
+const supportsPopover = ref(false)
+const showInlineNotice = ref(false)
+
+function detectedPlatform(): DownloadPlatformKey {
+  const agent = navigator.userAgent.toLowerCase()
+  if (agent.includes('android')) return 'android'
+  if (/iphone|ipad|ipod/.test(agent) || (agent.includes('macintosh') && navigator.maxTouchPoints > 1)) return 'ios'
+  if (agent.includes('win')) return 'windows'
+  if (agent.includes('mac')) return 'macos'
+  return 'linux'
+}
+
+// Prerendered HTML can't know the visitor's platform, so detect it after hydration.
+const selectedKey = ref<DownloadPlatformKey>(props.platform ?? 'android')
+const selectedPlatform = computed(() => DOWNLOAD_PLATFORMS.find(({ key }) => key === selectedKey.value)!)
+const selectedArchitectureKey = ref<string>()
+const selectedArchitecture = computed(() => selectedPlatform.value.architectures.find(({ key }) => key === selectedArchitectureKey.value))
+const selectedAsset = computed(() => selectedArchitecture.value
+  ? findDownloadAsset(selectedKey.value, selectedArchitecture.value.key, assets.value)
+  : undefined)
+const installInstructions = computed(() => selectedKey.value === 'windows' && selectedAsset.value?.name.toLowerCase().endsWith('.zip')
+  ? ['Download the portable ZIP.', 'Extract it to a folder.', 'Run Metrolist from the extracted folder.']
+  : selectedPlatform.value.instructions)
+const releasesUrl = 'https://github.com/MetrolistGroup/Metrolist/releases/latest'
+
+function selectPlatform(platform: DownloadPlatform) {
+  selectedKey.value = platform.key
+  // A Mac user agent cannot reliably distinguish Apple silicon from Intel.
+  selectedArchitectureKey.value = platform.key === 'macos' && platform.architectures.length > 1
+    ? undefined
+    : platform.architectures[0]!.key
+}
+
+selectPlatform(selectedPlatform.value)
+
+function selectArchitecture(key: string) {
+  selectedArchitectureKey.value = key
+}
+
+async function loadLatestRelease() {
+  if (isLoading.value) return
+  isLoading.value = true
+  loadFailed.value = false
+
+  try {
+    const release = await getLatestRelease()
+    assets.value = release.assets ?? []
+    releaseName.value = release.name || release.tag_name || 'Latest release'
+  } catch {
+    loadFailed.value = true
+  } finally {
+    isLoading.value = false
+  }
+}
+
+function open(platformKey?: DownloadPlatformKey) {
+  const platform = DOWNLOAD_PLATFORMS.find(({ key }) => key === (platformKey ?? props.platform))
+  if (platform) selectPlatform(platform)
+  emit('open')
+  dialog.value?.showModal()
+  void loadLatestRelease()
+}
+
+defineExpose({ open })
+
+onMounted(() => {
+  supportsPopover.value = typeof notice.value?.showPopover === 'function' && typeof notice.value?.hidePopover === 'function'
+  if (!props.platform) selectPlatform(DOWNLOAD_PLATFORMS.find(({ key }) => key === detectedPlatform())!)
+})
+
+function closeOnBackdrop(event: MouseEvent) {
+  if (!dialog.value || event.target !== dialog.value) return
+  const { left, right, top, bottom } = dialog.value.getBoundingClientRect()
+  if (event.clientX < left || event.clientX > right || event.clientY < top || event.clientY > bottom) {
+    dialog.value.close()
+  }
+}
+
+function onClose() {
+  donateDeveloper.value = undefined
+  hideNotice()
+  emit('close')
+}
+
+// Edit this list to change who can receive donations.
+const DEVELOPERS = [
+  { name: 'mostafaalagamy', url: 'https://www.buymeacoffee.com/mostafaalagamy' },
+  { name: 'nyxiereal', url: 'https://github.com/sponsors/nyxiereal' },
+  { name: 'l6t9', url: 'https://github.com/sponsors/l6t9' },
+  { name: 'adrielGGmotion', url: 'https://github.com/sponsors/adrielGGmotion' },
+]
+const donateDeveloper = ref<(typeof DEVELOPERS)[number]>()
+
+function onDownload() {
+  donateDeveloper.value ??= DEVELOPERS[Math.floor(Math.random() * DEVELOPERS.length)]
+  if (supportsPopover.value) notice.value?.showPopover()
+  else showInlineNotice.value = true
+}
+
+function hideNotice() {
+  if (supportsPopover.value) notice.value?.hidePopover()
+  showInlineNotice.value = false
+}
+
+function formatSize(bytes?: number) {
+  return bytes ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : ''
+}
+</script>
+
+<template>
+  <button v-if="showTrigger" type="button" :class="buttonClass" aria-haspopup="dialog" @click="open()">
+    <span class="material-symbols-rounded" aria-hidden="true">download</span>
+    {{ label }}
+  </button>
+
+  <Teleport to="body">
+    <dialog ref="dialog" class="site-dialog download-dialog" :aria-labelledby="titleId" @click="closeOnBackdrop" @close="onClose">
+      <div class="download-dialog__header">
+        <h2 :id="titleId">Download Metrolist</h2>
+        <form method="dialog">
+          <button class="icon-button" type="submit" aria-label="Close dialog" title="Close dialog">
+            <span class="material-symbols-rounded" aria-hidden="true">close</span>
+          </button>
+        </form>
+      </div>
+
+      <div class="download-dialog__platforms" role="group" aria-label="Platform">
+        <button
+          v-for="platformOption in DOWNLOAD_PLATFORMS"
+          :key="platformOption.key"
+          type="button"
+          :aria-pressed="selectedKey === platformOption.key"
+          @click="selectPlatform(platformOption)"
+        >
+          <img :src="`/icons/${platformOption.icon}.svg`" alt="" />
+          <span><strong>{{ platformOption.name }}</strong><small>{{ platformOption.package }}</small></span>
+          <span v-if="selectedKey === platformOption.key" class="material-symbols-rounded" aria-hidden="true">check</span>
+        </button>
+      </div>
+
+      <div v-if="selectedPlatform.architectures.length > 1" class="download-dialog__architectures">
+        <h3 :id="architectureId">Architecture</h3>
+        <div role="group" :aria-labelledby="architectureId" :aria-describedby="selectedKey === 'macos' ? architectureHelpId : undefined">
+          <button
+            v-for="architecture in selectedPlatform.architectures"
+            :key="architecture.key"
+            type="button"
+            :aria-pressed="selectedArchitectureKey === architecture.key"
+            @click="selectArchitecture(architecture.key)"
+          >{{ architecture.name }}</button>
+        </div>
+      </div>
+
+      <p v-if="selectedKey === 'macos' && selectedPlatform.architectures.length > 1" :id="architectureHelpId" class="download-dialog__architecture-help">
+        Open Apple menu &gt; About This Mac. If Chip shows an Apple M-series name, choose Apple silicon. If Processor shows Intel, choose Intel.
+      </p>
+
+      <section class="download-dialog__selection">
+        <header>
+          <img :src="`/icons/${selectedPlatform.icon}.svg`" alt="" />
+          <div>
+            <strong>{{ selectedPlatform.name }} · {{ selectedArchitecture?.name ?? 'Select an architecture' }}</strong>
+            <span>{{ selectedPlatform.detail }} · {{ selectedPlatform.package }}</span>
+          </div>
+        </header>
+
+        <div class="download-dialog__install">
+          <div>
+            <h3>Install</h3>
+            <ol>
+              <li v-for="instruction in installInstructions" :key="instruction">{{ instruction }}</li>
+            </ol>
+          </div>
+
+          <div>
+            <h3>Download</h3>
+            <p class="download-dialog__status" role="status" aria-atomic="true">
+              <template v-if="isLoading">Loading the latest release…</template>
+              <template v-else-if="loadFailed">Couldn't load the latest release. Browse release files or reopen this dialog to try again.</template>
+              <template v-else-if="!selectedArchitecture">Select an architecture above for a direct download, or browse release files.</template>
+              <template v-else-if="selectedAsset">{{ releaseName }}<template v-if="selectedAsset.size"> · {{ formatSize(selectedAsset.size) }}</template></template>
+              <template v-else>No matching build was found in the latest release.</template>
+            </p>
+            <div class="download-dialog__download-actions">
+              <a :href="selectedAsset?.browser_download_url || releasesUrl" class="btn btn-filled" target="_blank" rel="noopener noreferrer" @click="onDownload">
+                <span class="material-symbols-rounded" aria-hidden="true">download</span>
+                {{ selectedAsset?.name.toLowerCase().endsWith('.zip') ? 'Download portable ZIP' : selectedAsset ? `Download ${selectedPlatform.package}` : 'Browse release files' }}
+              </a>
+              <a v-if="selectedAsset" :href="releasesUrl" class="btn btn-tonal" target="_blank" rel="noopener noreferrer">All builds</a>
+            </div>
+            <div ref="notice" :popover="supportsPopover ? 'auto' : undefined" :hidden="!supportsPopover && !showInlineNotice" class="download-dialog__notice" role="note">
+              <p>{{ HOSTING_NOTICE }}</p>
+              <button type="button" class="btn btn-tonal" @click="hideNotice">Dismiss notice</button>
+            </div>
+            <p v-if="donateDeveloper" class="download-dialog__donate" role="status">
+              Support development.
+              <a :href="donateDeveloper.url" target="_blank" rel="noopener noreferrer">Donate to {{ donateDeveloper.name }}</a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <form method="dialog" class="download-dialog__footer">
+        <button type="submit" class="btn btn-outlined">Close</button>
+      </form>
+    </dialog>
+  </Teleport>
+</template>
+
+<style scoped>
+.download-dialog {
+  width: min(860px, calc(100% - 28px));
+  max-height: calc(100dvh - 28px);
+  overflow: auto;
+  margin: auto;
+  padding: 28px;
+  border-radius: var(--md-sys-shape-corner-extra-large-increased);
+  transform: translateY(12px) scale(0.98);
+  overflow-wrap: anywhere;
+  transition: var(--site-dialog-transition), transform var(--md-motion-spatial-exit);
+}
+
+.download-dialog[open] {
+  transform: none;
+  transition: var(--site-dialog-transition), transform var(--md-motion-spatial-default);
+}
+
+@starting-style {
+  .download-dialog[open] {
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
+.download-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.download-dialog__header form {
+  flex-shrink: 0;
+}
+
+.download-dialog .btn {
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
+}
+
+.download-dialog__header p {
+  margin-bottom: 6px;
+  color: var(--md-sys-color-primary);
+  font: var(--md-sys-typescale-label-medium);
+  font-variation-settings: 'ROND' 100;
+  letter-spacing: var(--md-sys-typescale-label-medium-tracking);
+}
+
+.download-dialog h2 {
+  font: var(--md-sys-typescale-display-small);
+  letter-spacing: var(--md-sys-typescale-display-small-tracking);
+}
+
+.download-dialog__platforms {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: 8px;
+  margin-top: 28px;
+}
+
+.download-dialog__platforms button {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 24px;
+  gap: 12px;
+  align-items: center;
+  min-height: 70px;
+  padding: 11px 13px;
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-large-increased);
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--md-motion-effects-default), color var(--md-motion-effects-default);
+}
+
+.download-dialog__platforms button[aria-pressed='true'] {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+
+.download-dialog__platforms img,
+.download-dialog__selection header > img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}
+
+.download-dialog__platforms button > span:nth-child(2),
+.download-dialog__selection header > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.download-dialog__platforms strong {
+  font: var(--md-sys-typescale-title-small);
+  letter-spacing: var(--md-sys-typescale-title-small-tracking);
+}
+
+.download-dialog__platforms small {
+  color: var(--md-sys-color-on-surface-variant);
+  font: var(--md-sys-typescale-body-small);
+  letter-spacing: var(--md-sys-typescale-body-small-tracking);
+}
+
+.download-dialog__platforms button[aria-pressed='true'] small {
+  color: inherit;
+}
+
+.download-dialog__platforms .material-symbols-rounded {
+  color: currentColor;
+}
+
+.download-dialog__architecture-help {
+  margin-top: 10px;
+  color: var(--md-sys-color-on-surface-variant);
+  font: var(--md-sys-typescale-body-small);
+}
+
+.download-dialog__architectures {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.download-dialog__architectures > h3 {
+  color: var(--md-sys-color-on-surface-variant);
+  font: var(--md-sys-typescale-label-medium);
+  font-variation-settings: 'ROND' 100;
+  letter-spacing: var(--md-sys-typescale-label-medium-tracking);
+}
+
+.download-dialog__architectures > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.download-dialog__architectures button {
+  min-height: 38px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-medium);
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface-variant);
+  cursor: pointer;
+  font: var(--md-sys-typescale-label-large);
+  font-variation-settings: 'ROND' 100;
+  letter-spacing: var(--md-sys-typescale-label-large-tracking);
+  transition: background var(--md-motion-effects-default), color var(--md-motion-effects-default);
+}
+
+.download-dialog__platforms button:hover:not([aria-pressed='true']),
+.download-dialog__architectures button:hover:not([aria-pressed='true']) {
+  background: var(--md-sys-color-surface-container-highest);
+  transition: none;
+}
+
+.download-dialog__architectures button[aria-pressed='true'] {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+
+.download-dialog__selection {
+  margin-top: 16px;
+  padding: 20px;
+  border-radius: var(--md-sys-shape-corner-extra-large);
+  background: var(--md-sys-color-surface-container);
+}
+
+.download-dialog__selection > header {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.download-dialog__selection strong {
+  font: var(--md-sys-typescale-title-medium);
+  letter-spacing: var(--md-sys-typescale-title-medium-tracking);
+}
+
+.download-dialog__selection header span {
+  color: var(--md-sys-color-on-surface-variant);
+  font: var(--md-sys-typescale-body-small);
+  letter-spacing: var(--md-sys-typescale-body-small-tracking);
+}
+
+.download-dialog__install {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 26px;
+  margin-top: 20px;
+}
+
+.download-dialog__install h3 {
+  font: var(--md-sys-typescale-title-small);
+  letter-spacing: var(--md-sys-typescale-title-small-tracking);
+}
+
+.download-dialog__install ol {
+  margin: 12px 0 0 1.2rem;
+  color: var(--md-sys-color-on-surface-variant);
+  font: var(--md-sys-typescale-body-medium);
+  letter-spacing: var(--md-sys-typescale-body-medium-tracking);
+}
+
+.download-dialog__install li + li {
+  margin-top: 6px;
+}
+
+.download-dialog__status {
+  min-height: 19px;
+  margin-top: 9px;
+  color: var(--md-sys-color-primary);
+  font: var(--md-sys-typescale-body-small);
+  letter-spacing: var(--md-sys-typescale-body-small-tracking);
+}
+
+.download-dialog__download-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 13px;
+}
+
+.download-dialog__download-actions > .btn-filled {
+  anchor-name: --download-button;
+}
+
+.download-dialog__notice {
+  width: min(360px, calc(100vw - 32px));
+  max-width: 100%;
+  margin: auto;
+  padding: 16px;
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-large);
+  background: var(--md-sys-color-tertiary-container);
+  color: var(--md-sys-color-on-tertiary-container);
+  font: var(--md-sys-typescale-body-medium);
+  letter-spacing: var(--md-sys-typescale-body-medium-tracking);
+}
+
+/* Without anchor positioning the popover stays centred on screen. */
+@supports (position-area: top) {
+  .download-dialog__notice[popover] {
+    position-anchor: --download-button;
+    position-area: top span-right;
+    position-try-fallbacks: flip-block;
+    margin: 0 0 8px;
+  }
+}
+
+.download-dialog__notice .btn {
+  margin-top: 12px;
+}
+
+.download-dialog__donate {
+  margin-top: 14px;
+  font: var(--md-sys-typescale-body-small);
+  letter-spacing: var(--md-sys-typescale-body-small-tracking);
+}
+
+.download-dialog__donate a {
+  color: var(--md-sys-color-primary);
+  font-weight: 700;
+}
+
+.download-dialog__footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+@media (forced-colors: active) {
+  .download-dialog__platforms button[aria-pressed='true'],
+  .download-dialog__architectures button[aria-pressed='true'] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+}
+
+@media (max-width: 760px) {
+  .download-dialog__install {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .download-dialog {
+    padding: 18px;
+    border-radius: var(--md-sys-shape-corner-extra-large);
+  }
+
+  .download-dialog__selection {
+    padding: 16px;
+  }
+
+  .download-dialog__architectures {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .download-dialog__download-actions,
+  .download-dialog__download-actions .btn,
+  .download-dialog__footer .btn {
+    width: 100%;
+  }
+}
+</style>

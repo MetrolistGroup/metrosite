@@ -3,7 +3,8 @@ compatibility_date = "2026-04-04"
 
 [assets]
 directory = "./dist"
-not_found_handling = "single-page-application"
+html_handling = "drop-trailing-slash"
+not_found_handling = "404-page"
 
 [observability]
 enabled = false
