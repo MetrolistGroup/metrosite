@@ -16,7 +16,7 @@ export const PLATFORM_GUIDES: readonly Guide[] = [
         id: 'why-metrolist',
         heading: 'Why we recommend Metrolist',
         paragraphs: [
-          'Metrolist plays songs and videos from YouTube Music without ads. You can listen without signing in, keep music playing with the screen off, and save songs for offline use. It runs on Android 9 and newer.',
+          'Metrolist plays songs and videos from YouTube Music without ads. You can listen without signing in, keep music playing with the screen off, and save songs for offline use. It runs on Android 7 and newer.',
           'Listen Together is a reason to choose it over an app you use alone. A host creates a room, friends join, and the app keeps their playback synchronized. On a computer, you can use the Windows, macOS, or Linux app from the same project. Moving your local library still takes a backup and restore. Installing the apps does not copy that library automatically.',
         ],
         links: [{ label: 'Metrolist playback and platform information', href: 'https://metrolist.cc/faq' }],

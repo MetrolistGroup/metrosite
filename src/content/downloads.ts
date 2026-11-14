@@ -74,7 +74,7 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
     key: 'android',
     icon: 'android',
     name: 'Android',
-    detail: 'Android 9 and newer',
+    detail: 'Android 7 and newer',
     package: 'APK',
     instructions: [
       'Download the APK for your device.',

@@ -42,7 +42,7 @@ const COMPARISON_GUIDES: readonly Guide[] = [
         id: 'devices',
         heading: 'Choose for your devices first',
         paragraphs: [
-          'Metrolist uses Kotlin Multiplatform and provides apps for Android 9+, iOS 17+, Windows 10+ x64, macOS 15+ on Intel and Apple silicon, and Linux x64. That makes it worth considering if you want the same project on a phone and computer. Check the actual release for your device: features and casting support vary by build and hardware.',
+          'Metrolist uses Kotlin Multiplatform and provides apps for Android 7+, iOS 17+, Windows 10+ x64, macOS 15+ on Intel and Apple silicon, and Linux x64. That makes it worth considering if you want the same project on a phone and computer. Check the actual release for your device: features and casting support vary by build and hardware.',
           'ArchiveTune documents an Android app built with Kotlin and Jetpack Compose. An Android listener can compare both directly; someone choosing an iPhone or desktop app should start with the documented Metrolist releases. ArchiveTune acknowledges Metrolist as its base framework, but shared origins do not establish which app will suit your listening habits.',
         ],
         links: [
@@ -162,7 +162,7 @@ const COMPARISON_GUIDES: readonly Guide[] = [
         id: 'metrolist',
         heading: 'Metrolist',
         paragraphs: [
-          'Metrolist is a Kotlin Multiplatform YouTube Music client for Android 9+, iOS 17+, Windows 10+ x64, macOS 15+ on Intel and Apple silicon, and Linux x64. It offers playback without sign-in, ad-free background listening, lyrics, offline downloads, and Listen Together rooms.',
+          'Metrolist is a Kotlin Multiplatform YouTube Music client for Android 7+, iOS 17+, Windows 10+ x64, macOS 15+ on Intel and Apple silicon, and Linux x64. It offers playback without sign-in, ad-free background listening, lyrics, offline downloads, and Listen Together rooms.',
           'Consider it for a music-focused app across phone and desktop, especially if shared listening matters. Casting and other features vary by build and device. Library transfers use backup and restore rather than automatic cross-device sync; downloads are excluded. Premium-only audio quality still requires your own YouTube Music Premium subscription.',
         ],
         links: [{ label: 'Metrolist official project and releases', href: 'https://github.com/MetrolistGroup/Metrolist' }],

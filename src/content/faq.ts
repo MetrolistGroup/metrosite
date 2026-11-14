@@ -18,7 +18,7 @@ export const FAQ_ITEMS: FaqItem[] = [
     topic: 'installation',
     question: 'Which platforms does Metrolist support?',
     guide: { label: 'Compare clients and installation guides', href: '/guides' },
-    answer: 'Metrolist runs on Android 9 and newer, iOS 17 and newer, Linux x64, macOS 15 and newer (Intel and Apple silicon), and Windows 10 x64 and newer. Choose your platform in the download dialog.',
+    answer: 'Metrolist runs on Android 7 and newer, iOS 17 and newer, Linux x64, macOS 15 and newer (Intel and Apple silicon), and Windows 10 x64 and newer. Choose your platform in the download dialog.',
   },
   {
     topic: 'installation',

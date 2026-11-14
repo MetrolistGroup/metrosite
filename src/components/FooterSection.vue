@@ -20,7 +20,6 @@ const links = [
           <img src="/logo.svg" alt="" width="50" height="50" loading="lazy" />
           <strong>Metrolist</strong>
         </RouterLink>
-        <p>Music without the noise</p>
       </div>
 
       <nav class="footer__links" aria-label="Footer navigation">
@@ -55,8 +54,6 @@ const links = [
 .footer__top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 32px;
   padding-bottom: 34px;
 }
 
@@ -73,14 +70,6 @@ const links = [
 .footer__brand img {
   width: 50px;
   height: 50px;
-}
-
-.footer__top > p {
-  max-width: 430px;
-  color: var(--md-sys-color-on-surface-variant);
-  font: var(--md-sys-typescale-body-medium);
-  letter-spacing: var(--md-sys-typescale-body-medium-tracking);
-  text-align: right;
 }
 
 .footer__links {
@@ -136,14 +125,9 @@ const links = [
     border-radius: 32px 32px 0 0;
   }
 
-  .footer__top,
   .footer__bottom {
     align-items: flex-start;
     flex-direction: column;
-  }
-
-  .footer__top > p {
-    text-align: left;
   }
 }
 </style>

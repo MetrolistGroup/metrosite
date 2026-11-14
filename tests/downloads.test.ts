@@ -48,7 +48,7 @@ test('rejects missing builds, other platforms, and unsupported architectures', (
 test('generated platform content has accurate requirements and both Windows install paths', () => {
   const home = homeMarkdown()
   for (const content of [home, faqMarkdown()]) {
-    expect(content).toContain('Android 9 and newer')
+    expect(content).toContain('Android 7 and newer')
     expect(content).toContain('iOS 17 and newer')
     expect(content).toContain('macOS 15 and newer')
     expect(content).not.toContain('TrollStore')

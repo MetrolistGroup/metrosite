@@ -4,9 +4,9 @@ import { SHOWCASE_VIEWS, type ShowcaseDevice, type ShowcaseView } from '../conte
 import ShowcaseScreen from './ShowcaseScreen.vue'
 
 const previews = [
-  { device: 'desktop', name: 'Desktop', detail: 'Windows/Linux/macOS', icon: 'desktop_windows', ratio: '2000 / 1091' },
-  { device: 'android', name: 'Android', detail: 'Android 9 and newer', icon: 'android', ratio: '1080 / 2364' },
-  { device: 'ios', name: 'iOS', detail: 'iOS 17 and newer', icon: 'apple', ratio: '1320 / 2868' },
+  { device: 'desktop', name: 'Desktop', detail: 'Windows/Linux/macOS', icon: 'desktop_windows', ratio: '1920 / 1000' },
+  { device: 'android', name: 'Android', detail: 'Android 7 and newer', icon: 'android', ratio: '1272 / 2772' },
+  { device: 'ios', name: 'iOS', detail: 'iOS 17 and newer', icon: 'apple', ratio: '1170 / 2532' },
 ] as const
 const view = ref<ShowcaseView>('home')
 const dialogView = ref<ShowcaseView>('home')
