@@ -104,7 +104,7 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
       {
         key: 'universal',
         name: 'iPhone & iPad',
-        patterns: [/^Metrolist-iOS\.ipa$/i],
+        patterns: [/^Metrolist\.ipa$/i],
       },
     ],
   },
@@ -122,8 +122,13 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
     architectures: [
       {
         key: 'x86_64',
-        name: 'x86_64',
-        patterns: [/^Metrolist-Linux-64\.appimage$/i],
+        name: 'x64',
+        patterns: [/^metrolist-desktop-linux-x64-.+\.AppImage$/i],
+      },
+      {
+        key: 'arm64',
+        name: 'ARM64',
+        patterns: [/^metrolist-desktop-linux-arm64-.+\.AppImage$/i],
       },
     ],
   },
@@ -142,12 +147,12 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
       {
         key: 'arm64',
         name: 'Apple silicon',
-        patterns: [/^Metrolist-macOS-arm\.dmg$/i],
+        patterns: [/^metrolist-desktop-macos-arm64-.+\.dmg$/i],
       },
       {
         key: 'x86_64',
         name: 'Intel',
-        patterns: [/^Metrolist-macos-intel\.dmg$/i],
+        patterns: [/^metrolist-desktop-macos-x64-.+\.dmg$/i],
       },
     ],
   },
@@ -166,7 +171,15 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
       {
         key: 'x64',
         name: 'x64',
-        patterns: [/^Metrolist-Windows-64\.exe$/i, /^Metrolist-Windows-64\.zip$/i],
+        patterns: [
+          /^metrolist-installer-windows-x64-.+\.exe$/i,
+          /^Metrolist-Desktop-windows\.zip$/i,
+        ],
+      },
+      {
+        key: 'arm64',
+        name: 'ARM64',
+        patterns: [/^metrolist-desktop-windows-arm64-.+\.zip$/i],
       },
     ],
   },
