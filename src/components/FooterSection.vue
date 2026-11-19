@@ -22,7 +22,7 @@ const links = [
         </RouterLink>
       </div>
 
-      <nav class="footer__links" aria-label="Footer navigation">
+      <nav class="footer__links" aria-label="Footer">
         <a
           v-for="link in links"
           :key="link.label"
@@ -37,8 +37,8 @@ const links = [
 
       <div class="footer__bottom">
         <p>{{ HOSTING_NOTICE }}</p>
-        <p>Metrolist is an educational open-source project and is not affiliated with Google LLC. YouTube and YouTube Music are trademarks of Google LLC.</p>
-        <p>Metrolist by <a href="https://github.com/mostafaalagamy" target="_blank" rel="noopener noreferrer">Mo Agamy</a> and contributors. Site by <a href="https://nyx.meowery.eu" target="_blank" rel="noopener noreferrer">Nyx</a>.</p>
+        <p>Metrolist is an independent open-source project and isn’t affiliated with Google LLC. YouTube and YouTube Music are trademarks of Google LLC.</p>
+        <p>Built by <a href="https://github.com/mostafaalagamy" target="_blank" rel="noopener noreferrer">Mo Agamy</a> and contributors. Website by <a href="https://nyx.meowery.eu" target="_blank" rel="noopener noreferrer">Nyx</a>.</p>
       </div>
     </div>
   </footer>

@@ -23,9 +23,9 @@ const notes = computed(() => {
   const unsynced = lines.filter(line => !synced(line)).length
   const hasWords = lines.some(line => line.words?.length)
   const result: string[] = []
-  if (unsynced && format.value !== 'plain' && format.value !== 'mlx') result.push(`${unsynced} unsynced ${unsynced === 1 ? 'line is' : 'lines are'} left out of ${EXPORT_FORMATS[format.value].label}.`)
+  if (unsynced && format.value !== 'plain' && format.value !== 'mlx') result.push(`${unsynced} unsynced ${unsynced === 1 ? 'line will be' : 'lines will be'} left out of ${EXPORT_FORMATS[format.value].label}.`)
   if (unsynced && format.value === 'mlx') result.push(`${unsynced} unsynced ${unsynced === 1 ? 'line stays' : 'lines stay'} at the end without timings.`)
-  if (hasWords && (format.value === 'lrc' || format.value === 'plain')) result.push('Word timings are not included in this format. Choose MLX, Enhanced LRC, or TTML to keep them.')
+  if (hasWords && (format.value === 'lrc' || format.value === 'plain')) result.push('Word timings aren’t supported in this format. Switch to MLX, Enhanced LRC, or TTML to keep them.')
   return result
 })
 

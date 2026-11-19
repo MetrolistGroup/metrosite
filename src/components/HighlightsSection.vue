@@ -40,7 +40,7 @@ function openDownload(platform: DownloadPlatformKey) {
 
   <section id="platforms" class="platforms">
     <div class="container platforms__layout">
-      <header><h2>Supported<br /><span>platforms</span></h2><p>Select a platform for downloads and installation instructions.</p></header>
+      <header><h2>Pick your<br /><span>platform</span></h2><p>Choose your device to grab the right build and quick install steps.</p></header>
       <div class="platforms__list">
         <button v-for="platform in DOWNLOAD_PLATFORMS" :key="platform.name" type="button" aria-haspopup="dialog" @click="openDownload(platform.key)">
           <span class="platforms__icon"><img :src="`/icons/${platform.icon}.svg`" alt="" /></span>

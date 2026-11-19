@@ -27,7 +27,7 @@ const topItems = FAQ_ITEMS.slice(0, 5)
           </details>
         </div>
         <RouterLink to="/faq" class="btn btn-tonal faq__more">
-          See the FAQ
+          Read the full FAQ
           <span class="material-symbols-rounded" aria-hidden="true">arrow_outward</span>
         </RouterLink>
       </div>

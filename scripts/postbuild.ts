@@ -274,7 +274,7 @@ const home = {
     type: 17,
     accent_color: 14268927,
     components: [
-      { type: 9, components: [text(`## [Metrolist](${SITE_URL}/)\nMusic without the noise · Fully multiplatform`)], accessory: button('Open', `${SITE_URL}/`) },
+      { type: 9, components: [text(`## [Metrolist](${SITE_URL}/)\nMusic without the noise · Phone to desktop`)], accessory: button('Open', `${SITE_URL}/`) },
       { type: 12, items: gallery.map(([url, description]) => ({ media: { url }, description })) },
       text('*Home and player on desktop and Android*'),
       { type: 14, divider: true, spacing: 1 },

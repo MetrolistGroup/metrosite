@@ -32,7 +32,7 @@ const reviewDate = new Intl.DateTimeFormat('en-US', {
         <h1 id="guides-title">{{ guide?.heading ?? 'YouTube Music app guides' }}</h1>
         <p class="guides-page__intro">{{ guide?.intro ?? GUIDE_INDEX_META.description }}</p>
         <p class="guides-page__disclosure">{{ GUIDE_DISCLOSURE }}</p>
-        <p class="guides-page__date">Sources checked <time :datetime="GUIDE_REVIEW_DATE">{{ reviewDate }}</time></p>
+        <p class="guides-page__date">Last checked <time :datetime="GUIDE_REVIEW_DATE">{{ reviewDate }}</time></p>
       </header>
 
       <article v-if="guide" class="guides-page__document" aria-labelledby="guides-title">
@@ -85,8 +85,8 @@ const reviewDate = new Intl.DateTimeFormat('en-US', {
       </div>
 
       <section v-if="guide" class="guides-page__next" aria-labelledby="guides-download-title">
-        <h2 id="guides-download-title">Install Metrolist</h2>
-        <p><RouterLink :to="{ path: '/', hash: '#desktop' }">See the app previews</RouterLink> and <RouterLink to="/faq">read the FAQ</RouterLink> for installation, account, and safety details.</p>
+        <h2 id="guides-download-title">Want to try Metrolist?</h2>
+        <p>Check out the <RouterLink :to="{ path: '/', hash: '#desktop' }">app previews</RouterLink> or <RouterLink to="/faq">read the FAQ</RouterLink> for install steps and account details.</p>
         <DownloadDialog />
       </section>
     </div>

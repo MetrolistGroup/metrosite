@@ -81,12 +81,12 @@ Source: ${SITE_URL}/sync
 
 ## How it works
 
-1. Choose the song audio. It plays from your device and is never uploaded.
-2. Paste lyrics or open a lyrics file. Existing timings are kept.
-3. In line mode, tap Space or the tap pad when each line starts. In word mode, hold for each word, or tap quickly to let a word last until the next tap.
-4. Fix lines with nudges, edits, undo, and preview, then export.
+1. Pick your song audio. It plays straight from your device and never gets uploaded.
+2. Paste lyrics or open a lyrics file. Existing timings are kept so you can just tweak them.
+3. In line mode, tap Space or the pad when each line starts. In word mode, hold for sustained words, or tap quickly to let a word run until your next tap.
+4. Fine-tune with nudges, edits, undo, and preview, then export.
 
-Drafts are saved in your browser, so a reload does not lose your work.
+Drafts save locally in your browser, so refreshing won’t wipe your progress.
 
 ## Import formats
 

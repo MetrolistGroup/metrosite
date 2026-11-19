@@ -75,15 +75,15 @@
      Baseline display weights stay light; emphasized words (h1/h2 > span)
      jump to a heavy, fully rounded cut for contrast. */
   --md-ref-typeface: 'Google Sans Flex', system-ui, sans-serif;
-  --md-sys-typescale-display-large: 500 clamp(3.25rem, 7vw, 6.75rem) / 0.94 var(--md-ref-typeface);
+  --md-sys-typescale-display-large: 500 clamp(3.25rem, 1.25rem + 5.5vw, 6.75rem) / 0.94 var(--md-ref-typeface);
   --md-sys-typescale-display-large-tracking: -0.035em;
-  --md-sys-typescale-display-medium: 500 clamp(2.6rem, 5.2vw, 5rem) / 0.98 var(--md-ref-typeface);
+  --md-sys-typescale-display-medium: 500 clamp(2.6rem, 1rem + 4vw, 5rem) / 0.98 var(--md-ref-typeface);
   --md-sys-typescale-display-medium-tracking: -0.03em;
-  --md-sys-typescale-display-small: 500 clamp(2.1rem, 4.2vw, 3.5rem) / 1.02 var(--md-ref-typeface);
+  --md-sys-typescale-display-small: 500 clamp(2.1rem, 1rem + 2.8vw, 3.5rem) / 1.02 var(--md-ref-typeface);
   --md-sys-typescale-display-small-tracking: -0.025em;
-  --md-sys-typescale-headline-large: 560 clamp(1.75rem, 3vw, 2.5rem) / 1.1 var(--md-ref-typeface);
+  --md-sys-typescale-headline-large: 560 clamp(1.75rem, 1rem + 1.8vw, 2.5rem) / 1.1 var(--md-ref-typeface);
   --md-sys-typescale-headline-large-tracking: -0.02em;
-  --md-sys-typescale-headline-medium: 600 clamp(1.4rem, 2.3vw, 2rem) / 1.12 var(--md-ref-typeface);
+  --md-sys-typescale-headline-medium: 600 clamp(1.4rem, 0.9rem + 1.2vw, 2rem) / 1.12 var(--md-ref-typeface);
   --md-sys-typescale-headline-medium-tracking: -0.015em;
   --md-sys-typescale-headline-small: 600 1.5rem / 1.2 var(--md-ref-typeface);
   --md-sys-typescale-headline-small-tracking: -0.01em;
@@ -93,7 +93,7 @@
   --md-sys-typescale-title-medium-tracking: 0;
   --md-sys-typescale-title-small: 620 0.875rem / 1.35 var(--md-ref-typeface);
   --md-sys-typescale-title-small-tracking: 0.005em;
-  --md-sys-typescale-body-large: 400 clamp(1.0625rem, 1.3vw, 1.1875rem) / 1.6 var(--md-ref-typeface);
+  --md-sys-typescale-body-large: 400 clamp(1.0625rem, 0.95rem + 0.3vw, 1.1875rem) / 1.6 var(--md-ref-typeface);
   --md-sys-typescale-body-large-tracking: 0;
   --md-sys-typescale-body-medium: 400 0.9375rem / 1.6 var(--md-ref-typeface);
   --md-sys-typescale-body-medium-tracking: 0.005em;

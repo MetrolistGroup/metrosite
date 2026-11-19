@@ -42,7 +42,7 @@ async function copyCode() {
 <template>
   <main id="main" class="listen">
     <div class="container listen__inner">
-      <nav class="listen__nav" aria-label="Listen page navigation">
+      <nav class="listen__nav" aria-label="Listen Together">
         <RouterLink to="/" class="listen__brand">
           <span><img src="/logo.svg" alt="" width="28" height="28" /></span>
           Metrolist
@@ -57,7 +57,7 @@ async function copyCode() {
         <div>
           <p class="section-label"><span class="material-symbols-rounded" aria-hidden="true">groups</span>Listen Together</p>
           <h1>Join a <span>listening room</span></h1>
-          <p>Open this invitation on a device with Metrolist to keep playback synchronized with friends.</p>
+          <p>Open this invite on a device with Metrolist installed to listen in sync with your friends.</p>
         </div>
         <span class="listen__hero-icon material-symbols-rounded" aria-hidden="true">groups</span>
       </header>
@@ -75,22 +75,22 @@ async function copyCode() {
 
       <section v-else class="listen__empty">
         <span class="material-symbols-rounded" aria-hidden="true">link_off</span>
-        <div><h2>{{ invalidCode ? 'Invalid room code' : 'No room code found' }}</h2><p>Use a Listen Together link shared from Metrolist. Room codes can contain up to 64 letters, numbers, underscores, or hyphens.</p></div>
+        <div><h2>{{ invalidCode ? 'That room code doesn’t look right' : 'No room code in this link' }}</h2><p>Ask your friend for a fresh Listen Together link from Metrolist. Room codes are up to 64 letters, numbers, underscores, or hyphens.</p></div>
       </section>
-      <p class="listen__feedback" role="status" aria-atomic="true">{{ copyStatus === 'success' ? 'Room code copied.' : copyStatus === 'error' ? 'Could not copy the room code. Select the code above and copy it manually.' : '' }}</p>
+      <p class="listen__feedback" role="status" aria-atomic="true">{{ copyStatus === 'success' ? 'Room code copied.' : copyStatus === 'error' ? 'Couldn’t copy the code automatically. Select it above and copy it yourself.' : '' }}</p>
 
       <div class="listen__guides">
         <article>
           <div class="listen__guide-top"><span class="material-symbols-rounded" aria-hidden="true">open_in_new</span><small>Step 1</small></div>
           <h2>Join in Metrolist</h2>
-          <p>Copy the room code, then open Metrolist on your device.</p>
+          <p>Copy the room code above, then open Metrolist.</p>
           <ol>
-            <li>Open Listen Together in the app.</li>
-            <li>Choose Join room and paste or type the code.</li>
-            <li>If the code is not accepted, ask the host for a new invitation and check that your app versions are compatible.</li>
+            <li>Head to Listen Together in the app.</li>
+            <li>Tap Join room and paste or type the code.</li>
+            <li>If the code isn’t accepted, ask the host for a fresh invite and check that you’re on compatible app versions.</li>
           </ol>
           <template v-if="openInAppUrl">
-            <p>If Metrolist is installed, try opening this room directly. If your browser cannot open the app or the room does not appear, join manually above.</p>
+            <p>Already have Metrolist installed? Try opening the room straight in the app. If your browser doesn’t hand it off, just join with the code above.</p>
             <a :href="openInAppUrl" class="btn btn-filled btn-lg">
               <span class="material-symbols-rounded" aria-hidden="true">open_in_new</span>
               Open in Metrolist
@@ -100,8 +100,8 @@ async function copyCode() {
 
         <article>
           <div class="listen__guide-top"><span class="material-symbols-rounded" aria-hidden="true">download</span><small>Step 2</small></div>
-          <h2>Install the app</h2>
-          <p>Metrolist is available for Android, iOS, Linux, macOS, and Windows from GitHub.</p>
+          <h2>Don’t have Metrolist yet?</h2>
+          <p>Download it free for Android, iOS, Windows, macOS, or Linux from GitHub.</p>
           <DownloadDialog label="Download Metrolist" button-class="btn btn-outlined btn-lg" />
         </article>
       </div>

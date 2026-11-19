@@ -2,7 +2,7 @@ export const SITE_URL = 'https://metrolist.cc'
 export const REPO_URL = 'https://github.com/MetrolistGroup/Metrolist'
 
 // Shown in the footer, FAQ, and llms.txt; written for takedown reviewers as much as users.
-export const HOSTING_NOTICE = 'Metrolist does not host, upload, or distribute any music, videos, or other media. It is a client that plays content directly from YouTube Music, the same way the official website does. It does not bypass DRM, and Premium-only features such as premium audio quality require your own YouTube Music Premium subscription.'
+export const HOSTING_NOTICE = 'Metrolist does not host, upload, or distribute any music, videos, or other media. It plays streams directly from YouTube Music, just like the official website. It does not bypass DRM, and Premium-only features like higher audio quality still require your own YouTube Music Premium subscription.'
 
 // Large image previews and full snippets let search results show screenshots and complete answers.
 const INDEX = 'index, follow, max-image-preview:large, max-snippet:-1'
@@ -16,37 +16,37 @@ export type PageMeta = {
 export const PAGE_META = {
   home: {
     title: 'Metrolist · Music without the noise',
-    description: 'Free, open-source YouTube Music client for Android, iOS, Windows, macOS, and Linux. No ads, background play, synced lyrics, offline downloads, and casting.',
+    description: 'A free, open-source YouTube Music player for Android, iOS, Windows, macOS, and Linux. No ads, background play, synced lyrics, offline downloads, and casting.',
     robots: INDEX,
   },
   faq: {
     title: 'Metrolist FAQ · Install, sign in, update, and import playlists',
-    description: 'Answers about Metrolist platforms, installation, YouTube Music sign-in, migration, updates, Spotify playlist import, and safety.',
+    description: 'Straight answers on installing Metrolist, signing in with YouTube Music, moving your library, importing Spotify playlists, updating, and staying safe.',
     robots: INDEX,
   },
   listen: {
     title: 'Listen Together · Metrolist',
-    description: 'Join a Metrolist listening room for synchronized playback with friends.',
+    description: 'Join a Metrolist listening room and stay in sync with friends.',
     robots: 'noindex, follow',
   },
   share: {
     title: 'Shared music · Metrolist',
-    description: 'Open a shared song, playlist, album, or artist in Metrolist or YouTube Music.',
+    description: 'Open this shared song, playlist, album, or artist in Metrolist or on YouTube Music.',
     robots: 'noindex, follow',
   },
   sync: {
     title: 'Lyrics sync · Metrolist',
-    description: 'Sync lyrics line by line or word by word in your browser, then export MLX, LRC, Enhanced LRC, or TTML for Metrolist.',
+    description: 'Time lyrics line by line or word by word right in your browser, then export to MLX, LRC, Enhanced LRC, or TTML.',
     robots: INDEX,
   },
   privacy: {
     title: 'Privacy policy · Metrolist',
-    description: 'Learn how Metrolist handles local app data, optional Sentry diagnostics, third-party services, and website requests.',
+    description: 'What Metrolist keeps on your device, how optional Sentry crash reports work, and what the website sends.',
     robots: INDEX,
   },
   notFound: {
     title: 'Page not found · Metrolist',
-    description: 'The requested Metrolist page could not be found.',
+    description: 'We couldn’t find that Metrolist page.',
     robots: 'noindex, nofollow',
   },
 } satisfies Record<string, PageMeta>

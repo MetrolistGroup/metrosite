@@ -176,7 +176,7 @@ function resumeDraft() {
 }
 
 function startOver() {
-  if (!confirm('Close these lyrics? Your current sync stays saved as a draft until you start a new one.')) return
+  if (!confirm('Leave these lyrics? Your current progress stays saved as a draft until you start a new song.')) return
   saveNow()
   savedDraft.value = JSON.parse(readStorage() ?? 'null') ?? undefined
   audio.value?.pause()
@@ -344,7 +344,7 @@ function shiftAll() {
 function togglePlay() {
   const element = audio.value
   if (!element || !audioUrl.value) return
-  if (element.paused) element.play().catch(() => announce('The browser could not play this audio file.'))
+  if (element.paused) element.play().catch(() => announce('Your browser couldn’t play that audio file.'))
   else element.pause()
 }
 
@@ -423,7 +423,7 @@ const SHORTCUTS = [
 <template>
   <main id="main" ref="root" class="sync" :class="{ 'sync--dragging': dragging }" @dragover.prevent="dragging = true" @dragleave.self="dragging = false" @drop.prevent="onDrop">
     <div class="container sync__inner">
-      <nav class="sync__nav" aria-label="Lyrics sync navigation">
+      <nav class="sync__nav" aria-label="Lyrics sync">
         <RouterLink to="/" class="sync__brand">
           <span><img src="/logo.svg" alt="" width="28" height="28" /></span>
           Metrolist
@@ -445,7 +445,7 @@ const SHORTCUTS = [
         <header class="sync-setup__hero">
           <p class="section-label"><span class="material-symbols-rounded" aria-hidden="true">lyrics</span>Lyrics sync</p>
           <h1 id="sync-title">Time every <span>line and word</span></h1>
-          <p>Bring a song and its lyrics, tap along as it plays, and export MLX for Metrolist. Files stay in your browser.</p>
+          <p>Drop in a song and its lyrics, tap along as it plays, and export for Metrolist. Everything stays right in your browser and nothing gets uploaded.</p>
         </header>
 
         <div v-if="savedDraft" class="sync-setup__draft">
@@ -461,7 +461,7 @@ const SHORTCUTS = [
           <article class="sync-setup__card sync-setup__card--audio">
             <div class="sync-setup__step"><span class="material-symbols-rounded" aria-hidden="true">audio_file</span><small>Step 1</small></div>
             <h2>Song audio</h2>
-            <p>Any file your browser can play: MP3, M4A, FLAC, OGG, Opus, WAV, or a video.</p>
+            <p>Pick any audio or video file your browser can play: MP3, M4A, FLAC, OGG, Opus, WAV, and more.</p>
             <label class="btn btn-filled btn-lg sync-file">
               <span class="material-symbols-rounded" aria-hidden="true">audio_file</span>{{ audioName ? 'Change audio' : 'Choose audio' }}
               <input type="file" accept="audio/*,video/*" @change="onFiles(($event.target as HTMLInputElement).files)" />
@@ -473,7 +473,7 @@ const SHORTCUTS = [
             <div class="sync-setup__step"><span class="material-symbols-rounded" aria-hidden="true">lyrics</span><small>Step 2</small></div>
             <h2>Lyrics</h2>
             <label :for="sourceId" class="sr-only">Lyrics text</label>
-            <textarea :id="sourceId" v-model="source" rows="9" spellcheck="false" placeholder="Paste one lyric line per row, or open LRC, TTML, MLX, QRC, KRC, YRC, ASS, Spotify, Musixmatch, or LyricsPlus files." @input="importError = ''" />
+            <textarea :id="sourceId" v-model="source" rows="9" spellcheck="false" placeholder="Paste lyrics (one line per row), or open an LRC, TTML, MLX, QRC, KRC, YRC, ASS, Spotify, Musixmatch, or LyricsPlus file." @input="importError = ''" />
             <div class="sync-setup__row">
               <label class="btn btn-outlined sync-file">
                 <span class="material-symbols-rounded" aria-hidden="true">upload_file</span>Open file
@@ -495,7 +495,7 @@ const SHORTCUTS = [
           <button type="button" class="btn btn-filled btn-lg" :disabled="!source.trim()" @click="startSyncing">
             <span class="material-symbols-rounded" aria-hidden="true">touch_app</span>Start syncing
           </button>
-          <p>Existing timings are kept, so you can import a file just to fix it. You can also drop files anywhere on this page.</p>
+          <p>Already timed? We’ll keep your existing timestamps so you can just tweak them. You can also drag and drop files anywhere on this page.</p>
         </div>
       </section>
 
@@ -543,7 +543,7 @@ const SHORTCUTS = [
             </template>
             <li v-if="!preview" class="sync-lyrics__end" :class="{ 'sync-lyrics__end--current': finished }">
               <span class="material-symbols-rounded" aria-hidden="true">check</span>
-              <span>{{ finished ? 'Every line has been tapped. Preview it, fix lines, or export.' : 'End of lyrics' }}</span>
+              <span>{{ finished ? 'You’ve tapped every line. Preview the timing, tweak anything that’s off, or export.' : 'End of lyrics' }}</span>
             </li>
           </ol>
         </section>

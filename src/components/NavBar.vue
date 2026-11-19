@@ -33,7 +33,7 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onPointerDown,
         <span>Metrolist</span>
       </RouterLink>
 
-      <nav class="navbar__links" aria-label="Main navigation">
+      <nav class="navbar__links" aria-label="Main">
         <RouterLink :to="{ path: '/', hash: '#desktop' }" :aria-current="currentAnchor('#desktop')">Showcase</RouterLink>
         <RouterLink :to="{ path: '/', hash: '#features' }" :aria-current="currentAnchor('#features')">Features</RouterLink>
         <RouterLink :to="{ path: '/', hash: '#platforms' }" :aria-current="currentAnchor('#platforms')">Platforms</RouterLink>
@@ -47,7 +47,7 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onPointerDown,
     </div>
 
     <Transition name="drawer">
-    <nav v-show="isMenuOpen" id="mobile-navigation" class="navbar__drawer" aria-label="Mobile navigation">
+    <nav v-show="isMenuOpen" id="mobile-navigation" class="navbar__drawer" aria-label="Mobile">
       <div class="container">
         <RouterLink :to="{ path: '/', hash: '#desktop' }" :aria-current="currentAnchor('#desktop')" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">devices</span>Showcase</RouterLink>
         <RouterLink :to="{ path: '/', hash: '#features' }" :aria-current="currentAnchor('#features')" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">tune</span>Features</RouterLink>

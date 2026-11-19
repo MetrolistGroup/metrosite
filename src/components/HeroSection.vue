@@ -28,7 +28,7 @@ onMounted(async () => {
         <div class="hero__copy">
           <h1 id="hero-title">Music <span>without the noise</span></h1>
           <p class="hero__lede">
-            An open-source YouTube Music client for Android, iOS, Linux, macOS, and Windows.
+            A free, open-source YouTube Music player for Android, iOS, Windows, macOS, and Linux. No ads, no clutter, just your music.
           </p>
           <div class="hero__actions">
             <DownloadDialog button-class="btn btn-filled btn-lg" />
@@ -42,8 +42,8 @@ onMounted(async () => {
         <div class="hero__signal">
           <span class="hero__signal-icon material-symbols-rounded" aria-hidden="true">desktop_windows</span>
           <div>
-            <strong>Mobile and desktop</strong>
-            <p>The same Metrolist app across all your devices.</p>
+            <strong>Phone to desktop</strong>
+            <p>The same Metrolist experience on your phone, tablet, and computer.</p>
           </div>
           <dl class="hero__stats" aria-label="Metrolist repository statistics">
             <div><dt>License</dt><dd>GPL-3.0</dd></div>

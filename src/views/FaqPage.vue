@@ -242,6 +242,7 @@ const topicGroups = FAQ_TOPICS.map(topic => ({
 }
 
 .faq-page__answer p {
+  max-width: 65ch;
   padding: 0 56px 24px 16px;
 }
 

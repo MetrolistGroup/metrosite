@@ -7,8 +7,8 @@ import DownloadDialog from './DownloadDialog.vue'
     <div class="container">
       <div class="download__panel">
         <div class="download__copy">
-          <h2 id="download-title">Install <span>Metrolist</span></h2>
-          <p>Get the latest release from GitHub.</p>
+          <h2 id="download-title">Ready to <span>listen?</span></h2>
+          <p>Grab the latest build for your device straight from GitHub Releases.</p>
         </div>
         <div class="download__actions">
           <DownloadDialog label="Download Metrolist" button-class="btn btn-filled btn-lg" />

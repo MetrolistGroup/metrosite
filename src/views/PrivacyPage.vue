@@ -9,63 +9,63 @@ import NavBar from '../components/NavBar.vue'
     <div class="container">
       <header class="privacy-page__header">
         <h1>Privacy policy</h1>
-        <p class="privacy-page__intro">This policy explains what the Metrolist apps and <a href="https://metrolist.cc">metrolist.cc</a> collect, why it is needed, and what you can control.</p>
+        <p class="privacy-page__intro">Plain-English details on what the Metrolist apps and <a href="https://metrolist.cc">metrolist.cc</a> collect, why it’s needed, and how you stay in control.</p>
         <p class="privacy-page__date">Last updated <time datetime="2026-09-16">September 16, 2026</time></p>
       </header>
 
       <article class="privacy-page__document">
         <section>
-          <h2>About this policy</h2>
-          <p>Metrolist is an open-source project maintained by its contributors. It does not operate an advertising network and does not sell or rent personal data.</p>
+          <h2>The short version</h2>
+          <p>Metrolist is an open-source project built by volunteers. We don’t run ads, we don’t track you across the web, and we never sell or rent your data.</p>
         </section>
 
         <section>
-          <h2>Data stored by the app</h2>
-          <p>Your settings, listening history, library information, downloads, account credentials, and similar app data are stored on your device. Metrolist’s maintainers do not receive that local data.</p>
-          <p>When you use an online feature, the app sends the information needed to the service providing it. For example, YouTube or Google receives playback, search, and account requests. Optional integrations such as Last.fm, Discord, lyrics, music recognition, or Listen Together receive data only when you use or enable those features. Those services handle data under their own privacy policies.</p>
+          <h2>Data stored on your device</h2>
+          <p>Your settings, listening history, library, downloads, and account credentials stay on your own device. Metrolist’s maintainers never see that local data.</p>
+          <p>When you use an online feature, the app talks directly to the service powering it. For instance, YouTube and Google handle your searches, playback streams, and account sync. Optional integrations like Last.fm, Discord, lyrics providers, music recognition, or Listen Together only receive data when you turn them on or use them, under their own privacy policies.</p>
         </section>
 
         <section>
-          <h2>Sentry diagnostics</h2>
-          <p>Supported release builds can send diagnostic reports to <a href="https://sentry.io/privacy/" target="_blank" rel="noopener noreferrer">Sentry</a>. Reporting is disabled by default and starts only after you enable it during onboarding or in <strong>Settings → Privacy &amp; Security → Sentry error reporting</strong>. This processing is based on your consent.</p>
+          <h2>Sentry crash and playback reports</h2>
+          <p>Supported release builds can send crash and error reports to <a href="https://sentry.io/privacy/" target="_blank" rel="noopener noreferrer">Sentry</a>. This is off by default and only turns on if you opt in during setup or in <strong>Settings → Privacy &amp; Security → Sentry error reporting</strong>. It runs strictly on your consent.</p>
 
-          <h3>Information a report may contain</h3>
+          <h3>What a report can include</h3>
           <ul>
-            <li>App version, platform, operating-system and device characteristics, timestamps, and an app-launch marker.</li>
-            <li>Crash or error type, stack traces, affected threads, and Android app-not-responding or native-crash details.</li>
-            <li>Playback diagnostics following a playback failure, including the YouTube video ID, song duration, explicit-content flag, source type, playback client and profile, media format, codec, bitrate, sample rate, and attempted playback strategies.</li>
-            <li>Your IP address may be processed by Sentry and network providers when they receive a report, although Metrolist does not intentionally add it to the report.</li>
+            <li>App version, platform, OS and device details, timestamps, and an app-launch marker.</li>
+            <li>Crash or error type, stack traces, affected threads, and Android ANR or native-crash details.</li>
+            <li>Playback diagnostics after a playback failure, including the YouTube video ID, song length, explicit-content flag, source type, playback client and profile, media format, codec, bitrate, sample rate, and which playback strategies were tried.</li>
+            <li>Your IP address may be seen by Sentry and network providers when a report is delivered, though Metrolist doesn’t intentionally attach it to the report.</li>
           </ul>
 
-          <h3>Information excluded from reports</h3>
-          <p>Metrolist configures Sentry not to send default personally identifiable information. Before reports are sent, the app removes request details, computer names, exception messages, local variables, and unrelated breadcrumbs. Credentials, authentication tokens, cookies, signed media URLs, and account details are not intentionally included. Performance tracing and session replay are disabled.</p>
+          <h3>What we strip out</h3>
+          <p>We configure Sentry not to collect default personal identifiers. Before anything leaves your device, the app strips request details, computer names, exception messages, local variables, and unrelated breadcrumbs. Passwords, auth tokens, cookies, signed media URLs, and account info aren’t intentionally included. Performance tracing and session replay are turned off.</p>
 
-          <h3>Use and retention</h3>
-          <p>Authorized project maintainers use reports only to investigate crashes, app errors, and playback failures. Sentry receives reports through the project’s EU endpoint. Sentry and its subprocessors may process data in other countries under their applicable safeguards.</p>
-          <p>Reports remain in Sentry for the retention period configured for the project and are then deleted automatically. We may delete them sooner when they are no longer useful. Diagnostic data is not used for advertising or user profiling.</p>
+          <h3>How we use and keep reports</h3>
+          <p>Maintainers use these reports strictly to track down crashes, bugs, and broken playback, never for ads or profiling. Reports go to Sentry’s EU endpoint, though Sentry and its subprocessors may process data in other countries under their safeguards.</p>
+          <p>Reports stay in Sentry only for our configured retention window and are deleted automatically afterward (or earlier once they’re no longer needed).</p>
         </section>
 
         <section>
           <h2>Website hosting</h2>
-          <p><a href="https://metrolist.cc">metrolist.cc</a> is a static site hosted by Cloudflare. It does not set cookies or include tracking, advertising, or analytics scripts. Cloudflare receives the connection data needed to serve the site, such as your IP address, browser information, requested page, and timestamp, under <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">Cloudflare’s privacy policy</a>.</p>
-          <p>The site requests public release and repository information from GitHub. When your browser makes those requests, GitHub receives standard connection information under <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer">GitHub’s privacy statement</a>.</p>
+          <p><a href="https://metrolist.cc">metrolist.cc</a> is a static site hosted on Cloudflare. It sets no cookies and loads no tracking, ad, or analytics scripts. Cloudflare receives standard connection details needed to serve pages (such as your IP address, browser info, requested URL, and timestamp) under <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">Cloudflare’s privacy policy</a>.</p>
+          <p>To show the latest download and star count, your browser fetches public release and repo info from GitHub, which receives standard connection details under <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer">GitHub’s privacy statement</a>.</p>
         </section>
 
         <section>
           <h2>Your choices and rights</h2>
-          <p>You can stop future diagnostic reports at any time by disabling Sentry error reporting in the app’s privacy settings. Disabling it closes the reporting client but does not remove reports already sent.</p>
-          <p>Depending on where you live, you may have rights to access, correct, delete, restrict, or object to processing of your personal data, withdraw consent, or complain to a data-protection authority. Diagnostic reports are pseudonymous and Metrolist has no user account system of its own, so we may need a Sentry event ID to locate a report and may not be able to associate a report with you.</p>
+          <p>You can stop diagnostic reports anytime by switching off Sentry error reporting in the app’s privacy settings. Turning it off stops new reports from being sent, though it doesn’t erase ones already received.</p>
+          <p>Depending on where you live, you may have the right to access, correct, delete, restrict, or object to processing of your personal data, withdraw consent, or contact a data-protection authority. Because Metrolist doesn’t have its own user accounts and reports are pseudonymous, we may need a Sentry event ID to find a specific report, and we may not be able to link one back to you.</p>
         </section>
 
         <section>
           <h2>Children</h2>
-          <p>Metrolist is not directed to children under 13, and we do not knowingly collect personal data from children. If you believe a child has sent diagnostic data, contact us so we can review and delete it where possible.</p>
+          <p>Metrolist isn’t aimed at children under 13, and we don’t knowingly collect personal data from them. If you think a child has sent diagnostic data, reach out and we’ll review and delete it wherever we can.</p>
         </section>
 
         <section>
           <h2>Updates and contact</h2>
-          <p>This policy may change when Metrolist’s data practices or service providers change. The date at the top of this page will be updated when that happens.</p>
-          <p>For privacy questions or requests, email <a href="mailto:contact@metrolist.cc">contact@metrolist.cc</a>. Do not include passwords, cookies, or authentication tokens in your message.</p>
+          <p>If our data practices or service providers change, we’ll update this page and bump the date at the top.</p>
+          <p>Questions or privacy requests? Email <a href="mailto:contact@metrolist.cc">contact@metrolist.cc</a>. Please don’t include passwords, cookies, or auth tokens in your email.</p>
         </section>
       </article>
     </div>

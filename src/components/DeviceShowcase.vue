@@ -41,7 +41,7 @@ onBeforeUnmount(() => { if (dialog.value?.open) restoreScroll() })
   <section id="desktop" class="showcase" aria-label="Metrolist app previews">
     <div class="container">
       <header class="showcase__heading">
-        <p>Preview the desktop and mobile apps.<br />Switch between Home, Library, and Player views.</p>
+        <p>Take a look around before you install.<br />Flip between Home, Library, and Player on desktop and mobile.</p>
         <div class="view-switch" role="group" aria-label="App preview">
           <button v-for="screen in SHOWCASE_VIEWS" :key="screen.key" type="button" :aria-pressed="view === screen.key" @click="view = screen.key">{{ screen.name }}</button>
         </div>
@@ -63,9 +63,9 @@ onBeforeUnmount(() => { if (dialog.value?.open) restoreScroll() })
 
   <Teleport to="body">
     <dialog ref="dialog" class="site-dialog preview-dialog" :aria-label="`${selected.name} · ${viewName} preview`" @close="restoreScroll" @click="(event) => { if (event.target === dialog) dialog?.close() }">
-      <form method="dialog" class="preview-dialog__close"><button class="icon-button" aria-label="Close dialog" title="Close dialog" autofocus><span class="material-symbols-rounded" aria-hidden="true">close</span></button></form>
+      <form method="dialog" class="preview-dialog__close"><button class="icon-button" aria-label="Close dialog" autofocus><span class="material-symbols-rounded" aria-hidden="true">close</span></button></form>
       <div class="preview-dialog__screen" :style="{ '--preview-ratio': selected.ratio }"><ShowcaseScreen v-if="dialogContentMounted" ref="fullScreen" :key="`${selectedDevice}-${dialogView}`" :device="selectedDevice" :view="dialogView" platform="windows" folded /></div>
-      <a v-if="fullScreen?.originalSource" class="preview-dialog__original" :href="fullScreen.originalSource" target="_blank" rel="noopener">Open image in new tab</a>
+      <a v-if="fullScreen?.originalSource" class="preview-dialog__original" :href="fullScreen.originalSource" target="_blank" rel="noopener">Open full image in a new tab</a>
     </dialog>
   </Teleport>
 </template>

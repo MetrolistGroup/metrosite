@@ -151,7 +151,7 @@ function formatSize(bytes?: number) {
       <div class="download-dialog__header">
         <h2 :id="titleId">Download Metrolist</h2>
         <form method="dialog">
-          <button class="icon-button" type="submit" aria-label="Close dialog" title="Close dialog">
+          <button class="icon-button" type="submit" aria-label="Close dialog">
             <span class="material-symbols-rounded" aria-hidden="true">close</span>
           </button>
         </form>
@@ -185,7 +185,7 @@ function formatSize(bytes?: number) {
       </div>
 
       <p v-if="selectedKey === 'macos' && selectedPlatform.architectures.length > 1" :id="architectureHelpId" class="download-dialog__architecture-help">
-        Open Apple menu &gt; About This Mac. If Chip shows an Apple M-series name, choose Apple silicon. If Processor shows Intel, choose Intel.
+        Not sure which Mac you have? Click the Apple menu, then About This Mac. If Chip lists an Apple M-series chip, pick Apple silicon; if Processor says Intel, pick Intel.
       </p>
 
       <section class="download-dialog__selection">
@@ -208,11 +208,11 @@ function formatSize(bytes?: number) {
           <div>
             <h3>Download</h3>
             <p class="download-dialog__status" role="status" aria-atomic="true">
-              <template v-if="isLoading">Loading the latest release…</template>
-              <template v-else-if="loadFailed">Couldn't load the latest release. Browse release files or reopen this dialog to try again.</template>
-              <template v-else-if="!selectedArchitecture">Select an architecture above for a direct download, or browse release files.</template>
+              <template v-if="isLoading">Checking for the latest release…</template>
+              <template v-else-if="loadFailed">Couldn’t reach GitHub right now. Browse the release files directly or reopen this window to try again.</template>
+              <template v-else-if="!selectedArchitecture">Pick an architecture above for a direct download, or browse all release files.</template>
               <template v-else-if="selectedAsset">{{ releaseName }}<template v-if="selectedAsset.size"> · {{ formatSize(selectedAsset.size) }}</template></template>
-              <template v-else>No matching build was found in the latest release.</template>
+              <template v-else>We couldn’t find a matching build in the latest release. Check all release files on GitHub instead.</template>
             </p>
             <div class="download-dialog__download-actions">
               <a :href="selectedAsset?.browser_download_url || releasesUrl" class="btn btn-filled" target="_blank" rel="noopener noreferrer" @click="onDownload">
@@ -226,8 +226,8 @@ function formatSize(bytes?: number) {
               <button type="button" class="btn btn-tonal" @click="hideNotice">Dismiss notice</button>
             </div>
             <p v-if="donateDeveloper" class="download-dialog__donate" role="status">
-              Support development.
-              <a :href="donateDeveloper.url" target="_blank" rel="noopener noreferrer">Donate to {{ donateDeveloper.name }}</a>
+              Enjoying Metrolist? Support the people building it:
+              <a :href="donateDeveloper.url" target="_blank" rel="noopener noreferrer">donate to {{ donateDeveloper.name }}</a>.
             </p>
           </div>
         </div>

@@ -11,7 +11,7 @@ function showLoadError() {
   notice.setAttribute('role', 'alert')
   notice.style.cssText = 'position:fixed;inset:auto 16px 16px;z-index:1000;padding:20px;background:#29262b;color:#ebe4eb;max-height:calc(100dvh - 32px);overflow:auto'
   const message = document.createElement('p')
-  message.textContent = 'This page could not finish loading. Check your connection, then reload to try again.'
+  message.textContent = 'This page didn’t finish loading. Check your internet connection and reload to try again.'
   const retry = document.createElement('button')
   retry.type = 'button'
   retry.className = 'btn btn-filled'

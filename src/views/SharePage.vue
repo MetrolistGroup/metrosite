@@ -19,7 +19,7 @@ const appUrl = computed(() => share.value ? musicAppUrl(share.value, navigator.u
   <main id="main" class="share-page">
     <section class="container share-page__inner" aria-labelledby="share-title">
       <h1 id="share-title">Shared music</h1>
-      <p>Open this link in Metrolist, or listen on YouTube Music.</p>
+      <p>Open this in Metrolist, or play it on YouTube Music instead.</p>
 
       <div v-if="!hydrated" class="share-page__loading" role="status" aria-label="Loading shared link">
         <span></span><span></span>
@@ -30,14 +30,14 @@ const appUrl = computed(() => share.value ? musicAppUrl(share.value, navigator.u
           <a :href="appUrl" class="btn btn-filled btn-lg">Open in Metrolist</a>
           <a :href="share.youtubeUrl" class="btn btn-outlined btn-lg" rel="noreferrer">Open in YouTube Music</a>
         </div>
-        <p>If your browser cannot open Metrolist, install the app or use YouTube Music.</p>
+        <p>If your browser won’t open Metrolist, grab the app below or listen on YouTube Music.</p>
       </div>
-      <p v-else class="share-page__error" role="status">This link is missing a valid song, playlist, album, or artist ID. Ask the sender for a new link.</p>
-      <noscript>Enable JavaScript to open this shared link, or paste the link into Metrolist.</noscript>
+      <p v-else class="share-page__error" role="status">This link is missing a valid song, playlist, album, or artist ID. Ask whoever sent it to share it again.</p>
+      <noscript>Turn on JavaScript to open this link automatically, or paste it straight into Metrolist.</noscript>
 
       <div class="share-page__install">
-        <h2>Need Metrolist?</h2>
-        <p>Available for Android, iOS, Linux, macOS, and Windows.</p>
+        <h2>Don’t have Metrolist?</h2>
+        <p>Free for Android, iOS, Windows, macOS, and Linux.</p>
         <DownloadDialog label="Download Metrolist" button-class="btn btn-tonal btn-lg" />
       </div>
     </section>

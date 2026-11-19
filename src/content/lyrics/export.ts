@@ -1,11 +1,11 @@
 import { lineText, sortLines, synced, syncType, toMlxJson, type Line, type LyricsDocument, type Word } from './model'
 
 export const EXPORT_FORMATS = {
-  mlx: { label: 'MLX', detail: 'Metrolist JSON MLX 2.0 with every timing, agent, and variant', extension: 'mlx', type: 'application/json' },
-  elrc: { label: 'Enhanced LRC', detail: 'Line and word timings for players that support <mm:ss.xx> tags', extension: 'lrc', type: 'text/plain' },
-  lrc: { label: 'LRC', detail: 'Line timings only, readable by almost every player', extension: 'lrc', type: 'text/plain' },
+  mlx: { label: 'MLX', detail: 'Metrolist JSON MLX 2.0, keeping every timing, singer, and translation', extension: 'mlx', type: 'application/json' },
+  elrc: { label: 'Enhanced LRC', detail: 'Line and word timings for players that read <mm:ss.xx> tags', extension: 'lrc', type: 'text/plain' },
+  lrc: { label: 'LRC', detail: 'Line timings only, supported by almost every player', extension: 'lrc', type: 'text/plain' },
   ttml: { label: 'TTML', detail: 'Apple-style timed text with word spans and background vocals', extension: 'ttml', type: 'application/ttml+xml' },
-  plain: { label: 'Plain text', detail: 'Lyrics without timings', extension: 'txt', type: 'text/plain' },
+  plain: { label: 'Plain text', detail: 'Just the words, no timestamps', extension: 'txt', type: 'text/plain' },
 } as const
 
 export type ExportFormat = keyof typeof EXPORT_FORMATS

@@ -77,9 +77,9 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
     detail: 'Android 7 and newer',
     package: 'APK',
     instructions: [
-      'Download the APK for your device.',
-      'Allow installs from this source when Android asks.',
-      'Open the APK and follow the installation prompt.',
+      'Download the APK file.',
+      'If Android asks, allow installs from your browser or file manager.',
+      'Tap the APK and follow the prompts to install.',
     ],
     architectures: [
       {
@@ -96,9 +96,9 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
     detail: 'iOS 17 and newer',
     package: 'IPA',
     instructions: [
-      'Download the unsigned IPA.',
+      'Download the unsigned IPA file.',
       'Open it in AltStore, SideStore, or Sideloadly.',
-      'Follow your sideloading app’s prompts to sign and install Metrolist.',
+      'Follow your sideloading tool’s prompts to sign and install Metrolist.',
     ],
     architectures: [
       {
@@ -115,9 +115,9 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
     detail: 'Most modern distributions',
     package: 'AppImage',
     instructions: [
-      'Download the AppImage for your architecture.',
-      'Make the file executable.',
-      'Run it directly or add it to your application menu.',
+      'Download the AppImage for your CPU architecture.',
+      'Mark the file as executable in its properties or with chmod +x.',
+      'Double-click to run it, or add it to your app launcher.',
     ],
     architectures: [
       {
@@ -140,8 +140,8 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
     package: 'DMG',
     instructions: [
       'Download and open the DMG for your Mac.',
-      'Drag Metrolist into Applications.',
-      'Open Metrolist from Applications and approve the first launch.',
+      'Drag Metrolist into your Applications folder.',
+      'Open Metrolist from Applications and approve the first-launch prompt.',
     ],
     architectures: [
       {
@@ -163,9 +163,9 @@ export const DOWNLOAD_PLATFORMS: readonly DownloadPlatform[] = [
     detail: 'Windows 10 and newer',
     package: 'Installer or portable ZIP',
     instructions: [
-      'Download the EXE installer or portable ZIP for your architecture.',
-      'For the EXE, run the installer and follow the prompts, then launch Metrolist from the Start menu.',
-      'For the ZIP, extract it to a folder and run Metrolist from the extracted folder.',
+      'Download the EXE installer or portable ZIP for your PC.',
+      'For the EXE, run the installer, follow the prompts, and launch Metrolist from the Start menu.',
+      'For the ZIP, extract it to a folder and run Metrolist from inside.',
     ],
     architectures: [
       {
