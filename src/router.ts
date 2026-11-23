@@ -17,6 +17,7 @@ const ROUTES = [
   { path: '/sync', name: 'sync', component: () => import('./views/SyncPage.vue'), meta: PAGE_META.sync },
   { path: '/faq', name: 'faq', component: () => import('./views/FaqPage.vue'), meta: PAGE_META.faq },
   { path: '/privacy', name: 'privacy', component: () => import('./views/PrivacyPage.vue'), meta: PAGE_META.privacy },
+  { path: '/privacy/bot', name: 'privacy-bot', component: () => import('./views/PrivacyBotPage.vue'), meta: PAGE_META.privacyBot },
   ...GUIDES.map(guide => ({
     path: `/guides/${guide.slug}`,
     name: `guide-${guide.slug}`,

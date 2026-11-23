@@ -9,11 +9,19 @@ import NavBar from '../components/NavBar.vue'
     <div class="container">
       <header class="privacy-page__header">
         <h1>Privacy policy</h1>
-        <p class="privacy-page__intro">Plain-English details on what the Metrolist apps and <a href="https://metrolist.cc">metrolist.cc</a> collect, why it’s needed, and how you stay in control.</p>
+        <p class="privacy-page__intro">Plain-English details on what the Metrolist apps and <a href="https://metrolist.cc">metrolist.cc</a> collect, why it’s needed, and how you stay in control. Looking for the Discord and Telegram bot? See the <a href="/privacy/bot">Metrobot policy</a>.</p>
         <p class="privacy-page__date">Last updated <time datetime="2026-09-16">September 16, 2026</time></p>
       </header>
 
       <article class="privacy-page__document">
+        <section>
+          <h2>Which policy applies</h2>
+          <ul>
+            <li>The Metrolist app and <a href="https://metrolist.cc">metrolist.cc</a>: this page.</li>
+            <li>Metrobot, the Discord and Telegram bot in the Metrolist community: <a href="/privacy/bot">Metrobot privacy policy</a>.</li>
+          </ul>
+        </section>
+
         <section>
           <h2>The short version</h2>
           <p>Metrolist is an open-source project built by volunteers. We don’t run ads, we don’t track you across the web, and we never sell or rent your data.</p>

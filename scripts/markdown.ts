@@ -100,10 +100,10 @@ MLX is the default and keeps every timing, singer, background vocal, translation
 `
 }
 
-export function privacyMarkdown(vueSource: string) {
+export function privacyMarkdown(vueSource: string, path = '/privacy') {
   const template = vueSource.match(/<header class="privacy-page__header">([\s\S]*?)<\/article>/)?.[1]
   if (!template) throw new Error('Privacy policy content was not found')
-  return `${htmlToMarkdown(template)}\n\nSource: ${SITE_URL}/privacy\n`
+  return `${htmlToMarkdown(template)}\n\nSource: ${SITE_URL}${path}\n`
 }
 
 const escapeMarkdown = (text: string) => text
@@ -161,6 +161,7 @@ Each Markdown page names its canonical HTML source.
 - [FAQ](${SITE_URL}/faq.md): platforms, migration, accounts, safety, updates, and imports
 - [Lyrics sync](${SITE_URL}/sync.md): time lyrics in the browser and export MLX, LRC, Enhanced LRC, or TTML
 - [Privacy policy](${SITE_URL}/privacy.md): app data, optional Sentry diagnostics, and website hosting
+- [Metrobot privacy policy](${SITE_URL}/privacy/bot.md): what the Discord and Telegram bot reads, keeps, and shares
 - [Guides](${SITE_URL}/guides.md): ${markdownLink('HTML topic index', `${SITE_URL}/guides`)} for comparisons, installation, library, and playback
 ${GUIDES.map(guide => `- ${markdownLink(guide.heading, `${SITE_URL}/guides/${guide.slug}.md`)}: ${escapeMarkdown(guide.meta.description)}`).join('\n')}
 - [Guide feed](${SITE_URL}/feed.xml): RSS links and summaries for every guide

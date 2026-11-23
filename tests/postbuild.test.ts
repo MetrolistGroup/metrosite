@@ -15,7 +15,7 @@ const teleport = `<div role="dialog">${escapeHtml(tokens)}</div>`
 const preload = '/assets/$&-$`-$\'-$$.css'
 const routes = [
   ['index', '/', PAGE_META.home], ['faq', '/faq', PAGE_META.faq],
-  ['privacy', '/privacy', PAGE_META.privacy], ['guides', '/guides', GUIDE_INDEX_META],
+  ['privacy', '/privacy', PAGE_META.privacy], ['privacy/bot', '/privacy/bot', PAGE_META.privacyBot], ['guides', '/guides', GUIDE_INDEX_META],
   ...GUIDES.map(guide => [`guides/${guide.slug}`, `/guides/${guide.slug}`, guide.meta] as const),
   ['sync', '/sync', PAGE_META.sync], ['listen', '/listen', PAGE_META.listen], ['party', '/party', PAGE_META.listen],
   ...SHARE_PATHS.map(path => [path.slice(1), path, PAGE_META.share] as const),
@@ -30,6 +30,7 @@ async function fixture(template: string, check: (dir: string, result: ReturnType
     await cp(new URL('src/content', root), join(dir, 'src/content'), { recursive: true })
     await mkdir(join(dir, 'src/views'), { recursive: true })
     await cp(new URL('src/views/PrivacyPage.vue', root), join(dir, 'src/views/PrivacyPage.vue'))
+    await cp(new URL('src/views/PrivacyBotPage.vue', root), join(dir, 'src/views/PrivacyBotPage.vue'))
     await mkdir(join(dir, 'dist/.vite'), { recursive: true })
     await mkdir(join(dir, 'dist/assets'))
     await mkdir(join(dir, 'dist-ssr'))

@@ -44,6 +44,11 @@ export const PAGE_META = {
     description: 'What Metrolist keeps on your device, how optional Sentry crash reports work, and what the website sends.',
     robots: INDEX,
   },
+  privacyBot: {
+    title: 'Metrobot privacy policy · Metrolist',
+    description: 'What the Metrolist Discord and Telegram bot reads, keeps, and shares, including logs, AI replies, and how to ask for deletion.',
+    robots: INDEX,
+  },
   notFound: {
     title: 'Page not found · Metrolist',
     description: 'We couldn’t find that Metrolist page.',

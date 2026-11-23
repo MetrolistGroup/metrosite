@@ -112,6 +112,7 @@ const pages: Page[] = [
   },
   { path: '/faq', file: 'faq.html', meta: PAGE_META.faq, embed: 'discord-embed-faq.json', schemas: [faq(FAQ_ITEMS), breadcrumbs('FAQ', '/faq')], markdown: ['faq.md', faqMarkdown()] },
   { path: '/privacy', file: 'privacy.html', meta: PAGE_META.privacy, embed: 'discord-embed-privacy.json', schemas: [breadcrumbs('Privacy policy', '/privacy')], markdown: ['privacy.md', privacyMarkdown(await readFile(new URL('../src/views/PrivacyPage.vue', import.meta.url), 'utf8'))] },
+  { path: '/privacy/bot', file: 'privacy/bot.html', meta: PAGE_META.privacyBot, schemas: [breadcrumbs('Metrobot privacy policy', '/privacy/bot')], markdown: ['privacy/bot.md', privacyMarkdown(await readFile(new URL('../src/views/PrivacyBotPage.vue', import.meta.url), 'utf8'), '/privacy/bot')] },
   {
     path: '/guides', file: 'guides.html', meta: GUIDE_INDEX_META,
     markdown: ['guides.md', guidesIndexMarkdown()],
