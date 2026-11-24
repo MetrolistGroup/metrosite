@@ -37,6 +37,7 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onPointerDown,
         <RouterLink :to="{ path: '/', hash: '#desktop' }" :aria-current="currentAnchor('#desktop')">Showcase</RouterLink>
         <RouterLink :to="{ path: '/', hash: '#features' }" :aria-current="currentAnchor('#features')">Features</RouterLink>
         <RouterLink :to="{ path: '/', hash: '#platforms' }" :aria-current="currentAnchor('#platforms')">Platforms</RouterLink>
+        <RouterLink to="/guides" :class="{ 'router-link-active': route.path.startsWith('/guides/') }">Guides</RouterLink>
         <RouterLink to="/faq">FAQ</RouterLink>
         <DownloadDialog label="Download" button-class="btn btn-filled btn-sm" />
       </nav>
@@ -52,6 +53,7 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onPointerDown,
         <RouterLink :to="{ path: '/', hash: '#desktop' }" :aria-current="currentAnchor('#desktop')" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">devices</span>Showcase</RouterLink>
         <RouterLink :to="{ path: '/', hash: '#features' }" :aria-current="currentAnchor('#features')" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">tune</span>Features</RouterLink>
         <RouterLink :to="{ path: '/', hash: '#platforms' }" :aria-current="currentAnchor('#platforms')" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">devices</span>Platforms</RouterLink>
+        <RouterLink to="/guides" :class="{ 'router-link-active': route.path.startsWith('/guides/') }" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">arrow_outward</span>Guides</RouterLink>
         <RouterLink to="/faq" @click="isMenuOpen = false"><span class="material-symbols-rounded" aria-hidden="true">help</span>FAQ</RouterLink>
         <DownloadDialog label="Download" button-class="navbar__drawer-download" @open="isMenuOpen = false" @close="menuButton?.focus()" />
       </div>

@@ -22,9 +22,18 @@
     document.body.append(notice)
   }
 
+  function isOwnScript(target) {
+    if (target?.tagName !== 'SCRIPT' || !target.src) return false
+    try {
+      return new URL(target.src, window.location.href).origin === new URL(window.location.href).origin
+    } catch {
+      return false
+    }
+  }
+
   // Resource errors do not bubble; capture also catches a failed static module import.
   window.addEventListener('error', event => {
-    if (event.target?.tagName === 'SCRIPT' && event.target.src) showLoadError()
+    if (isOwnScript(event.target)) showLoadError()
   }, true)
   // Do not suppress the rejection: the router must not mount a missing component.
   window.addEventListener('vite:preloadError', showLoadError)

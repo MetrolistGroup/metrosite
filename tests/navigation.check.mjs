@@ -58,12 +58,13 @@ globalThis.window = {
 
 // Execute the actual classic bootstrap before importing any application modules.
 const bootstrap = await Bun.file(new URL('../public/startup.js', import.meta.url)).text()
-runInNewContext(bootstrap, { window, document })
+runInNewContext(bootstrap, { window, document, URL })
 const resourceError = events.get('error')
 assert.equal(listenerOptions.get('error'), true, 'script resource errors require capture')
 resourceError({ target: { tagName: 'IMG', src: '/missing.webp' } })
+resourceError({ target: { tagName: 'SCRIPT', src: 'https://static.cloudflareinsights.com/beacon.min.js' } })
 resourceError({ target: window, message: 'unrelated runtime error' })
-assert.equal(document.body.children.length, 0, 'ignore non-script errors')
+assert.equal(document.body.children.length, 0, 'ignore non-script and third-party script errors')
 const body = document.body
 document.body = null
 const failedEntry = { target: { tagName: 'SCRIPT', src: '/assets/index-missing.js' } }
@@ -203,7 +204,7 @@ preload({ preventDefault() { assert.fail('preload rejection must reach the route
 assert.equal(body.children.length, 1, 'preload failures recover even without startup.js')
 
 // With both recovery paths available, overlapping failures still create only one notice.
-runInNewContext(bootstrap, { window, document })
+runInNewContext(bootstrap, { window, document, URL })
 events.get('error')(failedEntry)
 events.get('vite:preloadError')({})
 onError(new Error('overlapping failure'))

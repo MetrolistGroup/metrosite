@@ -6,6 +6,8 @@ const links = [
   { label: 'Releases', href: 'https://github.com/MetrolistGroup/Metrolist/releases' },
   { label: 'Issues', href: 'https://github.com/MetrolistGroup/Metrolist/issues' },
   { label: 'Translations', href: 'https://hosted.weblate.org/projects/Metrolist/' },
+  { label: 'Guides', href: '/guides' },
+  { label: 'FAQ', href: '/faq' },
   { label: 'Lyrics sync', href: '/sync' },
   { label: 'Privacy', href: '/privacy' },
   { label: 'GPL-3.0', href: 'https://github.com/MetrolistGroup/Metrolist/blob/main/LICENSE' },
